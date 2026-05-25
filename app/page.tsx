@@ -7,7 +7,7 @@ const features = [
   {
     icon: Zap,
     title: "Results in 15 seconds",
-    desc: "Paste your essay or record yourself speaking. Gemini 2.0 Flash scores you faster than any human examiner.",
+    desc: "Paste your essay or record yourself speaking. IELTS Sensei scores you faster than any human examiner.",
     color: "text-amber-500",
     bg: "bg-amber-50 dark:bg-amber-950",
   },
@@ -62,7 +62,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="max-w-5xl mx-auto px-4 pt-16 pb-20 text-center">
         <Badge variant="outline" className="mb-5 text-xs border-violet-200 text-violet-600">
-          Powered by Gemini 2.0 Flash
+          Powered by Gemini 2.5 Flash · IELTS Sensei
         </Badge>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight mb-5">
           Get your IELTS band score{" "}

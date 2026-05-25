@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { ScoreCard } from "@/components/writing/ScoreCard";
 import { CorrectionsView } from "@/components/writing/CorrectionsView";
 import { BandRewrite } from "@/components/writing/BandRewrite";
 import { WritingResult } from "@/types/ielts";
-import { Loader2, FileText, RotateCcw, Timer, ChevronDown, ChevronUp, Shuffle } from "lucide-react";
+import { Loader2, FileText, RotateCcw, Timer, ChevronDown, ChevronUp, Shuffle, ImagePlus, X, BarChart3 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { wordCount } from "@/lib/utils/word-count";
 
@@ -39,28 +39,36 @@ const TASK1_QUESTIONS = [
 ];
 
 const ESSAY_TYPE_LABELS: Record<string, { label: string; color: string; tip: string }> = {
-  opinion:               { label: "Opinion Essay",         color: "bg-violet-100 text-violet-700", tip: "Give a CLEAR opinion. Support with 2 reasons + examples." },
-  discuss_both_views:    { label: "Discuss Both Views",     color: "bg-blue-100 text-blue-700",    tip: "Discuss BOTH sides fairly. State your opinion in the introduction AND conclusion." },
-  problem_solution:      { label: "Problem & Solution",    color: "bg-amber-100 text-amber-700",  tip: "Name specific problems, then give realistic solutions. Avoid vague answers." },
-  advantages_disadvantages: { label: "Advantages & Disadvantages", color: "bg-emerald-100 text-emerald-700", tip: "Compare advantages and disadvantages. Give your opinion at the end." },
-  direct_question:       { label: "Direct Question",        color: "bg-pink-100 text-pink-700",    tip: "Answer ALL parts of the question directly. Don't just give one side." },
+  opinion:                    { label: "Opinion Essay",              color: "bg-violet-100 text-violet-700", tip: "Give a CLEAR opinion. Support with 2 reasons + examples." },
+  discuss_both_views:         { label: "Discuss Both Views",         color: "bg-blue-100 text-blue-700",    tip: "Discuss BOTH sides fairly. State your opinion in the introduction AND conclusion." },
+  problem_solution:           { label: "Problem & Solution",         color: "bg-amber-100 text-amber-700",  tip: "Name specific problems, then give realistic solutions. Avoid vague answers." },
+  advantages_disadvantages:   { label: "Advantages & Disadvantages", color: "bg-emerald-100 text-emerald-700", tip: "Compare advantages and disadvantages. Give your opinion at the end." },
+  direct_question:            { label: "Direct Question",            color: "bg-pink-100 text-pink-700",    tip: "Answer ALL parts of the question directly. Don't just give one side." },
 };
 
 const BAND_DESCRIPTIONS: Record<string, { label: string; desc: string }> = {
-  "9.0": { label: "Expert", desc: "Fully operational command of English. No errors." },
-  "8.5": { label: "Very Good+", desc: "Highly accurate. Minor errors only. Near-native." },
-  "8.0": { label: "Very Good", desc: "Fully competent with occasional inaccuracies. Very few errors." },
-  "7.5": { label: "Good+", desc: "Operates effectively. Good range with some errors under pressure." },
-  "7.0": { label: "Good", desc: "Handles complex language well. Some inaccuracies in less common situations." },
-  "6.5": { label: "Competent+", desc: "Effective basic competence. Errors occur in complex language." },
-  "6.0": { label: "Competent", desc: "Generally effective in familiar situations. Frequent errors in complex language." },
-  "5.5": { label: "Modest+", desc: "Partial command. Makes notable errors, but basic meaning is clear." },
-  "5.0": { label: "Modest", desc: "Partial command. Significant errors. Can handle general meaning." },
+  "9.0": { label: "Expert",       desc: "Fully operational command of English. No errors." },
+  "8.5": { label: "Very Good+",   desc: "Highly accurate. Minor errors only. Near-native." },
+  "8.0": { label: "Very Good",    desc: "Fully competent with occasional inaccuracies. Very few errors." },
+  "7.5": { label: "Good+",        desc: "Operates effectively. Good range with some errors under pressure." },
+  "7.0": { label: "Good",         desc: "Handles complex language well. Some inaccuracies in less common situations." },
+  "6.5": { label: "Competent+",   desc: "Effective basic competence. Errors occur in complex language." },
+  "6.0": { label: "Competent",    desc: "Generally effective in familiar situations. Frequent errors in complex language." },
+  "5.5": { label: "Modest+",      desc: "Partial command. Makes notable errors, but basic meaning is clear." },
+  "5.0": { label: "Modest",       desc: "Partial command. Significant errors. Can handle general meaning." },
 };
 
 function WritingSkeletonLoader() {
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-3 py-2">
+        <div className="w-8 h-8 rounded-full bg-violet-100 animate-pulse flex items-center justify-center">
+          <span className="text-violet-500 text-sm">🎓</span>
+        </div>
+        <p className="text-sm text-muted-foreground animate-pulse font-medium">
+          IELTS Sensei is analysing your essay…
+        </p>
+      </div>
       <Skeleton className="h-40 w-full rounded-xl" />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
@@ -75,17 +83,100 @@ function TimerDisplay({ seconds, limit }: { seconds: number; limit: number }) {
   const remaining = limit - seconds;
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
-  const isWarning = remaining <= 300; // 5 min warning
+  const isWarning = remaining <= 300;
   const isOver = remaining <= 0;
 
   return (
     <div className={`flex items-center gap-2 text-sm font-mono font-bold px-3 py-1.5 rounded-lg border ${
-      isOver ? "text-red-500 border-red-200 bg-red-50" :
+      isOver    ? "text-red-500 border-red-200 bg-red-50" :
       isWarning ? "text-amber-500 border-amber-200 bg-amber-50" :
-      "text-emerald-600 border-emerald-200 bg-emerald-50"
+                  "text-emerald-600 border-emerald-200 bg-emerald-50"
     }`}>
       <Timer className="w-3.5 h-3.5" />
       {isOver ? "TIME UP" : `${mins}:${secs.toString().padStart(2, "0")}`}
+    </div>
+  );
+}
+
+// ─── Chart image upload component ──────────────────────────────────────────
+function ChartUpload({
+  preview,
+  onFileSelect,
+  onRemove,
+}: {
+  preview: string | null;
+  onFileSelect: (file: File) => void;
+  onRemove: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) onFileSelect(file);
+    else toast.error("Please drop an image file (PNG, JPG, etc.)");
+  }
+
+  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) onFileSelect(file);
+    e.target.value = "";
+  }
+
+  if (preview) {
+    return (
+      <div className="relative rounded-xl border overflow-hidden bg-muted/30">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={preview} alt="Chart" className="w-full max-h-80 object-contain" />
+        <button
+          type="button"
+          onClick={onRemove}
+          className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/90 border flex items-center justify-center hover:bg-red-50 hover:border-red-300 transition-colors"
+        >
+          <X className="w-3.5 h-3.5 text-muted-foreground hover:text-red-500" />
+        </button>
+        <div className="absolute bottom-2 left-2">
+          <span className="text-xs bg-background/90 border px-2 py-0.5 rounded-full font-medium">
+            ✓ Chart uploaded — Sensei will analyse it
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={handleDrop}
+      onClick={() => inputRef.current?.click()}
+      className={`relative flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed cursor-pointer transition-all ${
+        dragging
+          ? "border-violet-400 bg-violet-50 dark:bg-violet-950"
+          : "border-border hover:border-violet-300 hover:bg-muted/30"
+      }`}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileInput}
+      />
+      <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
+        <BarChart3 className="w-5 h-5 text-violet-500" />
+      </div>
+      <div className="text-center">
+        <p className="text-sm font-medium">Upload your chart or diagram</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Drag &amp; drop or click — PNG, JPG, GIF supported
+        </p>
+      </div>
+      <Button type="button" variant="outline" size="sm" className="gap-1.5 pointer-events-none">
+        <ImagePlus className="w-3.5 h-3.5" /> Choose image
+      </Button>
     </div>
   );
 }
@@ -99,8 +190,10 @@ export default function WritingPage() {
   const [timerActive, setTimerActive] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [showBandGuide, setShowBandGuide] = useState(false);
+  const [chartFile, setChartFile] = useState<File | null>(null);
+  const [chartPreview, setChartPreview] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const timeLimit = taskType === "task1" ? 1200 : 2400; // 20min / 40min
+  const timeLimit = taskType === "task1" ? 1200 : 2400;
 
   const minWords = taskType === "task1" ? 150 : 250;
   const wc = wordCount(essay);
@@ -116,12 +209,10 @@ export default function WritingPage() {
     }
   }
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
-  // Auto-stop at time limit
   useEffect(() => {
     if (timerSeconds < timeLimit || !timerActive) return;
     clearInterval(timerRef.current!);
@@ -133,6 +224,18 @@ export default function WritingPage() {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timerSeconds, timeLimit]);
+
+  const handleChartSelect = useCallback((file: File) => {
+    setChartFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setChartPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleChartRemove = useCallback(() => {
+    setChartFile(null);
+    setChartPreview(null);
+  }, []);
 
   function pickRandomQuestion() {
     if (taskType === "task2") {
@@ -151,14 +254,29 @@ export default function WritingPage() {
     if (wc < minWords) {
       toast.warning(`Your essay is only ${wc} words. IELTS requires at least ${minWords} words. Submit anyway?`);
     }
+
     setLoading(true);
     setResult(null);
     if (timerActive) { clearInterval(timerRef.current!); setTimerActive(false); }
+
     try {
+      let imageBase64: string | undefined;
+      let imageMimeType: string | undefined;
+
+      // Convert chart image to base64 if provided
+      if (chartFile) {
+        const buffer = await chartFile.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        imageBase64 = btoa(binary);
+        imageMimeType = chartFile.type || "image/jpeg";
+      }
+
       const res = await fetch("/api/writing/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ taskType, question, essay }),
+        body: JSON.stringify({ taskType, question, essay, imageBase64, imageMimeType }),
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Scoring failed. Please try again."); return; }
@@ -180,6 +298,8 @@ export default function WritingPage() {
     setTimerSeconds(0);
     if (timerRef.current) clearInterval(timerRef.current);
     setTimerActive(false);
+    setChartFile(null);
+    setChartPreview(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -192,7 +312,6 @@ export default function WritingPage() {
             Paste or type your answer and get instant examiner-grade feedback
           </p>
         </div>
-        {/* Band guide toggle */}
         <button
           onClick={() => setShowBandGuide(!showBandGuide)}
           className="text-xs text-violet-500 hover:text-violet-600 flex items-center gap-1 shrink-0 mt-1"
@@ -227,6 +346,8 @@ export default function WritingPage() {
           setTimerSeconds(0);
           if (timerRef.current) clearInterval(timerRef.current);
           setTimerActive(false);
+          setChartFile(null);
+          setChartPreview(null);
         }}
       >
         <TabsList className="grid grid-cols-2 w-full max-w-xs">
@@ -236,11 +357,30 @@ export default function WritingPage() {
 
         <TabsContent value={taskType} className="mt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Question with practice question picker */}
+
+            {/* Task 1: Chart / diagram upload */}
+            {taskType === "task1" && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium flex items-center gap-1.5">
+                    <BarChart3 className="w-3.5 h-3.5 text-violet-500" />
+                    Chart or diagram
+                    <span className="text-xs text-muted-foreground font-normal">(optional but recommended)</span>
+                  </label>
+                </div>
+                <ChartUpload
+                  preview={chartPreview}
+                  onFileSelect={handleChartSelect}
+                  onRemove={handleChartRemove}
+                />
+              </div>
+            )}
+
+            {/* Question */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium">
-                  {taskType === "task1" ? "Chart / diagram description" : "Essay question"}
+                  {taskType === "task1" ? "Question / task instructions" : "Essay question"}
                 </label>
                 <button
                   type="button"
@@ -255,14 +395,14 @@ export default function WritingPage() {
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder={
                   taskType === "task1"
-                    ? "Paste the chart description here, or click 'Practice question' for a sample..."
+                    ? "Paste the task instructions here, e.g. 'The graph below shows... Summarise the information by selecting and reporting the main features...'"
                     : "Paste the essay question here, or click 'Practice question' for a sample..."
                 }
                 className="resize-none min-h-[100px] text-sm"
               />
             </div>
 
-            {/* Essay */}
+            {/* Essay / report */}
             <EssayEditor
               value={essay}
               onChange={setEssay}
@@ -271,7 +411,7 @@ export default function WritingPage() {
               placeholder={`Write your ${taskType === "task1" ? "report" : "essay"} here...`}
             />
 
-            {/* Timer + submit row */}
+            {/* Timer + submit */}
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="submit"
@@ -285,7 +425,6 @@ export default function WritingPage() {
                 )}
               </Button>
 
-              {/* Exam timer */}
               <Button
                 type="button"
                 variant="outline"
@@ -315,18 +454,12 @@ export default function WritingPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Loading skeleton */}
-      {loading && (
-        <div>
-          <p className="text-sm text-muted-foreground mb-4 animate-pulse">Scoring your essay…</p>
-          <WritingSkeletonLoader />
-        </div>
-      )}
+      {/* Loading */}
+      {loading && <WritingSkeletonLoader />}
 
       {/* Results */}
       {result && !loading && (
         <div id="results" className="space-y-4 pt-2">
-          {/* Essay type badge */}
           {result.essay_type && ESSAY_TYPE_LABELS[result.essay_type] && (
             <div className="flex items-center gap-2 flex-wrap">
               <Badge className={`text-xs ${ESSAY_TYPE_LABELS[result.essay_type].color} border-0`}>
@@ -338,7 +471,6 @@ export default function WritingPage() {
             </div>
           )}
 
-          {/* Task 1: overview warning */}
           {taskType === "task1" && result.has_overview === false && (
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700">
               ⚠️ <strong>No overview detected.</strong> Task 1 requires an overview paragraph (what the chart shows overall). This caps your Task Achievement score at 5.0.

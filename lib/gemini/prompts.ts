@@ -57,10 +57,10 @@ Include 5-10 corrections — prioritise the most impactful ones including any Uz
 Make next_actions extremely specific and actionable — not generic phrases like "improve vocabulary".
 `;
 
-export const writingTask1Prompt = (essay: string, question: string) => `
+export const writingTask1Prompt = (essay: string, question: string, hasImage = false) => `
 You are an official IELTS examiner. Score this Academic Task 1 report against public band descriptors.
-
-CHART/DIAGRAM DESCRIPTION:
+${hasImage ? "\nA chart/diagram image has been provided. Analyse the image carefully to evaluate whether the student has accurately described the data, selected the key features, and made correct comparisons. Reference specific data points from the image in your corrections and band_8_rewrite.\n" : ""}
+TASK INSTRUCTIONS:
 ${question}
 
 REPORT (${essay.split(/\s+/).length} words):

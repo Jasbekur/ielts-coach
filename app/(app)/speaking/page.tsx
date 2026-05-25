@@ -530,7 +530,12 @@ export default function SpeakingPage() {
       {/* Skeleton */}
       {loading && (
         <div>
-          <p className="text-sm text-muted-foreground mb-4 animate-pulse">Analysing your speaking…</p>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 animate-pulse flex items-center justify-center shrink-0">
+              <span className="text-sm">🎓</span>
+            </div>
+            <p className="text-sm text-muted-foreground animate-pulse font-medium">IELTS Sensei is analysing your speaking…</p>
+          </div>
           <SpeakingSkeletonLoader />
         </div>
       )}

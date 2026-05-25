@@ -10,6 +10,8 @@ const requestSchema = z.object({
   taskType: z.enum(["task1", "task2"]),
   question: z.string().min(10),
   essay: z.string().min(20),
+  imageBase64: z.string().optional(),
+  imageMimeType: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -42,27 +44,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { taskType, question, essay } = parsed.data;
+    const { taskType, question, essay, imageBase64, imageMimeType } = parsed.data;
+
     const prompt =
       taskType === "task1"
-        ? writingTask1Prompt(essay, question)
+        ? writingTask1Prompt(essay, question, !!imageBase64)
         : writingTask2Prompt(essay, question);
+
+    // Build content parts — include image for Task 1 if provided
+    type GeminiPart = string | { inlineData: { data: string; mimeType: string } };
+    const parts: GeminiPart[] = [prompt];
+    if (taskType === "task1" && imageBase64 && imageMimeType) {
+      parts.push({
+        inlineData: {
+          data: imageBase64,
+          mimeType: imageMimeType,
+        },
+      });
+    }
 
     // Call Gemini — retry once on Zod fail
     let result;
     let rawText = "";
     try {
-      const geminiResult = await geminiFlash.generateContent(prompt);
+      const geminiResult = await geminiFlash.generateContent(parts);
       rawText = geminiResult.response.text();
       const rawJson = JSON.parse(rawText);
       result = writingResultSchema.parse(rawJson);
     } catch {
-      // Retry with stricter suffix
       const retryPrompt =
         prompt +
         "\n\nReminder: return ONLY valid JSON matching the schema exactly. No markdown, no backticks, no preamble.";
+      const retryParts: GeminiPart[] = [retryPrompt];
+      if (taskType === "task1" && imageBase64 && imageMimeType) {
+        retryParts.push({ inlineData: { data: imageBase64, mimeType: imageMimeType } });
+      }
       try {
-        const retryResult = await geminiFlash.generateContent(retryPrompt);
+        const retryResult = await geminiFlash.generateContent(retryParts);
         rawText = retryResult.response.text();
         const rawJson = JSON.parse(rawText);
         result = writingResultSchema.parse(rawJson);
@@ -76,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     // Save to DB
     const overallBand = result.scores.overall;
-    const { data: attempt, error: dbError } = await supabase
+    const { data: attempt } = await supabase
       .from("attempts")
       .insert({
         user_id: user.id,
@@ -89,10 +107,6 @@ export async function POST(req: NextRequest) {
       })
       .select("id")
       .single();
-
-    if (dbError) {
-      // Still return result even if DB fails
-    }
 
     return NextResponse.json({
       result,
