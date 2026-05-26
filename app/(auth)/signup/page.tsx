@@ -30,7 +30,7 @@ export default function SignupPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Step 1 — create account, then send OTP code
+  // Step 1 — create account (Supabase sends ONE confirmation email with 6-digit code)
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 6) {
@@ -39,39 +39,32 @@ export default function SignupPage() {
     }
     setLoading(true);
     try {
-      // Create the account
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName } },
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: undefined, // force OTP code, not magic link
+        },
       });
 
-      if (signUpError) {
-        toast.error(signUpError.message);
+      if (error) {
+        if (error.message.toLowerCase().includes("already registered")) {
+          toast.error("An account with this email already exists. Please sign in.");
+        } else {
+          toast.error(error.message);
+        }
         return;
       }
 
-      // Send 6-digit verification code to their email
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: false },
-      });
-
-      if (otpError) {
-        // Even if OTP fails, account is created — push to login
-        toast.success("Account created! Please sign in.");
-        router.push("/login");
-        return;
-      }
-
-      toast.success("Account created! Check your email for a 6-digit verification code.");
+      toast.success("We sent a 6-digit code to " + email);
       setStep("verify");
     } finally {
       setLoading(false);
     }
   }
 
-  // Step 2 — verify the code → log in
+  // Step 2 — verify the signup confirmation code
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
     if (otp.length !== 6) {
@@ -83,10 +76,10 @@ export default function SignupPage() {
       const { error } = await supabase.auth.verifyOtp({
         email,
         token: otp,
-        type: "email",
+        type: "signup",  // "signup" matches the Confirm sign up email
       });
       if (error) {
-        toast.error("Invalid or expired code. Try requesting a new one.");
+        toast.error("Wrong or expired code. Check your email or click Resend.");
       } else {
         toast.success("Email verified! Welcome to IELTS AI Coach 🎉");
         router.push("/dashboard");
@@ -100,7 +93,7 @@ export default function SignupPage() {
   async function handleResend() {
     setLoading(true);
     try {
-      await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+      await supabase.auth.resend({ type: "signup", email });
       toast.success("New code sent to " + email);
       setOtp("");
     } finally {
