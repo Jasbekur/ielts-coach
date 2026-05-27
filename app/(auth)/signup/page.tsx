@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,10 +25,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createClient();
 
   // Step 1 — create account (Supabase sends ONE confirmation email with 6-digit code)
   async function handleRegister(e: React.FormEvent) {
@@ -39,22 +36,29 @@ export default function SignupPage() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { full_name: fullName },
-          emailRedirectTo: undefined, // force OTP code, not magic link
         },
       });
 
       if (error) {
-        if (error.message.toLowerCase().includes("already registered")) {
-          toast.error("An account with this email already exists. Please sign in.");
-        } else {
-          toast.error(error.message);
-        }
+        toast.error(error.message);
         return;
+      }
+
+      // User already confirmed — tell them to sign in
+      if (data.user?.confirmed_at) {
+        toast.error("An account with this email already exists. Please sign in.");
+        return;
+      }
+
+      // User exists but unconfirmed (identities empty = existing unverified user)
+      // Resend the confirmation code explicitly
+      if (data.user?.identities?.length === 0) {
+        await supabase.auth.resend({ type: "signup", email });
       }
 
       toast.success("We sent a 6-digit code to " + email);
