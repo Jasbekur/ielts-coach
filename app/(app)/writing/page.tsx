@@ -557,24 +557,6 @@ export default function WritingPage() {
         <TabsContent value={taskType} className="mt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
 
-            {/* Task 1: Chart / diagram upload */}
-            {taskType === "task1" && (
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium flex items-center gap-1.5">
-                    <BarChart3 className="w-3.5 h-3.5 text-violet-500" />
-                    Chart or diagram
-                    <span className="text-xs text-muted-foreground font-normal">(optional but recommended)</span>
-                  </label>
-                </div>
-                <ChartUpload
-                  preview={chartPreview}
-                  onFileSelect={handleChartSelect}
-                  onRemove={handleChartRemove}
-                />
-              </div>
-            )}
-
             {/* Question */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
@@ -601,6 +583,22 @@ export default function WritingPage() {
                 className="resize-none min-h-[100px] text-sm"
               />
             </div>
+
+            {/* Task 1: Chart / diagram upload */}
+            {taskType === "task1" && (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium flex items-center gap-1.5">
+                  <BarChart3 className="w-3.5 h-3.5 text-violet-500" />
+                  Chart or diagram
+                  <span className="text-xs text-muted-foreground font-normal">(optional but recommended)</span>
+                </label>
+                <ChartUpload
+                  preview={chartPreview}
+                  onFileSelect={handleChartSelect}
+                  onRemove={handleChartRemove}
+                />
+              </div>
+            )}
 
             {/* Essay / report */}
             <EssayEditor
