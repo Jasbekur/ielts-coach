@@ -71,8 +71,8 @@ export default function SignupPage() {
   // Step 2 — verify the signup confirmation code
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
-    if (otp.length !== 6) {
-      toast.error("Please enter the 6-digit code from your email");
+    if (otp.length !== 8) {
+      toast.error("Please enter the 8-digit code from your email");
       return;
     }
     setLoading(true);
@@ -231,23 +231,23 @@ export default function SignupPage() {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  maxLength={6}
+                  maxLength={8}
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  placeholder="• • • • • •"
-                  className="text-center text-3xl font-mono tracking-[0.5em] h-16 border-2 focus:border-violet-400"
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                  placeholder="• • • • • • • •"
+                  className="text-center text-2xl font-mono tracking-[0.4em] h-16 border-2 focus:border-violet-400"
                   required
                   autoFocus
                 />
                 <p className="text-center text-xs text-muted-foreground">
-                  {otp.length}/6 digits entered
+                  {otp.length}/8 digits entered
                 </p>
               </div>
 
               <Button
                 type="submit"
                 className="w-full bg-violet-500 hover:bg-violet-600 text-white"
-                disabled={loading || otp.length !== 6}
+                disabled={loading || otp.length !== 8}
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
