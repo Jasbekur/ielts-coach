@@ -8,6 +8,7 @@ import Link from "next/link";
 import { BookOpen, Mic, TrendingUp, ArrowRight, Flame, Lightbulb } from "lucide-react";
 import { getBandTailwind, getBandBg, Attempt } from "@/types/ielts";
 import { TargetBandSetter } from "@/components/dashboard/TargetBandSetter";
+import { formatBand, roundBand } from "@/lib/utils/band-score";
 
 // ─── Daily IELTS Tips ─────────────────────────────────────────────────────
 const IELTS_TIPS = [
@@ -207,17 +208,17 @@ export default function DashboardPage() {
         <Card><CardContent className="pt-4 pb-3">
           <p className="text-xs text-muted-foreground">Best this week</p>
           <p className={`text-2xl font-mono font-bold mt-1 ${bestBand ? getBandTailwind(bestBand) : "text-muted-foreground"}`}>
-            {bestBand ? bestBand.toFixed(1) : "—"}
+            {bestBand ? formatBand(bestBand) : "—"}
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">overall band</p>
         </CardContent></Card>
 
         <Card><CardContent className="pt-4 pb-3">
-          <TargetBandSetter userId={userId} currentTarget={(profile?.target_band as number) ?? null} />
-          <p className="text-2xl font-mono font-bold text-violet-500 mt-1">
-            {profile?.target_band ? (profile.target_band as number).toFixed(1) : "—"}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">goal band</p>
+          <TargetBandSetter
+            userId={userId}
+            currentTarget={(profile?.target_band as number) ?? null}
+            currentAvg={avgBand ? parseFloat(avgBand) : null}
+          />
         </CardContent></Card>
       </div>
 
@@ -281,19 +282,34 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {profile?.target_band && bestBand && (
+      {profile?.target_band != null && bestBand != null && (
         <Card><CardContent className="pt-4 pb-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Progress to Band {(profile.target_band as number).toFixed(1)}</p>
-            <span className="text-xs text-muted-foreground">{bestBand.toFixed(1)} / {(profile.target_band as number).toFixed(1)}</span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div className={`h-full rounded-full transition-all ${getBandBg(bestBand)}`}
-              style={{ width: `${Math.min(100, (bestBand / (profile.target_band as number)) * 100)}%` }} />
-          </div>
-          <p className="text-xs text-muted-foreground mt-1.5">
-            {bestBand >= (profile.target_band as number) ? "🎉 You've reached your target band this week!" : `${((profile.target_band as number) - bestBand).toFixed(1)} bands to go`}
-          </p>
+          {(() => {
+            const target = profile!.target_band as number;
+            const gapToTarget = (target - bestBand).toFixed(1);
+            const pct = Math.min(100, (bestBand / target) * 100);
+            return (
+              <>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Progress to Band {target.toFixed(1)}
+                  </p>
+                  <span className="text-xs text-muted-foreground">
+                    {formatBand(bestBand)} / {target.toFixed(1)}
+                  </span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full transition-all ${getBandBg(bestBand)}`}
+                    style={{ width: `${pct}%` }} />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  {bestBand >= target
+                    ? "🎉 You've reached your target band this week!"
+                    : `${gapToTarget} bands to go`}
+                </p>
+              </>
+            );
+          })()}
         </CardContent></Card>
       )}
 

@@ -5,6 +5,7 @@ import { speakingPrompt } from "@/lib/gemini/prompts";
 import { speakingResultSchema } from "@/lib/gemini/schemas";
 import { checkDailyLimit } from "@/lib/utils/rate-limit";
 import { blobToBase64 } from "@/lib/utils/audio";
+import { roundBand } from "@/lib/utils/band-score";
 
 export async function POST(req: NextRequest) {
   try {
@@ -107,6 +108,13 @@ export async function POST(req: NextRequest) {
     } catch {
       // Storage failure is non-fatal
     }
+
+    // Round all scores to real IELTS 0.5 increments before saving/returning
+    result.scores.overall            = roundBand(result.scores.overall);
+    result.scores.fluency_coherence  = roundBand(result.scores.fluency_coherence);
+    result.scores.lexical_resource   = roundBand(result.scores.lexical_resource);
+    result.scores.grammatical_range  = roundBand(result.scores.grammatical_range);
+    result.scores.pronunciation      = roundBand(result.scores.pronunciation);
 
     // Save attempt
     const { data: attempt } = await supabase

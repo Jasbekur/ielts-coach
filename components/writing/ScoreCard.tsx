@@ -1,6 +1,7 @@
 "use client";
 
 import { WritingResult } from "@/types/ielts";
+import { formatBand } from "@/lib/utils/band-score";
 import { BandScoreRing } from "@/components/shared/BandScoreRing";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +48,7 @@ export function ScoreCard({ result, taskType }: ScoreCardProps) {
               <div>
                 <p className="text-sm text-muted-foreground">Overall Band</p>
                 <p className="text-2xl font-mono font-bold">
-                  {result.scores.overall.toFixed(1)}
+                  {formatBand(result.scores.overall)}
                 </p>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">

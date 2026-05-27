@@ -470,6 +470,7 @@ export default function WritingPage() {
   const [result, setResult] = useState<WritingResult | null>(null);
   const [timerActive, setTimerActive] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
+  const timerStartedRef = useRef(false);
   const [showBandGuide, setShowBandGuide] = useState(false);
   const [chartFile, setChartFile] = useState<File | null>(null);
   const [chartPreview, setChartPreview] = useState<string | null>(null);
@@ -479,15 +480,28 @@ export default function WritingPage() {
   const minWords = taskType === "task1" ? 150 : 250;
   const wc = wordCount(essay);
 
+  function startTimer() {
+    if (timerActive || timerStartedRef.current) return;
+    timerStartedRef.current = true;
+    setTimerActive(true);
+    timerRef.current = setInterval(() => setTimerSeconds((s) => s + 1), 1000);
+  }
+
   function toggleTimer() {
     if (timerActive) {
       clearInterval(timerRef.current!);
       setTimerActive(false);
     } else {
-      setTimerSeconds(0);
+      timerStartedRef.current = true;
       setTimerActive(true);
       timerRef.current = setInterval(() => setTimerSeconds((s) => s + 1), 1000);
     }
+  }
+
+  // Auto-start timer on first keystroke in essay box
+  function handleEssayChange(val: string) {
+    setEssay(val);
+    if (val.length === 1) startTimer(); // first character typed
   }
 
   useEffect(() => {
@@ -587,6 +601,7 @@ export default function WritingPage() {
     setTimerSeconds(0);
     if (timerRef.current) clearInterval(timerRef.current);
     setTimerActive(false);
+    timerStartedRef.current = false;
     setChartFile(null);
     setChartPreview(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -647,6 +662,30 @@ export default function WritingPage() {
         <TabsContent value={taskType} className="mt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
 
+            {/* ── Exam info bar: always visible ── */}
+            <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border bg-muted/40">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  {taskType === "task1" ? "Task 1 · Academic Report" : "Task 2 · Essay"}
+                </span>
+                <span>⏱ {taskType === "task1" ? "20 minutes" : "40 minutes"}</span>
+                <span>📝 Min {taskType === "task1" ? "150" : "250"} words</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {timerActive && <TimerDisplay seconds={timerSeconds} limit={timeLimit} />}
+                <Button
+                  type="button"
+                  variant={timerActive ? "outline" : "default"}
+                  size="sm"
+                  onClick={toggleTimer}
+                  className={`gap-1.5 h-7 text-xs ${!timerActive ? "bg-violet-500 hover:bg-violet-600 text-white" : ""}`}
+                >
+                  <Timer className="w-3 h-3" />
+                  {timerActive ? "Pause" : timerSeconds > 0 ? "Resume" : "Start Timer"}
+                </Button>
+              </div>
+            </div>
+
             {/* Question */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
@@ -693,13 +732,13 @@ export default function WritingPage() {
             {/* Essay / report */}
             <EssayEditor
               value={essay}
-              onChange={setEssay}
+              onChange={handleEssayChange}
               minWords={minWords}
               label={taskType === "task1" ? "Your report" : "Your essay"}
-              placeholder={`Write your ${taskType === "task1" ? "report" : "essay"} here...`}
+              placeholder={`Write your ${taskType === "task1" ? "report" : "essay"} here… (timer starts automatically)`}
             />
 
-            {/* Timer + submit */}
+            {/* Submit */}
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="submit"
@@ -713,31 +752,12 @@ export default function WritingPage() {
                 )}
               </Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={toggleTimer}
-                className="gap-1.5"
-              >
-                <Timer className="w-3.5 h-3.5" />
-                {timerActive ? "Pause timer" : "Start exam timer"}
-              </Button>
-
-              {timerActive && <TimerDisplay seconds={timerSeconds} limit={timeLimit} />}
-
               {result && (
                 <Button type="button" variant="outline" onClick={handleReset} className="gap-2">
                   <RotateCcw className="w-4 h-4" /> New attempt
                 </Button>
               )}
             </div>
-
-            {timerActive && (
-              <p className="text-xs text-muted-foreground">
-                {taskType === "task1" ? "Task 1 recommended time: 20 minutes" : "Task 2 recommended time: 40 minutes"}
-              </p>
-            )}
           </form>
         </TabsContent>
       </Tabs>

@@ -270,8 +270,8 @@ const PART3_TOPICS: TopicSet[] = [
   },
 ];
 
-const PART_LIMITS: Record<SpeakingPart, number> = { 1: 35, 2: 120, 3: 60 };
-const PART_MIN: Record<SpeakingPart, number> = { 1: 10, 2: 60, 3: 15 };
+const PART_LIMITS: Record<SpeakingPart, number> = { 1: 40, 2: 120, 3: 120 };
+const PART_MIN: Record<SpeakingPart, number>  = { 1: 15, 2: 60, 3:  40 };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function SpeakingSkeletonLoader() {
@@ -738,8 +738,8 @@ export default function SpeakingPage() {
                       disabled={loading}
                       label={
                         part === 1
-                          ? "Answer in 20–30 seconds"
-                          : "Answer in 40–60 seconds"
+                          ? "Answer in 20–35 seconds"
+                          : "Discuss in depth — aim for 1–2 minutes"
                       }
                     />
                   </CardContent>

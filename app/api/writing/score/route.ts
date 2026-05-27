@@ -4,6 +4,7 @@ import { geminiFlash } from "@/lib/gemini/client";
 import { writingTask1Prompt, writingTask2Prompt } from "@/lib/gemini/prompts";
 import { writingResultSchema } from "@/lib/gemini/schemas";
 import { checkDailyLimit } from "@/lib/utils/rate-limit";
+import { roundBand } from "@/lib/utils/band-score";
 import { z } from "zod";
 
 const requestSchema = z.object({
@@ -91,6 +92,14 @@ export async function POST(req: NextRequest) {
         );
       }
     }
+
+    // Round all scores to real IELTS 0.5 increments before saving/returning
+    result.scores.overall = roundBand(result.scores.overall);
+    if (result.scores.task_response)   result.scores.task_response   = roundBand(result.scores.task_response);
+    if (result.scores.task_achievement) result.scores.task_achievement = roundBand(result.scores.task_achievement);
+    if (result.scores.coherence_cohesion) result.scores.coherence_cohesion = roundBand(result.scores.coherence_cohesion);
+    if (result.scores.lexical_resource) result.scores.lexical_resource = roundBand(result.scores.lexical_resource);
+    if (result.scores.grammatical_range) result.scores.grammatical_range = roundBand(result.scores.grammatical_range);
 
     // Save to DB
     const overallBand = result.scores.overall;

@@ -9,9 +9,9 @@ interface PartSelectorProps {
 }
 
 const PARTS: { value: SpeakingPart; label: string; desc: string }[] = [
-  { value: 1, label: "Part 1", desc: "Interview (4–5 questions)" },
-  { value: 2, label: "Part 2", desc: "Cue Card (2 min)" },
-  { value: 3, label: "Part 3", desc: "Discussion (4–5 questions)" },
+  { value: 1, label: "Part 1", desc: "Interview · 1 topic, 5 questions" },
+  { value: 2, label: "Part 2", desc: "Cue Card · 1 min prep + 2 min talk" },
+  { value: 3, label: "Part 3", desc: "Discussion · abstract ideas, 1–2 min each" },
 ];
 
 export function PartSelector({ selected, onChange }: PartSelectorProps) {
