@@ -30,12 +30,203 @@ const TASK2_QUESTIONS = [
   { type: "direct_question", q: "In some countries, people who are older than 65 should not be allowed to drive. Do you agree or disagree? What other measures could be taken to improve road safety?" },
 ];
 
-const TASK1_QUESTIONS = [
-  "The chart below shows the percentage of households in owned and rented accommodation in England and Wales between 1918 and 2011. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
-  "The graph below shows the number of university graduates in Canada from 1992 to 2007. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
-  "The diagram below shows the water cycle. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
-  "The table below gives information about the underground railway systems in six cities. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
-  "The pie charts below compare water usage in San Diego (USA) and Sydney (Australia). Summarise the information by selecting and reporting the main features.",
+// ─── Task 1 practice questions WITH matching SVG charts ────────────────────
+const TASK1_PRACTICE: { question: string; chartLabel: string; svg: string }[] = [
+  {
+    question: "The graph below shows the percentage of households in owned and rented accommodation in England and Wales between 1918 and 2011. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+    chartLabel: "Line Graph",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" style="font-family:Arial,sans-serif;background:#fff;">
+<text x="380" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">Percentage of Households: Owned vs Rented Accommodation</text>
+<text x="380" y="40" text-anchor="middle" font-size="11" fill="#555">England and Wales, 1918–2011</text>
+<line x1="80" y1="60" x2="80" y2="360" stroke="#888" stroke-width="1.5"/>
+<line x1="80" y1="360" x2="740" y2="360" stroke="#888" stroke-width="1.5"/>
+<line x1="80" y1="360" x2="740" y2="360" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="300" x2="740" y2="300" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="240" x2="740" y2="240" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="180" x2="740" y2="180" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="120" x2="740" y2="120" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="60" x2="740" y2="60" stroke="#eee" stroke-width="1"/>
+<text x="72" y="364" text-anchor="end" font-size="10" fill="#555">0%</text>
+<text x="72" y="304" text-anchor="end" font-size="10" fill="#555">20%</text>
+<text x="72" y="244" text-anchor="end" font-size="10" fill="#555">40%</text>
+<text x="72" y="184" text-anchor="end" font-size="10" fill="#555">60%</text>
+<text x="72" y="124" text-anchor="end" font-size="10" fill="#555">80%</text>
+<text x="72" y="64" text-anchor="end" font-size="10" fill="#555">100%</text>
+<text x="80" y="378" text-anchor="middle" font-size="10" fill="#555">1918</text>
+<text x="162" y="378" text-anchor="middle" font-size="10" fill="#555">1939</text>
+<text x="245" y="378" text-anchor="middle" font-size="10" fill="#555">1953</text>
+<text x="328" y="378" text-anchor="middle" font-size="10" fill="#555">1961</text>
+<text x="410" y="378" text-anchor="middle" font-size="10" fill="#555">1971</text>
+<text x="493" y="378" text-anchor="middle" font-size="10" fill="#555">1981</text>
+<text x="575" y="378" text-anchor="middle" font-size="10" fill="#555">1991</text>
+<text x="658" y="378" text-anchor="middle" font-size="10" fill="#555">2001</text>
+<text x="740" y="378" text-anchor="middle" font-size="10" fill="#555">2011</text>
+<polyline points="80,291 162,264 245,246 328,231 410,210 493,186 575,156 658,150 740,165" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>
+<polyline points="80,129 162,156 245,174 328,189 410,210 493,234 575,264 658,270 740,255" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="80" cy="291" r="4" fill="#2563eb"/><circle cx="162" cy="264" r="4" fill="#2563eb"/><circle cx="245" cy="246" r="4" fill="#2563eb"/><circle cx="328" cy="231" r="4" fill="#2563eb"/><circle cx="410" cy="210" r="4" fill="#2563eb"/><circle cx="493" cy="186" r="4" fill="#2563eb"/><circle cx="575" cy="156" r="4" fill="#2563eb"/><circle cx="658" cy="150" r="4" fill="#2563eb"/><circle cx="740" cy="165" r="4" fill="#2563eb"/>
+<circle cx="80" cy="129" r="4" fill="#ea580c"/><circle cx="162" cy="156" r="4" fill="#ea580c"/><circle cx="245" cy="174" r="4" fill="#ea580c"/><circle cx="328" cy="189" r="4" fill="#ea580c"/><circle cx="410" cy="210" r="4" fill="#ea580c"/><circle cx="493" cy="234" r="4" fill="#ea580c"/><circle cx="575" cy="264" r="4" fill="#ea580c"/><circle cx="658" cy="270" r="4" fill="#ea580c"/><circle cx="740" cy="255" r="4" fill="#ea580c"/>
+<rect x="220" y="396" width="18" height="4" fill="#2563eb"/><text x="244" y="401" font-size="11" fill="#333">Owned</text>
+<rect x="360" y="396" width="18" height="4" fill="#ea580c"/><text x="384" y="401" font-size="11" fill="#333">Rented</text>
+</svg>`,
+  },
+  {
+    question: "The bar chart below shows the number of university graduates in Canada from 1992 to 2007. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+    chartLabel: "Bar Chart",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" style="font-family:Arial,sans-serif;background:#fff;">
+<text x="380" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">Number of University Graduates in Canada</text>
+<text x="380" y="40" text-anchor="middle" font-size="11" fill="#555">1992–2007 (in thousands)</text>
+<line x1="90" y1="55" x2="90" y2="340" stroke="#888" stroke-width="1.5"/>
+<line x1="90" y1="340" x2="730" y2="340" stroke="#888" stroke-width="1.5"/>
+<line x1="90" y1="340" x2="730" y2="340" stroke="#eee" stroke-width="1"/>
+<line x1="90" y1="282" x2="730" y2="282" stroke="#eee" stroke-width="1"/>
+<line x1="90" y1="224" x2="730" y2="224" stroke="#eee" stroke-width="1"/>
+<line x1="90" y1="166" x2="730" y2="166" stroke="#eee" stroke-width="1"/>
+<line x1="90" y1="108" x2="730" y2="108" stroke="#eee" stroke-width="1"/>
+<line x1="90" y1="55" x2="730" y2="55" stroke="#eee" stroke-width="1"/>
+<text x="82" y="344" text-anchor="end" font-size="10" fill="#555">0</text>
+<text x="82" y="286" text-anchor="end" font-size="10" fill="#555">50</text>
+<text x="82" y="228" text-anchor="end" font-size="10" fill="#555">100</text>
+<text x="82" y="170" text-anchor="end" font-size="10" fill="#555">150</text>
+<text x="82" y="112" text-anchor="end" font-size="10" fill="#555">200</text>
+<text x="82" y="59" text-anchor="end" font-size="10" fill="#555">250</text>
+<rect x="110" y="186" width="50" height="154" fill="#7c3aed" opacity="0.85"/><text x="135" y="360" text-anchor="middle" font-size="10" fill="#555">1992</text><text x="135" y="182" text-anchor="middle" font-size="9" fill="#fff">162</text>
+<rect x="187" y="181" width="50" height="159" fill="#7c3aed" opacity="0.85"/><text x="212" y="360" text-anchor="middle" font-size="10" fill="#555">1993</text><text x="212" y="177" text-anchor="middle" font-size="9" fill="#fff">165</text>
+<rect x="264" y="175" width="50" height="165" fill="#7c3aed" opacity="0.85"/><text x="289" y="360" text-anchor="middle" font-size="10" fill="#555">1995</text><text x="289" y="171" text-anchor="middle" font-size="9" fill="#fff">170</text>
+<rect x="341" y="168" width="50" height="172" fill="#7c3aed" opacity="0.85"/><text x="366" y="360" text-anchor="middle" font-size="10" fill="#555">1997</text><text x="366" y="164" text-anchor="middle" font-size="9" fill="#fff">176</text>
+<rect x="418" y="158" width="50" height="182" fill="#7c3aed" opacity="0.85"/><text x="443" y="360" text-anchor="middle" font-size="10" fill="#555">1999</text><text x="443" y="154" text-anchor="middle" font-size="9" fill="#fff">185</text>
+<rect x="495" y="142" width="50" height="198" fill="#7c3aed" opacity="0.85"/><text x="520" y="360" text-anchor="middle" font-size="10" fill="#555">2001</text><text x="520" y="138" text-anchor="middle" font-size="9" fill="#fff">198</text>
+<rect x="572" y="117" width="50" height="223" fill="#7c3aed" opacity="0.85"/><text x="597" y="360" text-anchor="middle" font-size="10" fill="#555">2004</text><text x="597" y="113" text-anchor="middle" font-size="9" fill="#fff">218</text>
+<rect x="649" y="92" width="50" height="248" fill="#7c3aed" opacity="0.85"/><text x="674" y="360" text-anchor="middle" font-size="10" fill="#555">2007</text><text x="674" y="88" text-anchor="middle" font-size="9" fill="#fff">240</text>
+<text x="20" y="200" text-anchor="middle" font-size="10" fill="#555" transform="rotate(-90,20,200)">Graduates (thousands)</text>
+</svg>`,
+  },
+  {
+    question: "The pie charts below compare water usage in San Diego (USA) and Sydney (Australia). Summarise the information by selecting and reporting the main features.",
+    chartLabel: "Pie Charts",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" style="font-family:Arial,sans-serif;background:#fff;">
+<text x="380" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">Water Usage: San Diego (USA) vs Sydney (Australia)</text>
+<text x="190" y="52" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">San Diego</text>
+<text x="570" y="52" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">Sydney</text>
+<!-- San Diego pie: Residential 39%, Industry 27%, Agriculture 28%, Other 6% -->
+<path d="M190,220 L190,100 A120,120 0 0,1 280,285 Z" fill="#2563eb"/>
+<path d="M190,220 L280,285 A120,120 0 0,1 117,259 Z" fill="#16a34a"/>
+<path d="M190,220 L117,259 A120,120 0 0,1 170,98 Z" fill="#ca8a04"/>
+<path d="M190,220 L170,98 A120,120 0 0,1 190,100 Z" fill="#dc2626"/>
+<!-- SD labels -->
+<text x="245" y="178" font-size="10" fill="#fff" font-weight="bold">39%</text>
+<text x="218" y="278" font-size="10" fill="#fff" font-weight="bold">27%</text>
+<text x="122" y="188" font-size="10" fill="#fff" font-weight="bold">28%</text>
+<text x="168" y="116" font-size="10" fill="#fff" font-weight="bold">6%</text>
+<!-- Sydney pie: Residential 65%, Industry 10%, Agriculture 20%, Other 5% -->
+<path d="M570,220 L570,100 A120,120 0 1,1 451,265 Z" fill="#2563eb"/>
+<path d="M570,220 L451,265 A120,120 0 0,1 430,220 Z" fill="#16a34a"/>
+<path d="M570,220 L430,220 A120,120 0 0,1 506,95 Z" fill="#ca8a04"/>
+<path d="M570,220 L506,95 A120,120 0 0,1 570,100 Z" fill="#dc2626"/>
+<!-- Sydney labels -->
+<text x="532" y="148" font-size="10" fill="#fff" font-weight="bold">65%</text>
+<text x="444" y="248" font-size="10" fill="#fff" font-weight="bold">10%</text>
+<text x="462" y="185" font-size="10" fill="#fff" font-weight="bold">20%</text>
+<text x="526" y="106" font-size="10" fill="#fff" font-weight="bold">5%</text>
+<!-- Legend -->
+<rect x="180" y="368" width="14" height="14" fill="#2563eb"/><text x="200" y="380" font-size="11" fill="#333">Residential</text>
+<rect x="290" y="368" width="14" height="14" fill="#16a34a"/><text x="310" y="380" font-size="11" fill="#333">Industry</text>
+<rect x="380" y="368" width="14" height="14" fill="#ca8a04"/><text x="400" y="380" font-size="11" fill="#333">Agriculture</text>
+<rect x="486" y="368" width="14" height="14" fill="#dc2626"/><text x="506" y="380" font-size="11" fill="#333">Other</text>
+</svg>`,
+  },
+  {
+    question: "The table below gives information about the underground railway systems in six cities. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+    chartLabel: "Table",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="760" height="380" style="font-family:Arial,sans-serif;background:#fff;">
+<text x="380" y="28" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">Underground Railway Systems in Six Cities</text>
+<!-- Header row -->
+<rect x="40" y="50" width="680" height="38" fill="#7c3aed"/>
+<text x="130" y="74" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">City</text>
+<text x="270" y="74" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">Date opened</text>
+<text x="420" y="74" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">Route (km)</text>
+<text x="580" y="74" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">Passengers/yr (m)</text>
+<!-- Rows -->
+<rect x="40" y="88" width="680" height="36" fill="#f5f3ff"/>
+<rect x="40" y="124" width="680" height="36" fill="#fff"/>
+<rect x="40" y="160" width="680" height="36" fill="#f5f3ff"/>
+<rect x="40" y="196" width="680" height="36" fill="#fff"/>
+<rect x="40" y="232" width="680" height="36" fill="#f5f3ff"/>
+<rect x="40" y="268" width="680" height="36" fill="#fff"/>
+<!-- Row data -->
+<text x="130" y="111" text-anchor="middle" font-size="11" fill="#222">London</text><text x="270" y="111" text-anchor="middle" font-size="11" fill="#222">1863</text><text x="420" y="111" text-anchor="middle" font-size="11" fill="#222">394</text><text x="580" y="111" text-anchor="middle" font-size="11" fill="#222">775</text>
+<text x="130" y="147" text-anchor="middle" font-size="11" fill="#222">Paris</text><text x="270" y="147" text-anchor="middle" font-size="11" fill="#222">1900</text><text x="420" y="147" text-anchor="middle" font-size="11" fill="#222">199</text><text x="580" y="147" text-anchor="middle" font-size="11" fill="#222">1,191</text>
+<text x="130" y="183" text-anchor="middle" font-size="11" fill="#222">Tokyo</text><text x="270" y="183" text-anchor="middle" font-size="11" fill="#222">1927</text><text x="420" y="183" text-anchor="middle" font-size="11" fill="#222">155</text><text x="580" y="183" text-anchor="middle" font-size="11" fill="#222">1,927</text>
+<text x="130" y="219" text-anchor="middle" font-size="11" fill="#222">Washington DC</text><text x="270" y="219" text-anchor="middle" font-size="11" fill="#222">1976</text><text x="420" y="219" text-anchor="middle" font-size="11" fill="#222">126</text><text x="580" y="219" text-anchor="middle" font-size="11" fill="#222">144</text>
+<text x="130" y="255" text-anchor="middle" font-size="11" fill="#222">Kyoto</text><text x="270" y="255" text-anchor="middle" font-size="11" fill="#222">1981</text><text x="420" y="255" text-anchor="middle" font-size="11" fill="#222">11</text><text x="580" y="255" text-anchor="middle" font-size="11" fill="#222">45</text>
+<text x="130" y="291" text-anchor="middle" font-size="11" fill="#222">Los Angeles</text><text x="270" y="291" text-anchor="middle" font-size="11" fill="#222">2001</text><text x="420" y="291" text-anchor="middle" font-size="11" fill="#222">28</text><text x="580" y="291" text-anchor="middle" font-size="11" fill="#222">50</text>
+<!-- Grid lines -->
+<line x1="40" y1="50" x2="720" y2="50" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="88" x2="720" y2="88" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="124" x2="720" y2="124" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="160" x2="720" y2="160" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="196" x2="720" y2="196" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="232" x2="720" y2="232" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="268" x2="720" y2="268" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="304" x2="720" y2="304" stroke="#ccc" stroke-width="1"/>
+<line x1="40" y1="50" x2="40" y2="304" stroke="#ccc" stroke-width="1"/>
+<line x1="200" y1="50" x2="200" y2="304" stroke="#ccc" stroke-width="1"/>
+<line x1="340" y1="50" x2="340" y2="304" stroke="#ccc" stroke-width="1"/>
+<line x1="490" y1="50" x2="490" y2="304" stroke="#ccc" stroke-width="1"/>
+<line x1="720" y1="50" x2="720" y2="304" stroke="#ccc" stroke-width="1"/>
+</svg>`,
+  },
+  {
+    question: "The bar chart below shows CO₂ emissions per person (in tonnes) in five countries in 1990, 2000, and 2015. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+    chartLabel: "Grouped Bar Chart",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" style="font-family:Arial,sans-serif;background:#fff;">
+<text x="380" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">CO₂ Emissions Per Person (tonnes) — Five Countries</text>
+<text x="380" y="40" text-anchor="middle" font-size="11" fill="#555">1990, 2000, and 2015</text>
+<line x1="80" y1="55" x2="80" y2="340" stroke="#888" stroke-width="1.5"/>
+<line x1="80" y1="340" x2="740" y2="340" stroke="#888" stroke-width="1.5"/>
+<line x1="80" y1="340" x2="740" y2="340" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="286" x2="740" y2="286" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="232" x2="740" y2="232" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="178" x2="740" y2="178" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="124" x2="740" y2="124" stroke="#eee" stroke-width="1"/>
+<line x1="80" y1="70" x2="740" y2="70" stroke="#eee" stroke-width="1"/>
+<text x="72" y="344" text-anchor="end" font-size="10" fill="#555">0</text>
+<text x="72" y="290" text-anchor="end" font-size="10" fill="#555">5</text>
+<text x="72" y="236" text-anchor="end" font-size="10" fill="#555">10</text>
+<text x="72" y="182" text-anchor="end" font-size="10" fill="#555">15</text>
+<text x="72" y="128" text-anchor="end" font-size="10" fill="#555">20</text>
+<text x="72" y="74" text-anchor="end" font-size="10" fill="#555">25</text>
+<!-- USA: 19.3, 20.6, 16.5 → bars at x=100 -->
+<rect x="95" y="133" width="22" height="207" fill="#2563eb" opacity="0.9"/>
+<rect x="119" y="118" width="22" height="222" fill="#16a34a" opacity="0.9"/>
+<rect x="143" y="163" width="22" height="177" fill="#dc2626" opacity="0.9"/>
+<text x="133" y="358" text-anchor="middle" font-size="10" fill="#555">USA</text>
+<!-- Australia: 15.4, 17.2, 15.8 -->
+<rect x="215" y="174" width="22" height="166" fill="#2563eb" opacity="0.9"/>
+<rect x="239" y="155" width="22" height="185" fill="#16a34a" opacity="0.9"/>
+<rect x="263" y="170" width="22" height="170" fill="#dc2626" opacity="0.9"/>
+<text x="253" y="358" text-anchor="middle" font-size="10" fill="#555">Australia</text>
+<!-- UK: 9.8, 9.2, 6.5 -->
+<rect x="335" y="234" width="22" height="106" fill="#2563eb" opacity="0.9"/>
+<rect x="359" y="241" width="22" height="99" fill="#16a34a" opacity="0.9"/>
+<rect x="383" y="270" width="22" height="70" fill="#dc2626" opacity="0.9"/>
+<text x="373" y="358" text-anchor="middle" font-size="10" fill="#555">UK</text>
+<!-- China: 2.2, 2.9, 7.6 -->
+<rect x="455" y="316" width="22" height="24" fill="#2563eb" opacity="0.9"/>
+<rect x="479" y="309" width="22" height="31" fill="#16a34a" opacity="0.9"/>
+<rect x="503" y="258" width="22" height="82" fill="#dc2626" opacity="0.9"/>
+<text x="493" y="358" text-anchor="middle" font-size="10" fill="#555">China</text>
+<!-- India: 0.8, 1.1, 1.9 -->
+<rect x="575" y="331" width="22" height="9" fill="#2563eb" opacity="0.9"/>
+<rect x="599" y="328" width="22" height="12" fill="#16a34a" opacity="0.9"/>
+<rect x="623" y="319" width="22" height="21" fill="#dc2626" opacity="0.9"/>
+<text x="613" y="358" text-anchor="middle" font-size="10" fill="#555">India</text>
+<!-- Legend -->
+<rect x="200" y="374" width="14" height="10" fill="#2563eb" opacity="0.9"/><text x="220" y="383" font-size="11" fill="#333">1990</text>
+<rect x="290" y="374" width="14" height="10" fill="#16a34a" opacity="0.9"/><text x="310" y="383" font-size="11" fill="#333">2000</text>
+<rect x="380" y="374" width="14" height="10" fill="#dc2626" opacity="0.9"/><text x="400" y="383" font-size="11" fill="#333">2015</text>
+<text x="18" y="200" text-anchor="middle" font-size="10" fill="#555" transform="rotate(-90,18,200)">Tonnes per person</text>
+</svg>`,
+  },
 ];
 
 const ESSAY_TYPE_LABELS: Record<string, { label: string; color: string; tip: string }> = {
@@ -242,8 +433,16 @@ export default function WritingPage() {
       const q = TASK2_QUESTIONS[Math.floor(Math.random() * TASK2_QUESTIONS.length)];
       setQuestion(q.q);
     } else {
-      const q = TASK1_QUESTIONS[Math.floor(Math.random() * TASK1_QUESTIONS.length)];
-      setQuestion(q);
+      const practice = TASK1_PRACTICE[Math.floor(Math.random() * TASK1_PRACTICE.length)];
+      setQuestion(practice.question);
+      // Auto-load the matching chart as a File so Gemini can analyse it
+      const blob = new Blob([practice.svg], { type: "image/svg+xml" });
+      const file = new File([blob], "practice-chart.svg", { type: "image/svg+xml" });
+      setChartFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setChartPreview(e.target?.result as string);
+      reader.readAsDataURL(blob);
+      toast.success(`Loaded: ${practice.chartLabel} — chart ready for Gemini!`);
     }
   }
 
@@ -387,7 +586,8 @@ export default function WritingPage() {
                   onClick={pickRandomQuestion}
                   className="flex items-center gap-1 text-xs text-violet-500 hover:text-violet-600 transition-colors"
                 >
-                  <Shuffle className="w-3 h-3" /> Practice question
+                  <Shuffle className="w-3 h-3" />
+                  {taskType === "task1" ? "Practice question + chart" : "Practice question"}
                 </button>
               </div>
               <Textarea
