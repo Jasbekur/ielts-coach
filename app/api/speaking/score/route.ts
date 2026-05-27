@@ -57,28 +57,28 @@ export async function POST(req: NextRequest) {
     const prompt = speakingPrompt(part, question);
 
     let result;
+    let rawText = "";
     try {
       const geminiResult = await geminiFlash.generateContent([
         prompt,
         { inlineData: { mimeType, data: base64Audio } },
       ]);
-      const rawText = geminiResult.response.text();
-      const rawJson = JSON.parse(rawText);
-      result = speakingResultSchema.parse(rawJson);
-    } catch {
-      // Retry once
-      const retryPrompt =
-        prompt +
-        "\n\nReminder: return ONLY valid JSON matching the schema exactly. No markdown, no backticks.";
+      rawText = geminiResult.response.text();
+      const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+      result = speakingResultSchema.parse(JSON.parse(cleaned));
+    } catch (firstErr) {
+      console.error("[speaking/score] First attempt failed:", firstErr, "\nRaw:", rawText.slice(0, 300));
+      const retryPrompt = prompt + "\n\nIMPORTANT: Return ONLY valid JSON. No markdown, no backticks, no text outside the JSON.";
       try {
         const retryResult = await geminiFlash.generateContent([
           retryPrompt,
           { inlineData: { mimeType, data: base64Audio } },
         ]);
-        const rawText = retryResult.response.text();
-        const rawJson = JSON.parse(rawText);
-        result = speakingResultSchema.parse(rawJson);
-      } catch {
+        rawText = retryResult.response.text();
+        const cleaned2 = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+        result = speakingResultSchema.parse(JSON.parse(cleaned2));
+      } catch (secondErr) {
+        console.error("[speaking/score] Retry failed:", secondErr, "\nRaw:", rawText.slice(0, 300));
         return NextResponse.json(
           { error: "AI scoring failed. Please try again." },
           { status: 500 }

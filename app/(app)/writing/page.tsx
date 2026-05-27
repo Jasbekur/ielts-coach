@@ -539,15 +539,53 @@ export default function WritingPage() {
     } else {
       const practice = TASK1_PRACTICE[Math.floor(Math.random() * TASK1_PRACTICE.length)];
       setQuestion(practice.question);
-      // Auto-load the matching chart as a File so Gemini can analyse it
+      // Store as SVG File (will be auto-converted to PNG on submit)
       const blob = new Blob([practice.svg], { type: "image/svg+xml" });
       const file = new File([blob], "practice-chart.svg", { type: "image/svg+xml" });
       setChartFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => setChartPreview(e.target?.result as string);
-      reader.readAsDataURL(blob);
-      toast.success(`Loaded: ${practice.chartLabel} — chart ready for Gemini!`);
+      // Show SVG as preview (browser renders SVG fine in <img>)
+      const svgDataUrl = `data:image/svg+xml;base64,${btoa(practice.svg)}`;
+      setChartPreview(svgDataUrl);
+      toast.success(`Loaded: ${practice.chartLabel} — ready!`);
     }
+  }
+
+  // ── SVG → PNG conversion (Gemini does NOT support SVG) ──────────────────────
+  async function svgToPngBase64(svgFile: File): Promise<{ base64: string; mimeType: string }> {
+    const svgText = await svgFile.text();
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const svgBlob = new Blob([svgText], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(svgBlob);
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth || 760;
+        canvas.height = img.naturalHeight || 420;
+        const ctx = canvas.getContext("2d")!;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        const dataUrl = canvas.toDataURL("image/png");
+        // dataUrl = "data:image/png;base64,XXXX..."
+        const base64 = dataUrl.split(",")[1];
+        resolve({ base64, mimeType: "image/png" });
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("SVG render failed")); };
+      img.src = url;
+    });
+  }
+
+  async function fileToBase64(file: File): Promise<{ base64: string; mimeType: string }> {
+    // Gemini only supports: image/jpeg, image/png, image/gif, image/webp
+    if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
+      return svgToPngBase64(file);
+    }
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    return { base64: btoa(binary), mimeType: file.type || "image/jpeg" };
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -566,14 +604,11 @@ export default function WritingPage() {
       let imageBase64: string | undefined;
       let imageMimeType: string | undefined;
 
-      // Convert chart image to base64 if provided
+      // Convert chart image to base64 — SVG is auto-converted to PNG
       if (chartFile) {
-        const buffer = await chartFile.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        let binary = "";
-        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-        imageBase64 = btoa(binary);
-        imageMimeType = chartFile.type || "image/jpeg";
+        const { base64, mimeType } = await fileToBase64(chartFile);
+        imageBase64 = base64;
+        imageMimeType = mimeType;
       }
 
       const res = await fetch("/api/writing/score", {

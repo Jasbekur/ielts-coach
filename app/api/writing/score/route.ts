@@ -64,18 +64,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Call Gemini — retry once on Zod fail
+    // Call Gemini — retry once on Zod/parse fail
     let result;
     let rawText = "";
     try {
       const geminiResult = await geminiFlash.generateContent(parts);
       rawText = geminiResult.response.text();
-      const rawJson = JSON.parse(rawText);
+      // Strip markdown fences if Gemini wraps in ```json ... ```
+      const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+      const rawJson = JSON.parse(cleaned);
       result = writingResultSchema.parse(rawJson);
-    } catch {
+    } catch (firstErr) {
+      console.error("[writing/score] First attempt failed:", firstErr, "\nRaw:", rawText.slice(0, 500));
       const retryPrompt =
         prompt +
-        "\n\nReminder: return ONLY valid JSON matching the schema exactly. No markdown, no backticks, no preamble.";
+        "\n\nIMPORTANT: Return ONLY valid JSON. No markdown code fences, no backticks, no text before or after the JSON object.";
       const retryParts: GeminiPart[] = [retryPrompt];
       if (taskType === "task1" && imageBase64 && imageMimeType) {
         retryParts.push({ inlineData: { data: imageBase64, mimeType: imageMimeType } });
@@ -83,9 +86,11 @@ export async function POST(req: NextRequest) {
       try {
         const retryResult = await geminiFlash.generateContent(retryParts);
         rawText = retryResult.response.text();
-        const rawJson = JSON.parse(rawText);
+        const cleaned2 = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+        const rawJson = JSON.parse(cleaned2);
         result = writingResultSchema.parse(rawJson);
-      } catch {
+      } catch (secondErr) {
+        console.error("[writing/score] Retry also failed:", secondErr, "\nRaw:", rawText.slice(0, 500));
         return NextResponse.json(
           { error: "AI scoring failed. Please try again." },
           { status: 500 }
