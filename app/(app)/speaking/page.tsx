@@ -12,88 +12,268 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SpeakingPart, SpeakingResult, CueCard as CueCardType } from "@/types/ielts";
-import { Mic, RefreshCw, Loader2, Shuffle } from "lucide-react";
+import { Mic, RefreshCw, Loader2, Shuffle, ChevronRight, ArrowLeft, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
-// ─── Question Banks ────────────────────────────────────────────────────────
-const PART1_QUESTIONS = [
-  // Hometown & Home
-  "Where are you from originally? What do you like most about your hometown?",
-  "Do you live in a house or an apartment? What do you like about it?",
-  "Has your hometown changed much in recent years? How?",
-  // Work & Study
-  "Do you work or are you a student? What do you do?",
-  "What subject do you enjoy most in your studies? Why?",
-  "Do you prefer studying alone or with others? Why?",
-  // Free Time & Hobbies
-  "What do you do in your free time?",
-  "How do you usually spend your weekends?",
-  "Do you prefer indoor or outdoor activities? Why?",
-  // Technology
-  "How often do you use the internet? What do you mainly use it for?",
-  "Do you think smartphones have changed people's lives? How?",
-  "Do you prefer reading books or reading on a screen? Why?",
-  // Food
-  "What is your favourite food? Why do you like it?",
-  "Do you prefer eating at home or eating out? Why?",
-  "Is there any food from other countries that you enjoy?",
-  // Travel & Transport
-  "How do you usually travel around your city?",
-  "Have you ever visited another country? Where would you like to go?",
-  "Do you prefer travelling by train, bus, or plane? Why?",
-  // Nature & Weather
-  "What kind of weather do you like best? Why?",
-  "Do you enjoy spending time in nature? What do you do there?",
-  // Shopping
-  "Do you enjoy shopping? What do you usually buy?",
-  "Do you prefer shopping online or in a shop? Why?",
-  // Health & Sport
-  "Do you do any sport or exercise regularly?",
-  "How do you try to stay healthy?",
-  // Art & Culture
-  "Are you interested in art? Do you visit museums or galleries?",
-  "What traditional customs from your culture do you enjoy?",
-  // Future
-  "What are your plans for the future?",
-  "What job would you like to have in the future? Why?",
+// ─── Topic Banks ──────────────────────────────────────────────────────────────
+interface TopicSet {
+  topic: string;
+  emoji: string;
+  questions: string[];
+}
+
+const PART1_TOPICS: TopicSet[] = [
+  {
+    topic: "Hometown & Home",
+    emoji: "🏡",
+    questions: [
+      "Where are you from originally? Tell me a little about your hometown.",
+      "Do you enjoy living there? What do you like most about it?",
+      "Has your hometown changed much in recent years? How?",
+      "What is your hometown famous for?",
+      "Would you like to continue living there in the future, or move somewhere else?",
+    ],
+  },
+  {
+    topic: "Work & Study",
+    emoji: "📚",
+    questions: [
+      "Do you work or are you a student? Tell me what you do.",
+      "What do you enjoy most about your work or studies?",
+      "Do you prefer working or studying alone, or with other people? Why?",
+      "Is your current job or subject what you originally planned to do?",
+      "What are your plans for the future in terms of career or study?",
+    ],
+  },
+  {
+    topic: "Free Time & Hobbies",
+    emoji: "🎯",
+    questions: [
+      "What do you usually do in your free time?",
+      "How do you typically spend your weekends?",
+      "Do you prefer indoor or outdoor activities? Why?",
+      "Has your hobby changed compared to when you were younger?",
+      "Do you feel you have enough free time, or are you too busy?",
+    ],
+  },
+  {
+    topic: "Technology",
+    emoji: "📱",
+    questions: [
+      "How often do you use the internet? What do you mainly use it for?",
+      "Do you think smartphones have changed people's lives? In what ways?",
+      "Do you prefer reading books or reading on a screen? Why?",
+      "Which apps do you use most often on your phone?",
+      "Do you think children use technology too much these days?",
+    ],
+  },
+  {
+    topic: "Food & Cooking",
+    emoji: "🍜",
+    questions: [
+      "What is your favourite food? Why do you like it?",
+      "Do you prefer eating at home or eating out? Why?",
+      "Can you cook? Do you enjoy cooking?",
+      "Is there any food from other countries that you enjoy?",
+      "Has your diet changed compared to when you were a child?",
+    ],
+  },
+  {
+    topic: "Travel & Transport",
+    emoji: "✈️",
+    questions: [
+      "How do you usually travel around your city?",
+      "Have you ever visited another country? Where did you go?",
+      "Where would you most like to visit in the future? Why?",
+      "Do you prefer travelling by train, bus, or plane? Why?",
+      "Do you think people travel more now than they did in the past?",
+    ],
+  },
+  {
+    topic: "Health & Sport",
+    emoji: "🏃",
+    questions: [
+      "Do you do any sport or exercise regularly? What do you do?",
+      "How do you try to stay healthy in your daily life?",
+      "Do you think people in your country are generally healthy?",
+      "What sport is most popular where you live?",
+      "Did you do more sport when you were a child than you do now?",
+    ],
+  },
+  {
+    topic: "Shopping",
+    emoji: "🛍️",
+    questions: [
+      "Do you enjoy shopping? Why or why not?",
+      "Do you prefer shopping online or in a physical shop? Why?",
+      "How often do you go shopping for clothes or other items?",
+      "What was the last significant thing you bought?",
+      "Do you think people buy too many things they don't really need?",
+    ],
+  },
+  {
+    topic: "Nature & Weather",
+    emoji: "🌿",
+    questions: [
+      "What kind of weather do you like best? Why?",
+      "Do you enjoy spending time in nature? What do you do there?",
+      "How does the weather in your country affect people's daily lives?",
+      "Have you noticed any changes in the climate in recent years?",
+      "Would you rather live in a hot country or a cold country? Why?",
+    ],
+  },
+  {
+    topic: "Art & Music",
+    emoji: "🎵",
+    questions: [
+      "Are you interested in art? Do you visit museums or galleries?",
+      "Do you listen to music? What kind of music do you enjoy?",
+      "Do you play any musical instruments? Would you like to learn one?",
+      "What traditional customs or arts from your culture do you enjoy?",
+      "Do you think art and music should be taught in schools? Why?",
+    ],
+  },
+  {
+    topic: "Friends & Family",
+    emoji: "👨‍👩‍👧",
+    questions: [
+      "Do you have a large family or a small family?",
+      "How often do you spend time with your family?",
+      "How do you usually keep in touch with your friends?",
+      "Are your friends mostly from school, work, or somewhere else?",
+      "Is it easy to make new friends where you live?",
+    ],
+  },
+  {
+    topic: "Daily Routine",
+    emoji: "⏰",
+    questions: [
+      "What time do you usually wake up? Do you consider yourself a morning person?",
+      "What do you typically eat for breakfast?",
+      "How do you get to work or school each day?",
+      "What do you usually do in the evenings after work or study?",
+      "Is your daily routine during the week different from your weekends?",
+    ],
+  },
 ];
 
-const PART3_QUESTIONS = [
-  // Technology & Society
-  "How has technology changed the way people communicate in your country?",
-  "Do you think people rely too much on technology today? Why?",
-  "What are the advantages and disadvantages of social media?",
-  "How do you think technology will change education in the next 20 years?",
-  // Education
-  "What qualities should a good teacher have?",
-  "Do you think university education is necessary for success? Why or why not?",
-  "How has education in your country changed over the last generation?",
-  "Should children learn a foreign language from a very young age?",
-  // Environment
-  "What role should governments play in protecting the environment?",
-  "Do you think individuals or companies are more responsible for environmental problems?",
-  "What lifestyle changes could people make to help the environment?",
-  // Work & Economy
-  "Do you think it is better to work for yourself or for an employer? Why?",
-  "How has the nature of work changed in recent decades?",
-  "What skills will be most important in the workplace of the future?",
-  // Society & Values
-  "Do you think traditional values are still important in modern society?",
-  "How important is it to keep in touch with older generations?",
-  "What are the main causes of stress in modern life, and how can people deal with it?",
-  // Cities & Travel
-  "What are the advantages and disadvantages of living in a big city?",
-  "How do you think cities will change in the future?",
-  "Is tourism always a good thing for a country? Explain your view.",
-  // Health
-  "Who is responsible for people's health — individuals or governments?",
-  "Why do you think many people today have an unhealthy lifestyle?",
+const PART3_TOPICS: TopicSet[] = [
+  {
+    topic: "Technology & Society",
+    emoji: "💻",
+    questions: [
+      "How has technology changed the way people communicate in your country?",
+      "Do you think people rely too much on technology today? Why?",
+      "What are the main advantages and disadvantages of social media?",
+      "How do you think technology will change education in the next 20 years?",
+      "Should governments have more control over how technology companies use people's data?",
+    ],
+  },
+  {
+    topic: "Education",
+    emoji: "🎓",
+    questions: [
+      "What qualities do you think a good teacher should have?",
+      "Do you think a university education is necessary for success in life? Why?",
+      "How has education changed in your country over the last generation?",
+      "Should children learn a foreign language from a very young age? Why?",
+      "What do you think is more important — academic knowledge or practical skills?",
+    ],
+  },
+  {
+    topic: "Environment & Climate",
+    emoji: "🌍",
+    questions: [
+      "What role should governments play in protecting the environment?",
+      "Do you think individuals or large companies are more responsible for environmental problems?",
+      "What lifestyle changes could ordinary people make to help the environment?",
+      "Is it too late to prevent serious climate change, in your view?",
+      "How can we balance economic development with protecting the natural environment?",
+    ],
+  },
+  {
+    topic: "Work & Economy",
+    emoji: "💼",
+    questions: [
+      "Do you think it is better to work for yourself or for an employer? Why?",
+      "How has the nature of work changed over the last few decades?",
+      "What skills do you think will be most important in the workplace of the future?",
+      "Should employees have the right to work from home permanently?",
+      "Is it fair that some people earn significantly more money than others? Why?",
+    ],
+  },
+  {
+    topic: "Society & Values",
+    emoji: "🤝",
+    questions: [
+      "Do you think traditional values are still important in modern society?",
+      "How important is it for young people to maintain close relationships with older generations?",
+      "What are the main causes of stress in modern life, and how can people deal with it?",
+      "Do you think people today are more individualistic and less community-minded than in the past?",
+      "How has the role of women in society changed over the last 50 years in your country?",
+    ],
+  },
+  {
+    topic: "Cities & Urbanisation",
+    emoji: "🏙️",
+    questions: [
+      "What are the main advantages and disadvantages of living in a big city?",
+      "Why do so many people continue to move from rural areas to cities?",
+      "How can governments make cities more liveable for their residents?",
+      "What problems do rapidly growing cities typically face?",
+      "Do you think the future of cities lies in so-called 'smart cities'? Why?",
+    ],
+  },
+  {
+    topic: "Health & Medicine",
+    emoji: "🏥",
+    questions: [
+      "Who do you think is more responsible for people's health — individuals or governments?",
+      "Why do you think so many people today lead unhealthy lifestyles?",
+      "How has medical technology improved people's quality of life in recent years?",
+      "Do you think healthcare should be completely free for everyone?",
+      "How do you think artificial intelligence will change medicine in the future?",
+    ],
+  },
+  {
+    topic: "Tourism & Travel",
+    emoji: "🗺️",
+    questions: [
+      "Is tourism always beneficial for a country, or can it cause problems?",
+      "How has international tourism changed over the last few decades?",
+      "What are the main negative effects of mass tourism on local communities?",
+      "Should governments limit the number of tourists allowed to visit certain places?",
+      "Do you think tourism helps promote understanding between different cultures?",
+    ],
+  },
+  {
+    topic: "Media & Communication",
+    emoji: "📺",
+    questions: [
+      "How has the internet changed the way people get their news?",
+      "Do you think social media has made it easier or harder to know what is true?",
+      "Should governments be allowed to restrict what people post online?",
+      "How do you think the role of traditional newspapers will change in the future?",
+      "What responsibilities do journalists and media organisations have to the public?",
+    ],
+  },
+  {
+    topic: "Globalisation & Culture",
+    emoji: "🌐",
+    questions: [
+      "What are the main benefits of globalisation for ordinary people?",
+      "Do you think globalisation is causing local cultures and traditions to disappear?",
+      "Should countries try to protect their local industries from foreign competition?",
+      "How has the spread of English as a global language affected other languages?",
+      "In your view, does globalisation lead to greater equality between countries, or greater inequality?",
+    ],
+  },
 ];
 
-const PART_LIMITS: Record<SpeakingPart, number> = { 1: 35, 2: 120, 3: 50 };
+const PART_LIMITS: Record<SpeakingPart, number> = { 1: 35, 2: 120, 3: 60 };
 const PART_MIN: Record<SpeakingPart, number> = { 1: 10, 2: 60, 3: 15 };
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
 function SpeakingSkeletonLoader() {
   return (
     <div className="space-y-4">
@@ -107,7 +287,54 @@ function SpeakingSkeletonLoader() {
   );
 }
 
-// ─── Results view ─────────────────────────────────────────────────────────
+// ─── Topic Picker ─────────────────────────────────────────────────────────────
+function TopicPicker({
+  topics,
+  onSelect,
+  onRandom,
+  part,
+}: {
+  topics: TopicSet[];
+  onSelect: (idx: number) => void;
+  onRandom: () => void;
+  part: SpeakingPart;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="font-medium text-sm">
+            {part === 1 ? "Choose a topic for your interview" : "Choose a discussion theme"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {part === 1
+              ? "The examiner will ask you 5 questions about this topic"
+              : "Discuss 5 deep questions on this theme"}
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onRandom} className="gap-1.5 shrink-0">
+          <Shuffle className="w-3.5 h-3.5" /> Random
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {topics.map((t, i) => (
+          <button
+            key={i}
+            onClick={() => onSelect(i)}
+            className="flex items-center gap-2.5 p-3 rounded-xl border bg-card hover:border-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-all text-left group"
+          >
+            <span className="text-xl shrink-0">{t.emoji}</span>
+            <span className="text-xs font-medium text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-300 leading-tight">
+              {t.topic}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Results View ─────────────────────────────────────────────────────────────
 function SpeakingResultView({ result }: { result: SpeakingResult }) {
   const criteria = [
     { key: "fluency_coherence", label: "Fluency & Coherence", value: result.scores.fluency_coherence },
@@ -118,7 +345,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
 
   return (
     <div className="space-y-4">
-      {/* Overall */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -139,7 +365,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </CardContent>
       </Card>
 
-      {/* Criteria */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Criterion Scores</CardTitle>
@@ -153,7 +378,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </CardContent>
       </Card>
 
-      {/* Transcript */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Your Transcript</CardTitle>
@@ -163,7 +387,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </CardContent>
       </Card>
 
-      {/* Strengths / Weaknesses */}
       <div className="grid sm:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -195,13 +418,10 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </Card>
       </div>
 
-      {/* Pronunciation issues */}
       {result.pronunciation_issues.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Pronunciation Issues
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Pronunciation Issues</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {result.pronunciation_issues.map((p, i) => (
@@ -216,7 +436,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </Card>
       )}
 
-      {/* Grammar issues */}
       {result.grammar_issues.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
@@ -234,13 +453,10 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </Card>
       )}
 
-      {/* Vocabulary upgrades */}
       {result.vocabulary_suggestions && result.vocabulary_suggestions.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Vocabulary Upgrades
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Vocabulary Upgrades</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {result.vocabulary_suggestions.map((v, i) => (
@@ -257,7 +473,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </Card>
       )}
 
-      {/* Model answer */}
       <Card className="border-violet-200">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-violet-600">✦ Band 8+ Model Answer</CardTitle>
@@ -267,7 +482,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </CardContent>
       </Card>
 
-      {/* Next actions */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Next Actions</CardTitle>
@@ -285,29 +499,40 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────
+// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function SpeakingPage() {
   const [part, setPart] = useState<SpeakingPart>(1);
-  const [questionIdx, setQuestionIdx] = useState(0);
+
+  // Topic-based state (Part 1 & 3)
+  const [selectedTopicIdx, setSelectedTopicIdx] = useState<number | null>(null);
+  const [questionInSet, setQuestionInSet] = useState(0); // 0–4 within selected topic
+  const [completedQuestions, setCompletedQuestions] = useState<number[]>([]); // indices done
+
+  // Part 2 state
   const [cueCard, setCueCard] = useState<CueCardType | null>(null);
   const [loadingCueCard, setLoadingCueCard] = useState(false);
   const [prepTimeLeft, setPrepTimeLeft] = useState(60);
   const [prepActive, setPrepActive] = useState(false);
   const [recordingEnabled, setRecordingEnabled] = useState(false);
+
+  // Shared state
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SpeakingResult | null>(null);
 
   const prepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const topics = part === 1 ? PART1_TOPICS : PART3_TOPICS;
+  const currentTopicSet = selectedTopicIdx !== null ? topics[selectedTopicIdx] : null;
   const currentQuestion =
-    part === 1
-      ? PART1_QUESTIONS[questionIdx]
-      : part === 3
-      ? PART3_QUESTIONS[questionIdx]
-      : cueCard?.topic || "";
+    part === 2
+      ? cueCard?.topic || ""
+      : currentTopicSet?.questions[questionInSet] ?? "";
 
-  // Load cue card when Part 2 selected
+  const totalQsInSet = currentTopicSet?.questions.length ?? 0;
+  const isLastQuestion = questionInSet === totalQsInSet - 1;
+
+  // Load cue card for Part 2
   useEffect(() => {
     if (part !== 2 || cueCard) return;
     let cancelled = false;
@@ -326,6 +551,57 @@ export default function SpeakingPage() {
     loadCard();
     return () => { cancelled = true; };
   }, [part, cueCard]);
+
+  function resetForNewPart(p: SpeakingPart) {
+    setPart(p);
+    setSelectedTopicIdx(null);
+    setQuestionInSet(0);
+    setCompletedQuestions([]);
+    setResult(null);
+    setAudioBlob(null);
+    setRecordingEnabled(p !== 2);
+    setCueCard(null);
+    setPrepActive(false);
+    setPrepTimeLeft(60);
+    if (prepTimerRef.current) clearInterval(prepTimerRef.current);
+  }
+
+  function selectTopic(idx: number) {
+    setSelectedTopicIdx(idx);
+    setQuestionInSet(0);
+    setCompletedQuestions([]);
+    setResult(null);
+    setAudioBlob(null);
+  }
+
+  function selectRandomTopic() {
+    const idx = Math.floor(Math.random() * topics.length);
+    selectTopic(idx);
+  }
+
+  function handleNextQuestion() {
+    setCompletedQuestions((prev) => [...prev, questionInSet]);
+    setQuestionInSet((prev) => prev + 1);
+    setResult(null);
+    setAudioBlob(null);
+  }
+
+  function handleChangeTopic() {
+    setSelectedTopicIdx(null);
+    setQuestionInSet(0);
+    setCompletedQuestions([]);
+    setResult(null);
+    setAudioBlob(null);
+  }
+
+  function handleReset() {
+    setResult(null);
+    setAudioBlob(null);
+    setRecordingEnabled(part !== 2);
+    setPrepActive(false);
+    setPrepTimeLeft(60);
+    if (prepTimerRef.current) clearInterval(prepTimerRef.current);
+  }
 
   function fetchNewCueCard() {
     setCueCard(null);
@@ -351,23 +627,6 @@ export default function SpeakingPage() {
         return prev - 1;
       });
     }, 1000);
-  }
-
-  function handleReset() {
-    setResult(null);
-    setAudioBlob(null);
-    setRecordingEnabled(part !== 2);
-    setPrepActive(false);
-    setPrepTimeLeft(60);
-    if (prepTimerRef.current) clearInterval(prepTimerRef.current);
-  }
-
-  function pickRandomQuestion() {
-    const bank = part === 1 ? PART1_QUESTIONS : PART3_QUESTIONS;
-    const newIdx = Math.floor(Math.random() * bank.length);
-    setQuestionIdx(newIdx);
-    setResult(null);
-    setAudioBlob(null);
   }
 
   async function handleScore() {
@@ -406,135 +665,217 @@ export default function SpeakingPage() {
       </div>
 
       {/* Part selector */}
-      <PartSelector selected={part} onChange={(p) => {
-        setPart(p);
-        setResult(null);
-        setAudioBlob(null);
-        setRecordingEnabled(p !== 2);
-        setCueCard(null);
-        setQuestionIdx(0);
-      }} />
+      <PartSelector selected={part} onChange={resetForNewPart} />
 
-      {/* Question display */}
-      <Card>
-        <CardContent className="pt-5 pb-5">
-          {part === 2 ? (
-            loadingCueCard ? (
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-                <Skeleton className="h-4 w-4/6" />
-              </div>
-            ) : cueCard ? (
-              <div className="space-y-3">
-                <CueCard
-                  cueCard={cueCard}
-                  prepTimeLeft={prepActive ? prepTimeLeft : undefined}
-                  isPrep={prepActive}
+      {/* ── Part 1 & 3: Topic Picker or Interview Flow ── */}
+      {part !== 2 && (
+        <>
+          {selectedTopicIdx === null ? (
+            /* Topic picker */
+            <Card>
+              <CardContent className="pt-5 pb-5">
+                <TopicPicker
+                  topics={topics}
+                  onSelect={selectTopic}
+                  onRandom={selectRandomTopic}
+                  part={part}
                 />
-                {!prepActive && !recordingEnabled && !result && (
-                  <button
-                    onClick={fetchNewCueCard}
-                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Shuffle className="w-3 h-3" /> Get a different topic
-                  </button>
-                )}
-              </div>
-            ) : null
+              </CardContent>
+            </Card>
           ) : (
-            <div className="space-y-3">
-              <p className="font-medium text-base leading-relaxed">{currentQuestion}</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={pickRandomQuestion}
-                  className="gap-1.5 h-7 text-xs"
-                >
-                  <Shuffle className="w-3 h-3" /> Random question
-                </Button>
-                <div className="flex gap-1">
-                  {Array.from({ length: Math.min(8, (part === 1 ? PART1_QUESTIONS : PART3_QUESTIONS).length) }).map((_, i) => (
+            <>
+              {/* Topic header + progress */}
+              <Card>
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xl">{currentTopicSet!.emoji}</span>
+                        <span className="font-semibold text-sm">{currentTopicSet!.topic}</span>
+                        <Badge variant="outline" className="text-xs ml-auto">
+                          Q{questionInSet + 1} / {totalQsInSet}
+                        </Badge>
+                      </div>
+                      {/* Progress dots */}
+                      <div className="flex gap-1.5 mb-4">
+                        {currentTopicSet!.questions.map((_, i) => (
+                          <div
+                            key={i}
+                            className={`h-1.5 flex-1 rounded-full transition-all ${
+                              completedQuestions.includes(i)
+                                ? "bg-emerald-500"
+                                : i === questionInSet
+                                ? "bg-violet-500"
+                                : "bg-muted"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      {/* Current question */}
+                      <p className="font-medium text-base leading-relaxed">{currentQuestion}</p>
+                    </div>
+                  </div>
+                  {/* Change topic link */}
+                  {!result && !loading && (
                     <button
-                      key={i}
-                      onClick={() => { setQuestionIdx(i); setResult(null); setAudioBlob(null); }}
-                      className={`w-6 h-6 rounded-full text-[10px] font-mono transition-colors ${
-                        i === questionIdx % 8
-                          ? "bg-violet-500 text-white"
-                          : "bg-muted text-muted-foreground hover:bg-accent"
-                      }`}
+                      onClick={handleChangeTopic}
+                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-3 transition-colors"
                     >
-                      {i + 1}
+                      <ArrowLeft className="w-3 h-3" /> Change topic
                     </button>
-                  ))}
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recorder */}
+              {!result && (
+                <Card>
+                  <CardContent className="pt-6 pb-6">
+                    <Recorder
+                      limitSeconds={PART_LIMITS[part]}
+                      minSeconds={PART_MIN[part]}
+                      onRecordingComplete={(blob) => setAudioBlob(blob)}
+                      disabled={loading}
+                      label={
+                        part === 1
+                          ? "Answer in 20–30 seconds"
+                          : "Answer in 40–60 seconds"
+                      }
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Submit */}
+              {audioBlob && !result && (
+                <Button
+                  onClick={handleScore}
+                  disabled={loading}
+                  className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white"
+                >
+                  {loading ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Scoring your answer…</>
+                  ) : (
+                    <><Mic className="w-4 h-4" /> Get Band Score</>
+                  )}
+                </Button>
+              )}
+
+              {/* After result: Next question or finish */}
+              {result && !loading && (
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {!isLastQuestion ? (
+                    <Button
+                      onClick={handleNextQuestion}
+                      className="flex-1 gap-2 bg-violet-500 hover:bg-violet-600 text-white"
+                    >
+                      Next Question <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleChangeTopic}
+                      className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white"
+                    >
+                      <CheckCircle2 className="w-4 h-4" /> Topic Complete — Try Another
+                    </Button>
+                  )}
+                  <Button variant="outline" onClick={handleReset} className="gap-2">
+                    <RefreshCw className="w-4 h-4" /> Re-record
+                  </Button>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Part 2: Prep timer */}
-      {part === 2 && cueCard && !prepActive && !recordingEnabled && !result && (
-        <Button onClick={startPrep} className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white">
-          ✏️ Start 1-minute preparation time
-        </Button>
-      )}
-      {part === 2 && prepActive && (
-        <SpeakingTimer elapsed={60 - prepTimeLeft} limit={60} label="Preparation time (make notes)" warning={10} />
+        </>
       )}
 
-      {/* Recorder */}
-      {(part !== 2 || recordingEnabled) && !result && (
-        <Card>
-          <CardContent className="pt-6 pb-6">
-            <Recorder
-              limitSeconds={PART_LIMITS[part]}
-              minSeconds={PART_MIN[part]}
-              onRecordingComplete={(blob) => setAudioBlob(blob)}
+      {/* ── Part 2: Cue Card Flow ── */}
+      {part === 2 && (
+        <>
+          <Card>
+            <CardContent className="pt-5 pb-5">
+              {loadingCueCard ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/6" />
+                </div>
+              ) : cueCard ? (
+                <div className="space-y-3">
+                  <CueCard
+                    cueCard={cueCard}
+                    prepTimeLeft={prepActive ? prepTimeLeft : undefined}
+                    isPrep={prepActive}
+                  />
+                  {!prepActive && !recordingEnabled && !result && (
+                    <button
+                      onClick={fetchNewCueCard}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Shuffle className="w-3 h-3" /> Get a different topic
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          {cueCard && !prepActive && !recordingEnabled && !result && (
+            <Button onClick={startPrep} className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white">
+              ✏️ Start 1-minute preparation time
+            </Button>
+          )}
+          {prepActive && (
+            <SpeakingTimer elapsed={60 - prepTimeLeft} limit={60} label="Preparation time (make notes)" warning={10} />
+          )}
+
+          {recordingEnabled && !result && (
+            <Card>
+              <CardContent className="pt-6 pb-6">
+                <Recorder
+                  limitSeconds={PART_LIMITS[2]}
+                  minSeconds={PART_MIN[2]}
+                  onRecordingComplete={(blob) => setAudioBlob(blob)}
+                  disabled={loading}
+                  label="Speak for 1–2 minutes"
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {audioBlob && !result && (
+            <Button
+              onClick={handleScore}
               disabled={loading}
-              label={
-                part === 1 ? "Answer in 20–30 seconds"
-                : part === 2 ? "Speak for 1–2 minutes"
-                : "Answer in 30–45 seconds"
-              }
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Submit */}
-      {audioBlob && !result && (
-        <Button
-          onClick={handleScore}
-          disabled={loading}
-          className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white"
-        >
-          {loading ? (
-            <><Loader2 className="w-4 h-4 animate-spin" /> Scoring your answer…</>
-          ) : (
-            <><Mic className="w-4 h-4" /> Get Band Score</>
+              className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white"
+            >
+              {loading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Scoring your answer…</>
+              ) : (
+                <><Mic className="w-4 h-4" /> Get Band Score</>
+              )}
+            </Button>
           )}
-        </Button>
+
+          {result && (
+            <Button variant="outline" onClick={handleReset} className="w-full gap-2">
+              <RefreshCw className="w-4 h-4" /> Try another topic
+            </Button>
+          )}
+        </>
       )}
 
-      {/* Retry */}
-      {result && (
-        <Button variant="outline" onClick={handleReset} className="w-full gap-2">
-          <RefreshCw className="w-4 h-4" /> Try another question
-        </Button>
-      )}
-
-      {/* Skeleton */}
+      {/* Skeleton while loading */}
       {loading && (
         <div>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-full bg-emerald-100 animate-pulse flex items-center justify-center shrink-0">
               <span className="text-sm">🎓</span>
             </div>
-            <p className="text-sm text-muted-foreground animate-pulse font-medium">IELTS Sensei is analysing your speaking…</p>
+            <p className="text-sm text-muted-foreground animate-pulse font-medium">
+              IELTS Sensei is analysing your speaking…
+            </p>
           </div>
           <SpeakingSkeletonLoader />
         </div>
