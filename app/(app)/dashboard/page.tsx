@@ -1,14 +1,17 @@
-"use client";
+// Server Component — data fetched on the server, zero client-side waterfall
+export const revalidate = 30; // revalidate every 30 s — allows prefetch to cache
 
-import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, Mic, TrendingUp, ArrowRight, Flame, Lightbulb } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { getBandTailwind, getBandBg, Attempt } from "@/types/ielts";
 import { TargetBandSetter } from "@/components/dashboard/TargetBandSetter";
 import { formatBand, roundBand } from "@/lib/utils/band-score";
+import { CountUp } from "@/components/shared/CountUp";
+import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import { BandRing } from "@/components/shared/BandRing";
 
 // ─── Daily IELTS Tips ─────────────────────────────────────────────────────
 const IELTS_TIPS = [
@@ -53,8 +56,8 @@ function BandSparkline({ attempts }: { attempts: Attempt[] }) {
           const x = (i / (last7.length - 1)) * w;
           const y = h - ((a.overall_band - min) / (max - min)) * h;
           return <circle key={i} cx={x} cy={y} r="3"
-            fill={i === last7.length - 1 ? "#8b5cf6" : "#e5e7eb"}
-            stroke={i === last7.length - 1 ? "#8b5cf6" : "#9ca3af"} strokeWidth="1.5" />;
+            fill={i === last7.length - 1 ? "#059669" : "#e5e7eb"}
+            stroke={i === last7.length - 1 ? "#059669" : "#9ca3af"} strokeWidth="1.5" />;
         })}
       </svg>
       <div className="text-xs text-muted-foreground">
@@ -67,293 +70,451 @@ function BandSparkline({ attempts }: { attempts: Attempt[] }) {
   );
 }
 
-function StatSkeleton() {
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      {[...Array(4)].map((_, i) => (
-        <Card key={i}><CardContent className="pt-4 pb-3 space-y-2">
-          <Skeleton className="h-3 w-12" />
-          <Skeleton className="h-7 w-16" />
-          <Skeleton className="h-3 w-10" />
-        </CardContent></Card>
-      ))}
-    </div>
-  );
-}
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
-export default function DashboardPage() {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<{
-    firstName: string;
-    userId: string;
-    profile: Record<string, unknown> | null;
-    attempts: Attempt[];
-    todayCount: number;
-    streak: number;
-  } | null>(null);
+  const userId    = user.id;
+  const firstName = (user.user_metadata?.full_name as string)?.split(" ")[0] || "there";
 
-  const supabase = createClient();
-  const dailyTip = getDailyTip();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
 
-  const load = useCallback(async () => {
-    // getSession reads from cookie — zero network latency
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    const userId = session.user.id;
-    const firstName = (session.user.user_metadata?.full_name as string)?.split(" ")[0] || "there";
+  // All queries run in parallel on the server — allSettled so one failure won't crash the page
+  const [profileRes, recentRes, todayRes, allRes] = await Promise.allSettled([
+    supabase.from("profiles").select("*").eq("id", userId).single(),
+    supabase.from("attempts").select("*").eq("user_id", userId)
+      .gte("created_at", sevenDaysAgo.toISOString())
+      .order("created_at", { ascending: false }).limit(20),
+    supabase.from("attempts").select("id", { count: "exact", head: true })
+      .eq("user_id", userId).gte("created_at", today.toISOString()),
+    supabase.from("attempts").select("created_at").eq("user_id", userId)
+      .order("created_at", { ascending: false }).limit(100),
+  ]);
 
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const today = new Date(); today.setHours(0, 0, 0, 0);
+  const profile    = profileRes.status === "fulfilled" ? profileRes.value.data as Record<string, unknown> | null : null;
+  const attempts   = (recentRes.status === "fulfilled" ? recentRes.value.data ?? [] : []) as Attempt[];
+  const todayCount = todayRes.status === "fulfilled" ? (todayRes.value.count ?? 0) : 0;
+  const allData    = allRes.status === "fulfilled" ? allRes.value.data : null;
 
-    // Fire all queries in parallel — not sequential
-    const [profileRes, recentRes, todayRes, allRes] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", userId).single(),
-      supabase.from("attempts").select("*").eq("user_id", userId)
-        .gte("created_at", sevenDaysAgo.toISOString())
-        .order("created_at", { ascending: false }).limit(20),
-      supabase.from("attempts").select("id", { count: "exact", head: true })
-        .eq("user_id", userId).gte("created_at", today.toISOString()),
-      supabase.from("attempts").select("created_at").eq("user_id", userId)
-        .order("created_at", { ascending: false }).limit(100),
-    ]);
-
-    // Compute streak
-    let streak = 0;
-    if (allRes.data?.length) {
-      const uniqueDays = new Set(allRes.data.map((a: { created_at: string }) => new Date(a.created_at).toDateString()));
-      const d = new Date();
-      while (uniqueDays.has(d.toDateString())) { streak++; d.setDate(d.getDate() - 1); }
-    }
-
-    setData({
-      firstName,
-      userId,
-      profile: profileRes.data,
-      attempts: (recentRes.data ?? []) as Attempt[],
-      todayCount: todayRes.count ?? 0,
-      streak,
-    });
-    setLoading(false);
-  }, [supabase]);
-
-  useEffect(() => { load(); }, [load]);
-
-  const dailyTipCard = (
-    <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
-      <CardContent className="pt-4 pb-4">
-        <div className="flex gap-3 items-start">
-          <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wider mb-1">
-              Daily Tip — {dailyTip.category}
-            </p>
-            <p className="text-sm text-amber-900 dark:text-amber-100 leading-relaxed">{dailyTip.tip}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-64" />
-        </div>
-        {dailyTipCard}
-        <StatSkeleton />
-        <div className="grid sm:grid-cols-2 gap-4">
-          <Skeleton className="h-28 rounded-xl" />
-          <Skeleton className="h-28 rounded-xl" />
-        </div>
-      </div>
-    );
+  // Compute streak server-side
+  let streak = 0;
+  if (allData?.length) {
+    const uniqueDays = new Set(allData.map((a: { created_at: string }) => new Date(a.created_at).toDateString()));
+    const d = new Date();
+    while (uniqueDays.has(d.toDateString())) { streak++; d.setDate(d.getDate() - 1); }
   }
 
-  if (!data) return null;
-  const { firstName, userId, profile, attempts, todayCount, streak } = data;
-  const bestBand = attempts.length ? Math.max(...attempts.map(a => a.overall_band)) : null;
+  const bestBand        = attempts.length ? Math.max(...attempts.map(a => a.overall_band)) : null;
   const writingAttempts = attempts.filter(a => a.mode === "writing");
-  const speakingAttempts = attempts.filter(a => a.mode === "speaking");
-  const avgBand = attempts.length ? (attempts.reduce((s, a) => s + a.overall_band, 0) / attempts.length).toFixed(1) : null;
-  const remaining = 10 - todayCount;
+  const speakingAttempts= attempts.filter(a => a.mode === "speaking");
+  const avgBand         = attempts.length ? (attempts.reduce((s, a) => s + a.overall_band, 0) / attempts.length).toFixed(1) : null;
+  const remaining       = 10 - todayCount;
+  const dailyTip        = getDailyTip();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Hey, {firstName} 👋</h1>
-        <p className="text-muted-foreground text-sm mt-1">Every attempt gets you closer to your target. Let&apos;s practice.</p>
-      </div>
+    <div className="space-y-5">
 
-      {dailyTipCard}
+      {/* ── Hero greeting ──────────────────────────────────────────────── */}
+      <div className="fade-up rounded-2xl px-5 py-5 relative overflow-hidden"
+        style={{
+          animationDelay: "0ms",  // keep at 0 — hero is instant
+          background: "linear-gradient(135deg, #e8f5f0 0%, #f0f4ff 100%)",
+          border: "1px solid rgba(16,185,129,0.15)",
+        }}>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card><CardContent className="pt-4 pb-3">
-          <p className="text-xs text-muted-foreground">Today</p>
-          <p className="text-2xl font-mono font-bold mt-1">{todayCount}<span className="text-sm font-normal text-muted-foreground">/10</span></p>
-          <p className="text-xs text-muted-foreground mt-0.5">{remaining > 0 ? `${remaining} left` : "Limit reached"}</p>
-        </CardContent></Card>
+        {/* Noise texture — feTurbulence fractal noise at 3% opacity */}
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          className="absolute inset-0 h-full w-full pointer-events-none"
+          style={{ opacity: 0.03 }}
+        >
+          <defs>
+            <filter id="hero-grain" x="0%" y="0%" width="100%" height="100%"
+              colorInterpolationFilters="sRGB">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.68 0.68"
+                numOctaves="4"
+                stitchTiles="stitch"
+                result="noise"
+              />
+              <feColorMatrix type="saturate" values="0" />
+            </filter>
+          </defs>
+          <rect width="100%" height="100%" filter="url(#hero-grain)" />
+        </svg>
 
-        <Card><CardContent className="pt-4 pb-3">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Flame className={`w-3.5 h-3.5 ${streak > 0 ? "text-orange-500" : "text-muted-foreground"}`} />
-            <p className="text-xs text-muted-foreground">Streak</p>
-          </div>
-          <p className="text-2xl font-mono font-bold">{streak}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{streak === 1 ? "day" : "days"} in a row</p>
-        </CardContent></Card>
-
-        <Card><CardContent className="pt-4 pb-3">
-          <p className="text-xs text-muted-foreground">Best this week</p>
-          <p className={`text-2xl font-mono font-bold mt-1 ${bestBand ? getBandTailwind(bestBand) : "text-muted-foreground"}`}>
-            {bestBand ? formatBand(bestBand) : "—"}
+        <div className="relative">
+          <h1 className="text-2xl font-display tracking-heading">Hey, {firstName} 👋</h1>
+          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+            {streak > 0
+              ? <><span className="flame">🔥</span>{` ${streak}-day streak! Keep the momentum going.`}</>
+              : "Every attempt gets you closer to your target. Let's practice."}
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">overall band</p>
-        </CardContent></Card>
-
-        <Card><CardContent className="pt-4 pb-3">
-          <TargetBandSetter
-            userId={userId}
-            currentTarget={(profile?.target_band as number) ?? null}
-            currentAvg={avgBand ? parseFloat(avgBand) : null}
-          />
-        </CardContent></Card>
-      </div>
-
-      {attempts.length >= 2 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">This Week&apos;s Progress</CardTitle>
-              {avgBand && <span className="text-xs text-muted-foreground">Avg: <span className="font-mono font-semibold">{avgBand}</span></span>}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <BandSparkline attempts={attempts} />
-            <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
-              <span>✍️ {writingAttempts.length} writing</span>
-              <span>🎤 {speakingAttempts.length} speaking</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Link href="/writing">
-          <Card className="group hover:border-violet-300 hover:shadow-sm transition-all cursor-pointer h-full">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center">
-                      <BookOpen className="w-4 h-4 text-violet-500" />
-                    </div>
-                    <span className="font-semibold text-sm">Writing</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Task 1 (Academic) & Task 2 (Essay)</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{writingAttempts.length} sessions this week</p>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/speaking">
-          <Card className="group hover:border-violet-300 hover:shadow-sm transition-all cursor-pointer h-full">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
-                      <Mic className="w-4 h-4 text-emerald-500" />
-                    </div>
-                    <span className="font-semibold text-sm">Speaking</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Parts 1, 2 (Cue Card), and 3</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{speakingAttempts.length} sessions this week</p>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {profile?.target_band != null && bestBand != null && (
-        <Card><CardContent className="pt-4 pb-4">
-          {(() => {
-            const target = profile!.target_band as number;
-            const gapToTarget = (target - bestBand).toFixed(1);
-            const pct = Math.min(100, (bestBand / target) * 100);
-            return (
-              <>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Progress to Band {target.toFixed(1)}
-                  </p>
-                  <span className="text-xs text-muted-foreground">
-                    {formatBand(bestBand)} / {target.toFixed(1)}
-                  </span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${getBandBg(bestBand)}`}
-                    style={{ width: `${pct}%` }} />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1.5">
-                  {bestBand >= target
-                    ? "🎉 You've reached your target band this week!"
-                    : `${gapToTarget} bands to go`}
-                </p>
-              </>
-            );
-          })()}
-        </CardContent></Card>
-      )}
-
-      {attempts.length > 0 ? (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-sm">Recent attempts</h2>
-            <Link href="/history" className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">View all</Link>
+          <div className="flex gap-2 mt-4">
+            <Link href="/writing"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: "#006c49",
+                boxShadow: "0 4px 0 #004d35, 0 6px 16px #006c4940",
+              }}>
+              <BookOpen className="w-3.5 h-3.5" /> Write now
+            </Link>
+            <Link href="/speaking"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: "white",
+                color: "#0b1c30",
+                border: "1px solid #d1d5db",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+              }}>
+              <Mic className="w-3.5 h-3.5" style={{ color: "#059669" }} /> Speak now
+            </Link>
           </div>
-          <div className="space-y-2">
-            {attempts.slice(0, 5).map((attempt) => (
-              <Link key={attempt.id} href={`/history/${attempt.id}`}>
-                <Card className="hover:border-violet-300 transition-colors cursor-pointer">
-                  <CardContent className="py-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${attempt.mode === "writing" ? "bg-violet-100 dark:bg-violet-900" : "bg-emerald-100 dark:bg-emerald-900"}`}>
-                        {attempt.mode === "writing" ? <BookOpen className="w-3.5 h-3.5 text-violet-500" /> : <Mic className="w-3.5 h-3.5 text-emerald-500" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium capitalize">{attempt.mode} — {attempt.task_type.replace(/([a-z])([0-9])/g, "$1 $2").toUpperCase()}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(attempt.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
-                      </div>
-                      <span className={`font-mono font-bold text-lg shrink-0 ${getBandTailwind(attempt.overall_band)}`}>{attempt.overall_band.toFixed(1)}</span>
-                    </div>
-                  </CardContent>
-                </Card>
+        </div>
+      </div>
+
+      {/* ── Onboarding card — shown only on first visit (zero attempts ever) ── */}
+      {!allData?.length && (
+        <div className="fade-up rounded-2xl border-2 border-dashed px-5 py-5 space-y-4"
+          style={{ borderColor: "rgba(5,150,105,0.3)", animationDelay: "20ms" }}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg, oklch(0.546 0.245 274 / 15%), oklch(0.62 0.22 300 / 10%))" }}>
+              <span className="text-lg">🚀</span>
+            </div>
+            <div>
+              <p className="font-semibold text-sm">Welcome! Here&apos;s how to get started</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Complete your first attempt to unlock progress tracking</p>
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {[
+              { step: "1", icon: "✍️", title: "Try Writing Task 2", desc: "Write a 250-word essay. Get scored on 4 real IELTS criteria in under 15 seconds.", href: "/writing", cta: "Start Writing" },
+              { step: "2", icon: "🎙️", title: "Try Speaking Part 1", desc: "Record a 30–40 second answer. Get band scores for fluency, vocabulary, grammar & pronunciation.", href: "/speaking", cta: "Start Speaking" },
+              { step: "3", icon: "📈", title: "Track your progress", desc: "After 2+ attempts your band score chart appears here automatically.", href: "/history", cta: "View History" },
+            ].map(({ step, icon, title, desc, href, cta }) => (
+              <Link key={step} href={href}
+                className="group flex flex-col gap-2 p-3.5 rounded-xl border bg-card card-hover-default">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">{icon}</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Step {step}</span>
+                </div>
+                <p className="text-sm font-semibold">{title}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+                <span className="text-xs font-semibold flex items-center gap-1 mt-auto" style={{ color: "#059669" }}>
+                  {cta} <ArrowRight className="w-3 h-3" />
+                </span>
               </Link>
             ))}
           </div>
         </div>
+      )}
+
+      {/* ── Daily tip ───────────────────────────────────────────────────── */}
+      <div className="fade-up rounded-2xl px-4 py-3.5 flex gap-3 items-start"
+        style={{
+          animationDelay: "40ms",
+          background: "linear-gradient(135deg, oklch(0.82 0.14 55 / 12%), oklch(0.82 0.14 55 / 6%))",
+          border: "1px solid oklch(0.82 0.14 55 / 25%)",
+        }}>
+        <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center mt-0.5"
+          style={{ background: "oklch(0.82 0.14 55 / 20%)" }}>
+          <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+        </div>
+        <div>
+          <p className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-0.5">
+            Tip of the day · {dailyTip.category}
+          </p>
+          <p className="text-sm text-foreground leading-relaxed">{dailyTip.tip}</p>
+        </div>
+      </div>
+
+      {/* ── Stats row — each card fades up individually ─────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Card className="fade-up stat-card" style={{ animationDelay: "60ms" }}>
+          <CardContent className="card-inner">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Today</p>
+              <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "rgba(5,150,105,0.12)" }}>
+                <TrendingUp className="w-3 h-3" style={{ color: "#059669" }} />
+              </div>
+            </div>
+            <p className="text-3xl font-display leading-none tracking-nums">
+              <CountUp to={todayCount} />
+              <span className="text-sm font-normal text-muted-foreground">/10</span>
+            </p>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              {remaining > 0
+                ? <span className="text-emerald-600 dark:text-emerald-400 font-medium">{remaining} remaining</span>
+                : <span className="text-amber-600 font-medium">Limit reached</span>}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="fade-up stat-card" style={{ animationDelay: "80ms" }}>
+          <CardContent className="card-inner">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Streak</p>
+              <div className="w-6 h-6 rounded-lg bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center">
+                <Flame className="w-3 h-3 text-orange-500" />
+              </div>
+            </div>
+            <p className="text-3xl font-display leading-none tracking-nums">
+              {streak > 0
+                ? <CountUp to={streak} className="text-orange-500" />
+                : <span className="text-muted-foreground">0</span>}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              {streak > 2
+                ? <span className="text-orange-500 font-medium"><span className="flame">🔥</span> on fire!</span>
+                : streak === 1 ? "day in a row" : "days in a row"}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="fade-up stat-card" style={{ animationDelay: "100ms" }}>
+          <CardContent className="card-inner flex flex-col items-center gap-2.5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider self-start">
+              Best this week
+            </p>
+            <BandRing band={bestBand != null ? roundBand(bestBand) : null} />
+          </CardContent>
+        </Card>
+
+        <Card className="fade-up stat-card" style={{ animationDelay: "120ms" }}>
+          <CardContent className="card-inner">
+            <TargetBandSetter
+              userId={userId}
+              currentTarget={(profile?.target_band as number) ?? null}
+              currentAvg={bestBand}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ── Progress to target ──────────────────────────────────────────── */}
+      {profile?.target_band != null && bestBand != null && (() => {
+        const target = profile!.target_band as number;
+        const pct    = Math.min(100, (bestBand / target) * 100);
+        const reached = bestBand >= target;
+        return (
+          <ScrollReveal>
+          <Card>
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Journey to Band {target.toFixed(1)}
+                  </p>
+                  {reached && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                      🎉 Target reached this week!
+                    </p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <CountUp to={roundBand(bestBand)} decimals={1} className={`text-xl font-mono font-bold tracking-nums ${getBandTailwind(bestBand)}`} />
+                  <span className="text-xs text-muted-foreground"> / {target.toFixed(1)}</span>
+                </div>
+              </div>
+              <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${getBandBg(bestBand)}`}
+                  style={{ width: `${pct}%`, boxShadow: reached ? "0 0 8px currentColor" : undefined }}
+                />
+              </div>
+              {!reached && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  <CountUp to={parseFloat((target - bestBand).toFixed(1))} decimals={1} className="font-semibold text-foreground" suffix=" bands" />
+                  {" "}to reach your goal — you&apos;re <CountUp to={Math.round(pct)} suffix="%" /> there
+                </p>
+              )}
+              {attempts.length >= 2 && (
+                <div className="mt-3 pt-3 border-t border-border/60">
+                  <BandSparkline attempts={attempts} />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          </ScrollReveal>
+        );
+      })()}
+
+      {/* Progress card without target */}
+      {(profile?.target_band == null || bestBand == null) && attempts.length >= 2 && (
+        <ScrollReveal>
+        <Card>
+          <CardContent className="pt-4 pb-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">This week&apos;s trend</p>
+            <BandSparkline attempts={attempts} />
+            <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
+              <span>✍️ <CountUp to={writingAttempts.length} /> writing</span>
+              <span>🎤 <CountUp to={speakingAttempts.length} /> speaking</span>
+              {avgBand && (
+                <span>Avg: <CountUp to={parseFloat(avgBand)} decimals={1} className="font-mono font-semibold" /></span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        </ScrollReveal>
+      )}
+
+      {/* ── Practice cards — scroll-revealed individually ───────────────── */}
+      <div className="grid sm:grid-cols-2 gap-3">
+        <ScrollReveal className="h-full">
+        <Link href="/writing" className="group h-full block">
+          <div className="rounded-2xl p-5 h-full cursor-pointer card-hover-violet"
+            style={{
+              background: "linear-gradient(135deg, oklch(0.546 0.245 274 / 8%), oklch(0.62 0.22 300 / 5%))",
+            }}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <div className="w-10 h-10 rounded-xl mb-3 flex items-center justify-center"
+                  style={{ background: "linear-gradient(135deg, oklch(0.546 0.245 274 / 20%), oklch(0.546 0.245 274 / 10%))" }}>
+                  <BookOpen className="w-5 h-5 text-violet-500" />
+                </div>
+                <p className="text-base font-extrabold tracking-tight">Writing</p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Task 1 Academic Report · Task 2 Essay</p>
+                <p className="text-xs font-medium text-violet-600 dark:text-violet-400 mt-2">
+                  {writingAttempts.length > 0 ? `${writingAttempts.length} session${writingAttempts.length > 1 ? "s" : ""} this week` : "Start practising →"}
+                </p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-violet-400 group-hover:translate-x-0.5 transition-transform duration-150 mt-1 shrink-0" />
+            </div>
+          </div>
+        </Link>
+        </ScrollReveal>
+
+        <ScrollReveal className="h-full" delay={80}>
+        <Link href="/speaking" className="group h-full block">
+          <div className="rounded-2xl p-5 h-full cursor-pointer card-hover-emerald"
+            style={{
+              background: "linear-gradient(135deg, oklch(0.62 0.18 160 / 8%), oklch(0.65 0.16 175 / 5%))",
+            }}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <div className="w-10 h-10 rounded-xl mb-3 flex items-center justify-center"
+                  style={{ background: "linear-gradient(135deg, oklch(0.62 0.18 160 / 20%), oklch(0.62 0.18 160 / 10%))" }}>
+                  <Mic className="w-5 h-5 text-emerald-500" />
+                </div>
+                <p className="text-base font-extrabold tracking-tight">Speaking</p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Parts 1, 2 Cue Card, and 3 Discussion</p>
+                <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 mt-2">
+                  {speakingAttempts.length > 0 ? `${speakingAttempts.length} session${speakingAttempts.length > 1 ? "s" : ""} this week` : "Start practising →"}
+                </p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 transition-transform duration-150 mt-1 shrink-0" />
+            </div>
+          </div>
+        </Link>
+        </ScrollReveal>
+      </div>
+
+      {/* ── Speaking empty state ─────────────────────────────────────────── */}
+      {speakingAttempts.length === 0 && (
+        <ScrollReveal>
+          <div className="rounded-2xl p-5 flex items-start gap-4"
+            style={{
+              background: "linear-gradient(135deg, oklch(0.62 0.18 160 / 8%), oklch(0.65 0.16 175 / 5%))",
+              border: "1px solid oklch(0.62 0.18 160 / 25%)",
+            }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg, oklch(0.62 0.18 160 / 20%), oklch(0.62 0.18 160 / 10%))" }}>
+              <Mic className="w-5 h-5 text-emerald-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold tracking-tight">No speaking yet this week</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Record a 30-second answer — get band scores for fluency, vocabulary, grammar &amp; pronunciation in 15 seconds.
+              </p>
+              <Link href="/speaking"
+                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: "linear-gradient(135deg, oklch(0.62 0.18 160), oklch(0.55 0.16 175))",
+                  boxShadow: "0 4px 12px oklch(0.62 0.18 160 / 30%)",
+                }}>
+                <Mic className="w-3 h-3" /> Speak now
+              </Link>
+            </div>
+          </div>
+        </ScrollReveal>
+      )}
+
+      {/* ── Recent attempts ─────────────────────────────────────────────── */}
+      {attempts.length > 0 ? (
+        <div>
+          <ScrollReveal>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-bold tracking-tight text-foreground">Recent attempts</h2>
+            <Link href="/history"
+              className="text-xs font-medium text-violet-600 dark:text-violet-400 hover:underline underline-offset-2 flex items-center gap-1">
+              View all <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          </ScrollReveal>
+          <div className="space-y-2">
+            {attempts.slice(0, 5).map((attempt, i) => (
+              <ScrollReveal key={attempt.id} delay={i * 60}>
+              <Link href={`/history/${attempt.id}`} className="block">
+                <div className="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-card shadow-card cursor-pointer card-hover-default">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    attempt.mode === "writing" ? "bg-violet-100 dark:bg-violet-900/50" : "bg-emerald-100 dark:bg-emerald-900/50"
+                  }`}>
+                    {attempt.mode === "writing"
+                      ? <BookOpen className="w-4 h-4 text-violet-500" />
+                      : <Mic className="w-4 h-4 text-emerald-500" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold capitalize leading-none tracking-tight">
+                      {attempt.mode} · {attempt.task_type.replace(/([a-z])([0-9])/g, "$1 $2").toUpperCase()}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(attempt.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                  <div className={`px-2.5 py-1 rounded-xl font-mono font-bold text-sm tracking-nums shrink-0 ${
+                    attempt.overall_band >= 7
+                      ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300"
+                      : attempt.overall_band >= 5.5
+                      ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300"
+                      : "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300"
+                  }`}>
+                    <CountUp to={attempt.overall_band} decimals={1} duration={1000} />
+                  </div>
+                </div>
+              </Link>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
       ) : (
-        <Card className="border-dashed"><CardContent className="pt-8 pb-8 flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-muted-foreground" />
+        <ScrollReveal>
+        <div className="rounded-2xl border-2 border-dashed border-border p-10 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+            <TrendingUp className="w-7 h-7 text-muted-foreground" />
           </div>
-          <div className="text-center">
-            <p className="font-medium text-sm">No attempts yet this week</p>
-            <p className="text-xs text-muted-foreground mt-1">Start with Writing or Speaking to get your first band score</p>
+          <p className="text-lg font-bold tracking-tight mb-1">Start your first session</p>
+          <p className="text-sm text-muted-foreground mb-5 max-w-xs mx-auto">
+            Complete a Writing or Speaking task to receive your first band score and personalised feedback.
+          </p>
+          <div className="flex gap-2 justify-center">
+            <Link href="/writing"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.02]"
+              style={{ background: "linear-gradient(135deg, oklch(0.546 0.245 274), oklch(0.48 0.22 290))", boxShadow: "0 4px 12px oklch(0.546 0.245 274 / 30%)" }}>
+              <BookOpen className="w-3.5 h-3.5" /> Try Writing
+            </Link>
+            <Link href="/speaking"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-border hover:border-violet-300 transition-all hover:scale-[1.02]">
+              <Mic className="w-3.5 h-3.5 text-emerald-500" /> Try Speaking
+            </Link>
           </div>
-          <div className="flex gap-2">
-            <Link href="/writing" className="text-xs bg-violet-500 text-white px-3 py-1.5 rounded-md hover:bg-violet-600 transition-colors">Try Writing</Link>
-            <Link href="/speaking" className="text-xs border border-border px-3 py-1.5 rounded-md hover:bg-accent transition-colors">Try Speaking</Link>
-          </div>
-        </CardContent></Card>
+        </div>
+        </ScrollReveal>
       )}
     </div>
   );

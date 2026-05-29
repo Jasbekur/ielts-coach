@@ -12,8 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { SpeakingPart, SpeakingResult } from "@/types/ielts";
-import { Mic, RefreshCw, Loader2, Shuffle, ChevronRight, ArrowLeft, CheckCircle2, PencilLine } from "lucide-react";
-import { formatBand } from "@/lib/utils/band-score";
+import {
+  Mic, RefreshCw, Loader2, Shuffle, ChevronRight, ArrowLeft,
+  CheckCircle2, PencilLine, Trophy, Zap, ClipboardList, Sparkles, Copy, Check,
+} from "lucide-react";
+import { formatBand, roundBand } from "@/lib/utils/band-score";
 import confetti from "canvas-confetti";
 
 // ─── Cue Card Bank (50 real IELTS Part 2 cards) ───────────────────────────────
@@ -145,7 +148,7 @@ function TopicPicker({ topics, onSelect, onRandom, part }: {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-medium text-sm">{part === 1 ? "Choose a topic for your interview" : "Choose a discussion theme"}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{part === 1 ? "The examiner will ask you 5 questions about this topic" : "Discuss 5 deep questions on this theme"}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{part === 1 ? "Practice 4–5 questions on this topic (real exam covers 3–4 different topics)" : "Discuss 4–6 in-depth analytical questions (aim for 2–3 min per answer)"}</p>
         </div>
         <Button variant="outline" size="sm" onClick={onRandom} className="gap-1.5 shrink-0">
           <Shuffle className="w-3.5 h-3.5" /> Random
@@ -154,9 +157,9 @@ function TopicPicker({ topics, onSelect, onRandom, part }: {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {topics.map((t, i) => (
           <button key={i} onClick={() => onSelect(i)}
-            className="flex items-center gap-2.5 p-3 rounded-xl border bg-card hover:border-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-all text-left group">
+            className="flex items-center gap-2.5 p-3 rounded-xl border bg-card hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all text-left group">
             <span className="text-xl shrink-0">{t.emoji}</span>
-            <span className="text-xs font-medium text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-300 leading-tight">{t.topic}</span>
+            <span className="text-xs font-medium text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-300 leading-tight">{t.topic}</span>
           </button>
         ))}
       </div>
@@ -185,24 +188,20 @@ function CueCardPicker({ onSelect, onRandom }: {
           <Shuffle className="w-3.5 h-3.5" /> Random
         </Button>
       </div>
-
-      {/* Category filter */}
       <div className="flex flex-wrap gap-1.5">
         {["All", ...categories].map(cat => (
           <button key={cat} onClick={() => setActiveCategory(cat)}
             className={`text-xs px-3 py-1 rounded-full border transition-all ${
-              activeCategory === cat ? "bg-violet-500 text-white border-violet-500" : "border-border text-muted-foreground hover:border-violet-300 hover:text-foreground"
+              activeCategory === cat ? "bg-emerald-600 text-white border-emerald-600" : "border-border text-muted-foreground hover:border-emerald-300 hover:text-foreground"
             }`}>
             {cat}
           </button>
         ))}
       </div>
-
-      {/* Card grid */}
       <div className="grid gap-2 max-h-96 overflow-y-auto pr-1">
         {filtered.map((card, i) => (
           <button key={i} onClick={() => onSelect(card)}
-            className="text-left p-3 rounded-xl border bg-card hover:border-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-all">
+            className="text-left p-3 rounded-xl border bg-card hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all">
             <p className="text-xs font-medium text-foreground leading-snug">{card.topic}</p>
             <p className="text-xs text-muted-foreground mt-0.5 italic">and {card.followUp.replace("and ", "")}</p>
           </button>
@@ -222,37 +221,32 @@ function CueCardDisplay({ card, prepTimeLeft, isPrep, notes, onNotesChange }: {
 }) {
   return (
     <div className="space-y-4">
-      {/* The card */}
-      <div className="rounded-xl border-2 border-violet-300 bg-gradient-to-br from-violet-50 to-white dark:from-violet-950 dark:to-background p-5">
+      <div className="rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-background p-5">
         <div className="flex items-start justify-between gap-3 mb-4">
-          <Badge variant="outline" className="text-xs text-violet-600 border-violet-300 shrink-0">{card.category}</Badge>
+          <Badge variant="outline" className="text-xs text-emerald-600 border-emerald-300 shrink-0">{card.category}</Badge>
           {isPrep && prepTimeLeft !== undefined && (
-            <div className="flex items-center gap-1.5 text-sm font-mono font-bold text-violet-600 shrink-0">
+            <div className="flex items-center gap-1.5 text-sm font-mono font-bold text-emerald-600 shrink-0">
               <PencilLine className="w-3.5 h-3.5" />
               {prepTimeLeft}s left
             </div>
           )}
         </div>
-
         <p className="font-semibold text-base text-foreground leading-snug mb-4">{card.topic}</p>
-
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">You should say:</p>
         <ul className="space-y-1.5 mb-4">
           {card.bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-              <span className="text-violet-400 font-bold shrink-0 mt-0.5">•</span>
+              <span className="text-emerald-400 font-bold shrink-0 mt-0.5">•</span>
               {b}
             </li>
           ))}
         </ul>
         <p className="text-sm text-muted-foreground italic border-t pt-3">{card.followUp}</p>
       </div>
-
-      {/* Preparation notes */}
       {isPrep && (
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <PencilLine className="w-3.5 h-3.5 text-violet-500" />
+            <PencilLine className="w-3.5 h-3.5 text-emerald-600" />
             <p className="text-sm font-medium">Preparation notes</p>
             <span className="text-xs text-muted-foreground">(use this 1 minute to plan your answer)</span>
           </div>
@@ -265,8 +259,6 @@ function CueCardDisplay({ card, prepTimeLeft, isPrep, notes, onNotesChange }: {
           <p className="text-xs text-muted-foreground">These notes are for your eyes only — not submitted or scored.</p>
         </div>
       )}
-
-      {/* Show notes read-only after prep ends */}
       {!isPrep && notes.trim() && (
         <div className="space-y-1.5">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -281,7 +273,109 @@ function CueCardDisplay({ card, prepTimeLeft, isPrep, notes, onNotesChange }: {
   );
 }
 
-// ─── Results View ─────────────────────────────────────────────────────────────
+// ─── Shared band-picker helpers ───────────────────────────────────────────────
+type BandKey = "band5" | "band6" | "band7" | "band8";
+
+const BAND_TABS = [
+  { key: "band5" as BandKey, label: "Band 5", activeBg: "bg-red-500",     activeRing: "ring-red-300",     descColor: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300",     desc: "Simple sentences, basic vocabulary — a solid first step" },
+  { key: "band6" as BandKey, label: "Band 6", activeBg: "bg-amber-500",   activeRing: "ring-amber-300",   descColor: "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300",   desc: "Adequate structure, reasonable vocabulary — clear and competent" },
+  { key: "band7" as BandKey, label: "Band 7", activeBg: "bg-emerald-500", activeRing: "ring-emerald-300", descColor: "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300", desc: "Good range, mostly accurate — well organised and convincing" },
+  { key: "band8" as BandKey, label: "Band 8+", activeBg: "bg-emerald-600", activeRing: "ring-emerald-300", descColor: "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300", desc: "Sophisticated, idiomatic, natural — examiner-level quality" },
+] as const;
+
+function getDefaultBand(score: number): BandKey {
+  if (score <= 5.0) return "band5";
+  if (score <= 6.0) return "band6";
+  if (score <= 7.0) return "band7";
+  return "band8";
+}
+
+function SpeakingModelAnswer({ result }: { result: SpeakingResult }) {
+  const hasMultiBand = !!result.model_answers;
+  const defaultBand = getDefaultBand(result.scores.overall);
+  const [selected, setSelected] = useState<BandKey>(defaultBand);
+  const [copied, setCopied] = useState(false);
+
+  const text = hasMultiBand
+    ? result.model_answers![selected]
+    : (result.model_answer ?? "");
+
+  async function copy() {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  const tab = BAND_TABS.find(t => t.key === selected)!;
+
+  return (
+    <Card className="border-emerald-200 dark:border-emerald-800">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-medium text-emerald-600 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" /> Model Answer
+          </CardTitle>
+          <button onClick={copy} className="text-muted-foreground hover:text-foreground transition-colors p-1">
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {hasMultiBand ? (
+          <>
+            {/* Band selector */}
+            <div className="flex flex-wrap gap-2">
+              {BAND_TABS.map(t => {
+                const isSelected = selected === t.key;
+                const isDefault  = t.key === defaultBand;
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => setSelected(t.key)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                      isSelected
+                        ? `${t.activeBg} text-white border-transparent shadow-sm`
+                        : "bg-background border-border text-muted-foreground hover:border-emerald-300 hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                    {isDefault && (
+                      <span className={`text-[10px] font-normal ${isSelected ? "text-white/80" : "text-emerald-600"}`}>
+                        ← your level
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Desc chip */}
+            <div className={`text-xs rounded-lg px-3 py-2 border ${tab.descColor}`}>
+              <span className="font-semibold">{tab.label}:</span> {tab.desc}
+            </div>
+          </>
+        ) : null}
+
+        {/* Answer text */}
+        <p className="text-sm leading-relaxed text-foreground">{text}</p>
+
+        {/* Nudge to see Band 8 */}
+        {hasMultiBand && selected !== "band8" && (
+          <p className="text-xs text-muted-foreground border-t pt-2.5 flex items-center gap-1.5">
+            <Sparkles className="w-3 h-3 text-emerald-400 shrink-0" />
+            Compare with{" "}
+            <button onClick={() => setSelected("band8")} className="text-emerald-600 hover:underline font-medium">
+              Band 8+ answer
+            </button>{" "}
+            to see how far you can stretch.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Practice Results View ────────────────────────────────────────────────────
 function SpeakingResultView({ result }: { result: SpeakingResult }) {
   const criteria = [
     { key: "fluency_coherence",  label: "Fluency & Coherence",  value: result.scores.fluency_coherence },
@@ -310,7 +404,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Criterion Scores</CardTitle>
@@ -321,12 +414,10 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Your Transcript</CardTitle></CardHeader>
         <CardContent><p className="text-sm text-foreground leading-relaxed font-mono whitespace-pre-wrap">{result.transcript}</p></CardContent>
       </Card>
-
       <div className="grid sm:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-emerald-600">✓ Strengths</CardTitle></CardHeader>
@@ -337,7 +428,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
           <CardContent><ul className="space-y-1.5">{result.weaknesses.map((w, i) => <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-red-500 shrink-0">•</span>{w}</li>)}</ul></CardContent>
         </Card>
       </div>
-
       {result.pronunciation_issues.length > 0 && (
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Pronunciation Issues</CardTitle></CardHeader>
@@ -353,7 +443,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
           </CardContent>
         </Card>
       )}
-
       {result.grammar_issues.length > 0 && (
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Grammar Issues</CardTitle></CardHeader>
@@ -368,7 +457,6 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
           </CardContent>
         </Card>
       )}
-
       {result.vocabulary_suggestions && result.vocabulary_suggestions.length > 0 && (
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Vocabulary Upgrades</CardTitle></CardHeader>
@@ -377,25 +465,20 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
               <div key={i} className="text-sm border rounded-md p-3 bg-card">
                 <span className="text-muted-foreground line-through">{v.basic_word}</span>
                 <span className="mx-2 text-muted-foreground">→</span>
-                <span className="text-violet-600 font-semibold">{v.better_word}</span>
+                <span className="text-emerald-600 font-semibold">{v.better_word}</span>
                 <p className="text-xs text-muted-foreground mt-1 italic">&ldquo;{v.example}&rdquo;</p>
               </div>
             ))}
           </CardContent>
         </Card>
       )}
-
-      <Card className="border-violet-200">
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-violet-600">✦ Band 8+ Model Answer</CardTitle></CardHeader>
-        <CardContent><p className="text-sm leading-relaxed text-foreground">{result.model_answer}</p></CardContent>
-      </Card>
-
+      <SpeakingModelAnswer result={result} />
       <Card>
         <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Next Actions</CardTitle></CardHeader>
         <CardContent className="space-y-2">
           {result.next_actions.map((action, i) => (
             <div key={i} className="flex gap-2.5 text-sm">
-              <span className="font-mono font-bold text-violet-500 shrink-0">{i + 1}.</span>
+              <span className="font-mono font-bold text-emerald-600 shrink-0">{i + 1}.</span>
               <span className="text-foreground">{action}</span>
             </div>
           ))}
@@ -405,40 +488,302 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
   );
 }
 
+// ─── Mock Results View ────────────────────────────────────────────────────────
+interface MockResultsData {
+  part1: SpeakingResult[];
+  part2: SpeakingResult;
+  part3: SpeakingResult[];
+}
+
+function MockResultsView({ results, onRetry }: { results: MockResultsData; onRetry: () => void }) {
+  const [expandedPart, setExpandedPart] = useState<number | null>(null);
+
+  const avg = (arr: number[]) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+
+  const p1Avg = avg(results.part1.map(r => r.scores.overall));
+  const p2Score = results.part2.scores.overall;
+  const p3Avg = avg(results.part3.map(r => r.scores.overall));
+  const overallBand = roundBand(avg([p1Avg, p2Score, p3Avg]));
+
+  const p1Band = roundBand(p1Avg);
+  const p2Band = roundBand(p2Score);
+  const p3Band = roundBand(p3Avg);
+
+  const allResults = [...results.part1, results.part2, ...results.part3];
+  const fluency  = roundBand(avg(allResults.map(r => r.scores.fluency_coherence)));
+  const lexical  = roundBand(avg(allResults.map(r => r.scores.lexical_resource)));
+  const grammar  = roundBand(avg(allResults.map(r => r.scores.grammatical_range)));
+  const pronun   = roundBand(avg(allResults.map(r => r.scores.pronunciation)));
+
+  // Deduplicated strengths/weaknesses
+  const allStrengths = [...new Set(allResults.flatMap(r => r.strengths))].slice(0, 5);
+  const allWeaknesses = [...new Set(allResults.flatMap(r => r.weaknesses))].slice(0, 5);
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50/50 to-background dark:from-emerald-950/30">
+        <CardContent className="pt-6">
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold mb-3">
+              <Trophy className="w-3.5 h-3.5" />
+              Full Mock Test Complete
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <BandScoreRing band={overallBand} size={140} />
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-sm text-muted-foreground">Overall Mock Band Score</p>
+              <p className="text-5xl font-mono font-bold text-emerald-600">{formatBand(overallBand)}</p>
+              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                Averaged across all {allResults.length} answers in your full IELTS Speaking mock test
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Part breakdown */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Part 1", sublabel: "Interview", band: p1Band, count: results.part1.length },
+          { label: "Part 2", sublabel: "Cue Card", band: p2Band, count: 1 },
+          { label: "Part 3", sublabel: "Discussion", band: p3Band, count: results.part3.length },
+        ].map(({ label, sublabel, band, count }) => (
+          <Card key={label} className="text-center">
+            <CardContent className="pt-4 pb-4">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{label}</p>
+              <p className="text-2xl font-mono font-bold">{formatBand(band)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{sublabel}</p>
+              <p className="text-xs text-muted-foreground opacity-60">{count} answer{count > 1 ? "s" : ""}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Criteria */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Overall Criterion Scores</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <BandScoreRing band={fluency} size={80} strokeWidth={7} label="Fluency & Coherence" />
+            <BandScoreRing band={lexical} size={80} strokeWidth={7} label="Lexical Resource" />
+            <BandScoreRing band={grammar} size={80} strokeWidth={7} label="Grammar & Accuracy" />
+            <BandScoreRing band={pronun}  size={80} strokeWidth={7} label="Pronunciation" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Strengths / Weaknesses */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-emerald-600">✓ Key Strengths</CardTitle></CardHeader>
+          <CardContent><ul className="space-y-1.5">{allStrengths.map((s, i) => <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-emerald-500 shrink-0">•</span>{s}</li>)}</ul></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-red-600">✗ Areas to Improve</CardTitle></CardHeader>
+          <CardContent><ul className="space-y-1.5">{allWeaknesses.map((w, i) => <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-red-500 shrink-0">•</span>{w}</li>)}</ul></CardContent>
+        </Card>
+      </div>
+
+      {/* Question-by-question breakdown */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Question-by-Question Scores</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1">
+            {results.part1.map((r, i) => (
+              <div key={`p1-${i}`} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center">P1 · Q{i + 1}</Badge>
+                  <p className="text-xs text-muted-foreground truncate hidden sm:block">{r.transcript?.slice(0, 70)}…</p>
+                </div>
+                <span className="font-mono font-semibold text-sm text-emerald-600 shrink-0 ml-3">{formatBand(r.scores.overall)}</span>
+              </div>
+            ))}
+            <div className="flex items-center justify-between py-2 border-b border-border/40">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center border-emerald-300 text-emerald-600">P2</Badge>
+                <p className="text-xs text-muted-foreground truncate hidden sm:block">{results.part2.transcript?.slice(0, 70)}…</p>
+              </div>
+              <span className="font-mono font-semibold text-sm text-emerald-600 shrink-0 ml-3">{formatBand(results.part2.scores.overall)}</span>
+            </div>
+            {results.part3.map((r, i) => (
+              <div key={`p3-${i}`} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center">P3 · Q{i + 1}</Badge>
+                  <p className="text-xs text-muted-foreground truncate hidden sm:block">{r.transcript?.slice(0, 70)}…</p>
+                </div>
+                <span className="font-mono font-semibold text-sm text-emerald-600 shrink-0 ml-3">{formatBand(r.scores.overall)}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Expandable detailed feedback per part */}
+      {[
+        { label: "Part 1 — Detailed Feedback", results: results.part1, partNum: 1 },
+        { label: "Part 2 — Detailed Feedback", results: [results.part2], partNum: 2 },
+        { label: "Part 3 — Detailed Feedback", results: results.part3, partNum: 3 },
+      ].map(({ label, results: partResults, partNum }) => (
+        <Card key={partNum}>
+          <button
+            className="w-full flex items-center justify-between px-5 py-4 text-left"
+            onClick={() => setExpandedPart(expandedPart === partNum ? null : partNum)}
+          >
+            <span className="text-sm font-medium">{label}</span>
+            <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${expandedPart === partNum ? "rotate-90" : ""}`} />
+          </button>
+          {expandedPart === partNum && (
+            <CardContent className="pt-0 space-y-6">
+              {partResults.map((r, i) => (
+                <div key={i} className="space-y-3">
+                  {partResults.length > 1 && (
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b pb-2">
+                      Question {i + 1} · Band {formatBand(r.scores.overall)}
+                    </p>
+                  )}
+                  <p className="text-sm font-mono leading-relaxed text-foreground bg-muted/40 rounded-lg p-3">{r.transcript}</p>
+                  {r.grammar_issues.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-semibold text-red-600 uppercase tracking-wider">Grammar Issues</p>
+                      {r.grammar_issues.slice(0, 2).map((g, j) => (
+                        <div key={j} className="text-xs border rounded-md p-2 bg-card">
+                          <span className="line-through text-red-500">{g.said}</span>
+                          <span className="mx-2">→</span>
+                          <span className="text-emerald-600 font-medium">{g.should_be}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {r.vocabulary_suggestions && r.vocabulary_suggestions.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Vocabulary Upgrades</p>
+                      {r.vocabulary_suggestions.slice(0, 2).map((v, j) => (
+                        <div key={j} className="text-xs border rounded-md p-2 bg-card flex gap-2">
+                          <span className="text-muted-foreground line-through">{v.basic_word}</span>
+                          <span>→</span>
+                          <span className="text-emerald-600 font-semibold">{v.better_word}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          )}
+        </Card>
+      ))}
+
+      <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#059669" }}>
+        <ClipboardList className="w-5 h-5" /> Take Another Mock Test
+      </Button>
+    </div>
+  );
+}
+
+// ─── Mock Step Progress Bar ───────────────────────────────────────────────────
+function MockProgressBar({ phase, p1Done, p2Done, p3Done }: {
+  phase: string; p1Done: number; p2Done: boolean; p3Done: number;
+}) {
+  const steps = [
+    { label: "Part 1", sublabel: "Interview", done: p1Done >= 5, active: phase === "p1" },
+    { label: "Part 2", sublabel: "Cue Card",  done: p2Done,      active: phase === "p2" },
+    { label: "Part 3", sublabel: "Discussion",done: p3Done >= 5, active: phase === "p3" },
+  ];
+
+  return (
+    <div className="flex items-center gap-0">
+      {steps.map((step, i) => (
+        <div key={i} className="flex items-center flex-1">
+          <div className={`flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl transition-all ${
+            step.active
+              ? "bg-emerald-100 dark:bg-emerald-900/40"
+              : step.done
+              ? "bg-emerald-50 dark:bg-emerald-950/30"
+              : "bg-muted/40"
+          }`}>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+              step.done
+                ? "bg-emerald-500 text-white"
+                : step.active
+                ? "bg-emerald-600 text-white"
+                : "bg-muted text-muted-foreground"
+            }`}>
+              {step.done ? "✓" : i + 1}
+            </div>
+            <p className={`text-xs font-semibold ${step.active ? "text-emerald-700 dark:text-emerald-300" : step.done ? "text-emerald-600" : "text-muted-foreground"}`}>{step.label}</p>
+            <p className="text-xs text-muted-foreground hidden sm:block">{step.sublabel}</p>
+          </div>
+          {i < steps.length - 1 && <div className="h-px w-3 bg-border shrink-0" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function SpeakingPage() {
-  const [part, setPart] = useState<SpeakingPart>(1);
+  // ── Mode ──────────────────────────────────────────────────────────────────
+  const [mode, setMode] = useState<"practice" | "mock">("practice");
 
-  // Part 1 & 3
+  // ── Practice: Part 1 & 3 ──────────────────────────────────────────────────
+  const [part, setPart] = useState<SpeakingPart>(1);
   const [selectedTopicIdx, setSelectedTopicIdx] = useState<number | null>(null);
   const [questionInSet, setQuestionInSet] = useState(0);
   const [completedQuestions, setCompletedQuestions] = useState<number[]>([]);
 
-  // Part 2
+  // ── Practice: Part 2 ──────────────────────────────────────────────────────
   const [selectedCard, setSelectedCard] = useState<CueCardData | null>(null);
   const [prepNotes, setPrepNotes] = useState("");
   const [prepTimeLeft, setPrepTimeLeft] = useState(60);
   const [prepActive, setPrepActive] = useState(false);
   const [recordingEnabled, setRecordingEnabled] = useState(false);
 
-  // Shared
+  // ── Practice: Shared ──────────────────────────────────────────────────────
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SpeakingResult | null>(null);
-
   const prepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // ── Mock Test State ───────────────────────────────────────────────────────
+  type MockPhase = "intro" | "p1" | "p2" | "p3" | "scoring" | "results";
+  const [mockPhase, setMockPhase] = useState<MockPhase>("intro");
+  const [mockP1Topic, setMockP1Topic] = useState<TopicSet | null>(null);
+  const [mockP3Topic, setMockP3Topic] = useState<TopicSet | null>(null);
+  const [mockCueCard, setMockCueCard] = useState<CueCardData | null>(null);
+  const [mockQIdx, setMockQIdx]   = useState(0);
+
+  const [mockRecordings, setMockRecordings] = useState<{ part: 1 | 2 | 3; question: string; blob: Blob }[]>([]);
+  const [mockAudioBlob, setMockAudioBlob]   = useState<Blob | null>(null);
+
+  // Part 2 prep in mock
+  const [mockPrepActive, setMockPrepActive]           = useState(false);
+  const [mockPrepTimeLeft, setMockPrepTimeLeft]       = useState(60);
+  const [mockPrepNotes, setMockPrepNotes]             = useState("");
+  const [mockRecordingEnabled, setMockRecordingEnabled] = useState(false);
+
+  const [mockResults, setMockResults] = useState<MockResultsData | null>(null);
+  const [mockScoringProgress, setMockScoringProgress] = useState(0);
+  const [mockTotalToScore, setMockTotalToScore]       = useState(11);
+
+  const mockPrepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Practice derived values ───────────────────────────────────────────────
   const topics = part === 1 ? PART1_TOPICS : PART3_TOPICS;
   const currentTopicSet = selectedTopicIdx !== null ? topics[selectedTopicIdx] : null;
-
   const currentQuestion =
     part === 2
       ? selectedCard ? `${selectedCard.topic} You should say: ${selectedCard.bullets.join(", ")}. ${selectedCard.followUp}` : ""
       : currentTopicSet?.questions[questionInSet] ?? "";
-
   const totalQsInSet = currentTopicSet?.questions.length ?? 0;
   const isLastQuestion = questionInSet === totalQsInSet - 1;
 
+  // ── Practice functions ────────────────────────────────────────────────────
   function resetForNewPart(p: SpeakingPart) {
     setPart(p);
     setSelectedTopicIdx(null); setQuestionInSet(0); setCompletedQuestions([]);
@@ -457,14 +802,39 @@ export default function SpeakingPage() {
   }
   function selectRandomCard() { selectCueCard(CUE_CARDS[Math.floor(Math.random() * CUE_CARDS.length)]); }
 
+  function playDing() {
+    try {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      // Two-tone ding: high then slightly lower
+      osc.frequency.setValueAtTime(1047, ctx.currentTime);       // C6
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.18); // A5
+      gain.gain.setValueAtTime(0.55, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.1);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 1.1);
+    } catch { /* ignore */ }
+  }
+
   function startPrep() {
-    setPrepActive(true); setPrepTimeLeft(60); setRecordingEnabled(false);
+    const startAt = Date.now();
+    const TOTAL = 60;
+    setPrepActive(true); setPrepTimeLeft(TOTAL); setRecordingEnabled(false);
     prepTimerRef.current = setInterval(() => {
-      setPrepTimeLeft(prev => {
-        if (prev <= 1) { clearInterval(prepTimerRef.current!); setRecordingEnabled(true); setPrepActive(false); return 0; }
-        return prev - 1;
-      });
-    }, 1000);
+      const elapsed = Math.floor((Date.now() - startAt) / 1000);
+      const remaining = Math.max(0, TOTAL - elapsed);
+      setPrepTimeLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(prepTimerRef.current!);
+        playDing();
+        setRecordingEnabled(true);
+        setPrepActive(false);
+      }
+    }, 200); // poll every 200 ms so wall-clock drift is minimal
   }
 
   function handleReset() {
@@ -492,181 +862,636 @@ export default function SpeakingPage() {
     finally { setLoading(false); }
   }
 
+  // ── Mock Test functions ───────────────────────────────────────────────────
+  function startMockTest() {
+    const p1 = PART1_TOPICS[Math.floor(Math.random() * PART1_TOPICS.length)];
+    const p3 = PART3_TOPICS[Math.floor(Math.random() * PART3_TOPICS.length)];
+    const card = CUE_CARDS[Math.floor(Math.random() * CUE_CARDS.length)];
+    setMockP1Topic(p1);
+    setMockP3Topic(p3);
+    setMockCueCard(card);
+    setMockQIdx(0);
+    setMockRecordings([]);
+    setMockAudioBlob(null);
+    setMockPrepActive(false);
+    setMockPrepTimeLeft(60);
+    setMockPrepNotes("");
+    setMockRecordingEnabled(false);
+    setMockResults(null);
+    setMockScoringProgress(0);
+    setMockPhase("p1");
+    if (mockPrepTimerRef.current) clearInterval(mockPrepTimerRef.current);
+  }
+
+  function mockSaveAndNext(recordings: typeof mockRecordings) {
+    if (!mockAudioBlob) return;
+    const blob = mockAudioBlob;
+    setMockAudioBlob(null);
+
+    if (mockPhase === "p1") {
+      const question = mockP1Topic!.questions[mockQIdx];
+      const updated = [...recordings, { part: 1 as const, question, blob }];
+      setMockRecordings(updated);
+      if (mockQIdx < 4) {
+        setMockQIdx(mockQIdx + 1);
+      } else {
+        setMockQIdx(0);
+        setMockPhase("p2");
+      }
+    } else if (mockPhase === "p2") {
+      const question = `${mockCueCard!.topic} You should say: ${mockCueCard!.bullets.join(", ")}. ${mockCueCard!.followUp}`;
+      const updated = [...recordings, { part: 2 as const, question, blob }];
+      setMockRecordings(updated);
+      setMockQIdx(0);
+      setMockPrepActive(false);
+      setMockPrepTimeLeft(60);
+      setMockPrepNotes("");
+      setMockRecordingEnabled(false);
+      if (mockPrepTimerRef.current) clearInterval(mockPrepTimerRef.current);
+      setMockPhase("p3");
+    } else if (mockPhase === "p3") {
+      const question = mockP3Topic!.questions[mockQIdx];
+      const updated = [...recordings, { part: 3 as const, question, blob }];
+      setMockRecordings(updated);
+      if (mockQIdx < 4) {
+        setMockQIdx(mockQIdx + 1);
+      } else {
+        // All done — submit
+        submitMockTest(updated);
+      }
+    }
+  }
+
+  function startMockPrep() {
+    const startAt = Date.now();
+    const TOTAL = 60;
+    setMockPrepActive(true);
+    setMockPrepTimeLeft(TOTAL);
+    setMockRecordingEnabled(false);
+    mockPrepTimerRef.current = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startAt) / 1000);
+      const remaining = Math.max(0, TOTAL - elapsed);
+      setMockPrepTimeLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(mockPrepTimerRef.current!);
+        playDing();
+        setMockRecordingEnabled(true);
+        setMockPrepActive(false);
+      }
+    }, 200);
+  }
+
+  async function submitMockTest(allRecordings: typeof mockRecordings) {
+    const total = allRecordings.length;
+    setMockTotalToScore(total);
+    setMockScoringProgress(0);
+    setMockPhase("scoring");
+
+    let completed = 0;
+
+    const scoreOne = async (r: typeof allRecordings[0]) => {
+      const formData = new FormData();
+      formData.append("audio", r.blob, "recording.webm");
+      formData.append("part", String(r.part));
+      formData.append("question", r.question);
+      const res = await fetch("/api/speaking/score", { method: "POST", body: formData });
+      const data = await res.json();
+      completed++;
+      setMockScoringProgress(completed);
+      if (!res.ok) throw new Error(data.error ?? "scoring failed");
+      return { part: r.part as 1 | 2 | 3, result: data.result as SpeakingResult };
+    };
+
+    const settled = await Promise.allSettled(allRecordings.map(scoreOne));
+
+    const succeeded = settled
+      .filter((s): s is PromiseFulfilledResult<{ part: 1|2|3; result: SpeakingResult }> => s.status === "fulfilled")
+      .map(s => s.value);
+
+    const part1Results = succeeded.filter(s => s.part === 1).map(s => s.result);
+    const part2Result  = succeeded.find(s => s.part === 2)?.result;
+    const part3Results = succeeded.filter(s => s.part === 3).map(s => s.result);
+
+    if (!part2Result || part1Results.length === 0 || part3Results.length === 0) {
+      toast.error("Some answers could not be scored. Please try the mock test again.");
+      setMockPhase("intro");
+      return;
+    }
+
+    const results: MockResultsData = { part1: part1Results, part2: part2Result, part3: part3Results };
+    setMockResults(results);
+    setMockPhase("results");
+
+    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+    const overall = avg([
+      avg(part1Results.map(r => r.scores.overall)),
+      part2Result.scores.overall,
+      avg(part3Results.map(r => r.scores.overall)),
+    ]);
+    if (overall >= 7) confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#8b5cf6", "#10b981", "#f59e0b", "#3b82f6"] });
+    setTimeout(() => document.getElementById("mock-results-top")?.scrollIntoView({ behavior: "smooth" }), 100);
+  }
+
+  // Derived: how many P1/P3 answers saved so far
+  const p1Saved = mockRecordings.filter(r => r.part === 1).length;
+  const p2Saved = mockRecordings.some(r => r.part === 2);
+  const p3Saved = mockRecordings.filter(r => r.part === 3).length;
+
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Speaking Practice</h1>
-        <p className="text-sm text-muted-foreground mt-1">Record your answer and get instant examiner feedback</p>
+        <span className="inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full mb-3"
+          style={{ background: "rgba(5,150,105,0.08)", color: "#059669" }}>
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#059669" }} />
+          AI-POWERED FEEDBACK
+        </span>
+        <h1 className="text-3xl font-display tracking-tight text-foreground">Speaking Practice</h1>
+        <p className="text-base text-muted-foreground mt-1">
+          {mode === "practice"
+            ? "Master the art of conversation. Practice individual parts or take a full exam to get your AI-generated band score in under 15 seconds."
+            : "Complete all 3 parts (Parts 1, 2 & 3) — takes about 15 minutes, just like the real exam"}
+        </p>
       </div>
 
-      <PartSelector selected={part} onChange={resetForNewPart} />
+      {/* ── Mode Selector ── */}
+      <div className="flex gap-1.5 p-1.5 rounded-2xl w-fit" style={{ background: "#f3f4f6" }}>
+        <button
+          onClick={() => setMode("practice")}
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
+          style={mode === "practice" ? {
+            background: "white",
+            color: "#059669",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+            border: "1px solid rgba(5,150,105,0.2)",
+          } : { color: "#6b7280" }}
+        >
+          <Zap className="w-3.5 h-3.5" /> Practice
+        </button>
+        <button
+          onClick={() => { setMode("mock"); if (mockPhase === "intro") setMockPhase("intro"); }}
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
+          style={mode === "mock" ? {
+            background: "white",
+            color: "#059669",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+            border: "1px solid rgba(5,150,105,0.2)",
+          } : { color: "#6b7280" }}
+        >
+          <ClipboardList className="w-3.5 h-3.5" /> Full Mock Test
+          <span className="text-[10px] font-normal hidden sm:inline" style={{ color: "#9ca3af" }}>~15 min</span>
+        </button>
+      </div>
 
-      {/* ── PART 1 & 3 ── */}
-      {part !== 2 && (
+      {/* ══════════════════════════════════════════════════════════════════════
+          PRACTICE MODE
+      ══════════════════════════════════════════════════════════════════════ */}
+      {mode === "practice" && (
         <>
-          {selectedTopicIdx === null ? (
-            <Card><CardContent className="pt-5 pb-5">
-              <TopicPicker topics={topics} onSelect={selectTopic} onRandom={selectRandomTopic} part={part} />
-            </CardContent></Card>
-          ) : (
-            <>
-              <Card><CardContent className="pt-4 pb-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xl">{currentTopicSet!.emoji}</span>
-                      <span className="font-semibold text-sm">{currentTopicSet!.topic}</span>
-                      <Badge variant="outline" className="text-xs ml-auto">Q{questionInSet + 1} / {totalQsInSet}</Badge>
-                    </div>
-                    <div className="flex gap-1.5 mb-4">
-                      {currentTopicSet!.questions.map((_, i) => (
-                        <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${completedQuestions.includes(i) ? "bg-emerald-500" : i === questionInSet ? "bg-violet-500" : "bg-muted"}`} />
-                      ))}
-                    </div>
-                    <p className="font-medium text-base leading-relaxed">{currentTopicSet!.questions[questionInSet]}</p>
-                  </div>
-                </div>
-                {!result && !loading && (
-                  <button onClick={handleChangeTopic} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-3 transition-colors">
-                    <ArrowLeft className="w-3 h-3" /> Change topic
-                  </button>
-                )}
-              </CardContent></Card>
+          <PartSelector selected={part} onChange={resetForNewPart} />
 
-              {!result && (
-                <Card><CardContent className="pt-6 pb-6">
-                  <Recorder limitSeconds={PART_LIMITS[part]} minSeconds={PART_MIN[part]} onRecordingComplete={setAudioBlob} disabled={loading}
-                    label={part === 1 ? "Answer in 20–35 seconds" : "Discuss in depth — aim for 1–2 minutes"} />
+          {/* ── PART 1 & 3 ── */}
+          {part !== 2 && (
+            <>
+              {selectedTopicIdx === null ? (
+                <Card><CardContent className="pt-5 pb-5">
+                  <TopicPicker topics={topics} onSelect={selectTopic} onRandom={selectRandomTopic} part={part} />
+                </CardContent></Card>
+              ) : (
+                <>
+                  <Card><CardContent className="pt-4 pb-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xl">{currentTopicSet!.emoji}</span>
+                          <span className="font-semibold text-sm">{currentTopicSet!.topic}</span>
+                          <Badge variant="outline" className="text-xs ml-auto">Q{questionInSet + 1} / {totalQsInSet}</Badge>
+                        </div>
+                        <div className="flex gap-1.5 mb-4">
+                          {currentTopicSet!.questions.map((_, i) => (
+                            <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${completedQuestions.includes(i) ? "bg-emerald-500" : i === questionInSet ? "bg-emerald-400" : "bg-muted"}`} />
+                          ))}
+                        </div>
+                        <p className="font-medium text-base leading-relaxed">{currentTopicSet!.questions[questionInSet]}</p>
+                      </div>
+                    </div>
+                    {!result && !loading && (
+                      <button onClick={handleChangeTopic} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-3 transition-colors">
+                        <ArrowLeft className="w-3 h-3" /> Change topic
+                      </button>
+                    )}
+                  </CardContent></Card>
+
+                  {!result && (
+                    <Card><CardContent className="pt-5 pb-6">
+                      {/* Mic permission notice */}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 mb-4">
+                        <Mic className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Your browser will ask for <strong>microphone access</strong> when you click Record. Allow it to continue.</span>
+                      </div>
+                      <Recorder limitSeconds={PART_LIMITS[part]} minSeconds={PART_MIN[part]} onRecordingComplete={setAudioBlob} disabled={loading}
+                        label={part === 1 ? "Answer in 20–35 seconds" : "Discuss in depth — aim for 1–2 minutes"} />
+                    </CardContent></Card>
+                  )}
+
+                  {audioBlob && !result && (
+                    <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                      {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring…</> : <><Mic className="w-4 h-4" /> Get Band Score</>}
+                    </Button>
+                  )}
+
+                  {result && !loading && (
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      {!isLastQuestion ? (
+                        <Button onClick={handleNextQuestion} className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                          Next Question <ChevronRight className="w-4 h-4" />
+                        </Button>
+                      ) : (
+                        <Button onClick={handleChangeTopic} className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                          <CheckCircle2 className="w-4 h-4" /> Topic Complete — Try Another
+                        </Button>
+                      )}
+                      <Button variant="outline" onClick={handleReset} className="gap-2">
+                        <RefreshCw className="w-4 h-4" /> Try again
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {/* ── PART 2 ── */}
+          {part === 2 && (
+            <>
+              {!selectedCard && (
+                <Card><CardContent className="pt-5 pb-5">
+                  <CueCardPicker onSelect={selectCueCard} onRandom={selectRandomCard} />
                 </CardContent></Card>
               )}
 
-              {audioBlob && !result && (
-                <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white">
-                  {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring…</> : <><Mic className="w-4 h-4" /> Get Band Score</>}
-                </Button>
-              )}
+              {selectedCard && (
+                <>
+                  <Card>
+                    <CardContent className="pt-5 pb-5">
+                      <CueCardDisplay
+                        card={selectedCard}
+                        prepTimeLeft={prepActive ? prepTimeLeft : undefined}
+                        isPrep={prepActive}
+                        notes={prepNotes}
+                        onNotesChange={setPrepNotes}
+                      />
+                      {!prepActive && !recordingEnabled && !result && !audioBlob && (
+                        <button onClick={() => { setSelectedCard(null); setPrepNotes(""); }}
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-4 transition-colors">
+                          <ArrowLeft className="w-3 h-3" /> Choose a different card
+                        </button>
+                      )}
+                    </CardContent>
+                  </Card>
 
-              {result && !loading && (
-                <div className="flex flex-col sm:flex-row gap-2">
-                  {!isLastQuestion ? (
-                    <Button onClick={handleNextQuestion} className="flex-1 gap-2 bg-violet-500 hover:bg-violet-600 text-white">
-                      Next Question <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  ) : (
-                    <Button onClick={handleChangeTopic} className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
-                      <CheckCircle2 className="w-4 h-4" /> Topic Complete — Try Another
+                  {!prepActive && !recordingEnabled && !result && (
+                    <Button onClick={startPrep} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                      ✏️ Start 1-minute preparation time
                     </Button>
                   )}
-                  <Button variant="outline" onClick={handleReset} className="gap-2">
+
+                  {prepActive && (
+                    <SpeakingTimer elapsed={60 - prepTimeLeft} limit={60} label="Make notes and plan your answer" warning={10} />
+                  )}
+
+                  {recordingEnabled && !result && (
+                    <Card><CardContent className="pt-5 pb-6">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 mb-4">
+                        <Mic className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Preparation time is over — speak for <strong>1–2 minutes</strong>. The examiner may ask 1–2 follow-up questions after.</span>
+                      </div>
+                      <Recorder limitSeconds={PART_LIMITS[2]} minSeconds={PART_MIN[2]} onRecordingComplete={setAudioBlob} disabled={loading}
+                        label="Speak for 1–2 minutes" autoStart={recordingEnabled} />
+                    </CardContent></Card>
+                  )}
+
+                  {audioBlob && !result && (
+                    <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                      {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring…</> : <><Mic className="w-4 h-4" /> Get Band Score</>}
+                    </Button>
+                  )}
+
+                  {result && (
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button onClick={() => { setSelectedCard(null); setPrepNotes(""); setResult(null); setAudioBlob(null); setRecordingEnabled(false); setPrepTimeLeft(60); }}
+                        className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                        <CheckCircle2 className="w-4 h-4" /> Try Another Card
+                      </Button>
+                      <Button variant="outline" onClick={handleReset} className="gap-2">
+                        <RefreshCw className="w-4 h-4" /> Try again
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {/* Practice loading */}
+          {loading && (
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 rounded-full bg-emerald-100 animate-pulse flex items-center justify-center shrink-0">
+                  <span className="text-sm">🎓</span>
+                </div>
+                <p className="text-sm text-muted-foreground animate-pulse font-medium">IELTS Sensei is analysing your speaking…</p>
+              </div>
+              <SpeakingSkeletonLoader />
+            </div>
+          )}
+
+          {/* Practice results */}
+          {result && !loading && (
+            <div id="speaking-results" className="pt-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Your Results</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <SpeakingResultView result={result} />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          MOCK TEST MODE
+      ══════════════════════════════════════════════════════════════════════ */}
+      {mode === "mock" && (
+        <>
+          {/* ── Intro ── */}
+          {mockPhase === "intro" && (
+            <Card className="border-2 border-dashed border-emerald-200 dark:border-emerald-800">
+              <CardContent className="pt-8 pb-8 text-center space-y-6">
+                <div>
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center mx-auto mb-4">
+                    <ClipboardList className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h2 className="text-xl font-bold mb-2">Full IELTS Speaking Mock Test</h2>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                    Complete all 3 parts of the real IELTS Speaking test back-to-back.
+                    No feedback between questions — just like the real exam.
+                    Get one comprehensive report at the very end.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto text-center">
+                  <div className="p-3 rounded-xl bg-muted/60">
+                    <p className="text-2xl mb-1">🎙️</p>
+                    <p className="text-xs font-semibold">Part 1</p>
+                    <p className="text-xs text-muted-foreground">5 interview questions</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-muted/60">
+                    <p className="text-2xl mb-1">📋</p>
+                    <p className="text-xs font-semibold">Part 2</p>
+                    <p className="text-xs text-muted-foreground">1 cue card + 1 min prep</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-muted/60">
+                    <p className="text-2xl mb-1">💬</p>
+                    <p className="text-xs font-semibold">Part 3</p>
+                    <p className="text-xs text-muted-foreground">5 discussion questions</p>
+                  </div>
+                </div>
+
+                <div className="text-xs text-muted-foreground bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3 max-w-sm mx-auto">
+                  ⚡ Topics &amp; cue card are randomly selected. This uses <strong>11 scoring credits</strong> from your daily limit.
+                </div>
+
+                <Button onClick={startMockTest} size="lg" className="gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-10 text-base">
+                  <ClipboardList className="w-5 h-5" /> Start Full Mock Test
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ── Progress bar (shown during p1/p2/p3) ── */}
+          {(mockPhase === "p1" || mockPhase === "p2" || mockPhase === "p3") && (
+            <MockProgressBar phase={mockPhase} p1Done={p1Saved} p2Done={p2Saved} p3Done={p3Saved} />
+          )}
+
+          {/* ── Part 1 ── */}
+          {mockPhase === "p1" && mockP1Topic && (
+            <>
+              <Card>
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className="bg-emerald-600 text-white text-xs">Part 1 · Interview</Badge>
+                    <span className="text-xl">{mockP1Topic.emoji}</span>
+                    <span className="font-semibold text-sm flex-1">{mockP1Topic.topic}</span>
+                    <Badge variant="outline" className="text-xs shrink-0">Q{mockQIdx + 1} / 5</Badge>
+                  </div>
+                  <div className="flex gap-1.5 mb-4">
+                    {mockP1Topic.questions.map((_, i) => (
+                      <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${
+                        i < mockQIdx ? "bg-emerald-500" : i === mockQIdx ? "bg-emerald-600" : "bg-muted"
+                      }`} />
+                    ))}
+                  </div>
+                  <p className="font-medium text-base leading-relaxed">{mockP1Topic.questions[mockQIdx]}</p>
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+                    No feedback until the end of the full test
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card><CardContent className="pt-6 pb-6">
+                <Recorder
+                  limitSeconds={PART_LIMITS[1]}
+                  minSeconds={PART_MIN[1]}
+                  onRecordingComplete={setMockAudioBlob}
+                  disabled={false}
+                  label="Answer in 20–35 seconds"
+                  key={`mock-p1-${mockQIdx}`}
+                />
+              </CardContent></Card>
+
+              {mockAudioBlob && (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => mockSaveAndNext(mockRecordings)}
+                    className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    {mockQIdx < 4 ? (
+                      <><CheckCircle2 className="w-4 h-4" /> Save &amp; Next Question <ChevronRight className="w-4 h-4" /></>
+                    ) : (
+                      <><CheckCircle2 className="w-4 h-4" /> Save &amp; Continue to Part 2 <ChevronRight className="w-4 h-4" /></>
+                    )}
+                  </Button>
+                  <Button variant="outline" onClick={() => setMockAudioBlob(null)} className="gap-2">
                     <RefreshCw className="w-4 h-4" /> Re-record
                   </Button>
                 </div>
               )}
             </>
           )}
-        </>
-      )}
 
-      {/* ── PART 2 ── */}
-      {part === 2 && (
-        <>
-          {/* Step 1: Pick a card */}
-          {!selectedCard && (
-            <Card><CardContent className="pt-5 pb-5">
-              <CueCardPicker onSelect={selectCueCard} onRandom={selectRandomCard} />
-            </CardContent></Card>
-          )}
-
-          {/* Step 2: Card selected — show it */}
-          {selectedCard && (
+          {/* ── Part 2 ── */}
+          {mockPhase === "p2" && mockCueCard && (
             <>
               <Card>
-                <CardContent className="pt-5 pb-5">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className="bg-emerald-600 text-white text-xs">Part 2 · Cue Card</Badge>
+                    <span className="text-xs text-muted-foreground ml-auto">1 min prep + 2 min talk</span>
+                  </div>
                   <CueCardDisplay
-                    card={selectedCard}
-                    prepTimeLeft={prepActive ? prepTimeLeft : undefined}
-                    isPrep={prepActive}
-                    notes={prepNotes}
-                    onNotesChange={setPrepNotes}
+                    card={mockCueCard}
+                    prepTimeLeft={mockPrepActive ? mockPrepTimeLeft : undefined}
+                    isPrep={mockPrepActive}
+                    notes={mockPrepNotes}
+                    onNotesChange={setMockPrepNotes}
                   />
-
-                  {/* Change card link */}
-                  {!prepActive && !recordingEnabled && !result && !audioBlob && (
-                    <button onClick={() => { setSelectedCard(null); setPrepNotes(""); }}
-                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-4 transition-colors">
-                      <ArrowLeft className="w-3 h-3" /> Choose a different card
-                    </button>
+                  {!mockPrepActive && !mockRecordingEnabled && (
+                    <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
+                      <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+                      No feedback until the end of the full test
+                    </p>
                   )}
                 </CardContent>
               </Card>
 
-              {/* Prep timer button */}
-              {!prepActive && !recordingEnabled && !result && (
-                <Button onClick={startPrep} className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white">
+              {!mockPrepActive && !mockRecordingEnabled && !mockAudioBlob && (
+                <Button onClick={startMockPrep} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
                   ✏️ Start 1-minute preparation time
                 </Button>
               )}
 
-              {/* Countdown bar */}
-              {prepActive && (
-                <SpeakingTimer elapsed={60 - prepTimeLeft} limit={60} label="Make notes and plan your answer" warning={10} />
+              {mockPrepActive && (
+                <SpeakingTimer elapsed={60 - mockPrepTimeLeft} limit={60} label="Make notes and plan your answer" warning={10} />
               )}
 
-              {/* Recorder — only after prep is done */}
-              {recordingEnabled && !result && (
+              {mockRecordingEnabled && !mockAudioBlob && (
                 <Card><CardContent className="pt-6 pb-6">
-                  <Recorder limitSeconds={PART_LIMITS[2]} minSeconds={PART_MIN[2]} onRecordingComplete={setAudioBlob} disabled={loading}
-                    label="Speak for 1–2 minutes" />
+                  <Recorder
+                    limitSeconds={PART_LIMITS[2]}
+                    minSeconds={PART_MIN[2]}
+                    onRecordingComplete={setMockAudioBlob}
+                    disabled={false}
+                    label="Speak for 1–2 minutes"
+                    autoStart={mockRecordingEnabled}
+                    key="mock-p2"
+                  />
                 </CardContent></Card>
               )}
 
-              {/* Submit */}
-              {audioBlob && !result && (
-                <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-violet-500 hover:bg-violet-600 text-white">
-                  {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring…</> : <><Mic className="w-4 h-4" /> Get Band Score</>}
-                </Button>
-              )}
-
-              {/* After result */}
-              {result && (
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button onClick={() => { setSelectedCard(null); setPrepNotes(""); setResult(null); setAudioBlob(null); setRecordingEnabled(false); setPrepTimeLeft(60); }}
-                    className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
-                    <CheckCircle2 className="w-4 h-4" /> Try Another Card
+              {mockAudioBlob && (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => mockSaveAndNext(mockRecordings)}
+                    className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    <CheckCircle2 className="w-4 h-4" /> Save &amp; Continue to Part 3 <ChevronRight className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" onClick={handleReset} className="gap-2">
+                  <Button variant="outline" onClick={() => { setMockAudioBlob(null); setMockRecordingEnabled(true); }} className="gap-2">
                     <RefreshCw className="w-4 h-4" /> Re-record
                   </Button>
                 </div>
               )}
             </>
           )}
-        </>
-      )}
 
-      {/* Loading skeleton */}
-      {loading && (
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-full bg-emerald-100 animate-pulse flex items-center justify-center shrink-0">
-              <span className="text-sm">🎓</span>
+          {/* ── Part 3 ── */}
+          {mockPhase === "p3" && mockP3Topic && (
+            <>
+              <Card>
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className="bg-emerald-600 text-white text-xs">Part 3 · Discussion</Badge>
+                    <span className="text-xl">{mockP3Topic.emoji}</span>
+                    <span className="font-semibold text-sm flex-1">{mockP3Topic.topic}</span>
+                    <Badge variant="outline" className="text-xs shrink-0">Q{mockQIdx + 1} / 5</Badge>
+                  </div>
+                  <div className="flex gap-1.5 mb-4">
+                    {mockP3Topic.questions.map((_, i) => (
+                      <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${
+                        i < mockQIdx ? "bg-emerald-500" : i === mockQIdx ? "bg-emerald-600" : "bg-muted"
+                      }`} />
+                    ))}
+                  </div>
+                  <p className="font-medium text-base leading-relaxed">{mockP3Topic.questions[mockQIdx]}</p>
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+                    {mockQIdx < 4 ? "No feedback until the end of the full test" : "Last question — submit for your full results!"}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card><CardContent className="pt-6 pb-6">
+                <Recorder
+                  limitSeconds={PART_LIMITS[3]}
+                  minSeconds={PART_MIN[3]}
+                  onRecordingComplete={setMockAudioBlob}
+                  disabled={false}
+                  label="Discuss in depth — aim for 1–2 minutes"
+                  key={`mock-p3-${mockQIdx}`}
+                />
+              </CardContent></Card>
+
+              {mockAudioBlob && (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => mockSaveAndNext(mockRecordings)}
+                    className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    {mockQIdx < 4 ? (
+                      <><CheckCircle2 className="w-4 h-4" /> Save &amp; Next Question <ChevronRight className="w-4 h-4" /></>
+                    ) : (
+                      <><Trophy className="w-4 h-4" /> Submit Full Test &amp; Get Results</>
+                    )}
+                  </Button>
+                  <Button variant="outline" onClick={() => setMockAudioBlob(null)} className="gap-2">
+                    <RefreshCw className="w-4 h-4" /> Re-record
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── Scoring ── */}
+          {mockPhase === "scoring" && (
+            <Card className="border-emerald-200 dark:border-emerald-800">
+              <CardContent className="pt-10 pb-10 text-center space-y-5">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center mx-auto">
+                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Analysing your complete mock test…</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Scoring {mockScoringProgress} / {mockTotalToScore} answers
+                  </p>
+                </div>
+                <div className="w-full max-w-xs mx-auto bg-muted rounded-full h-2">
+                  <div
+                    className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${mockTotalToScore > 0 ? (mockScoringProgress / mockTotalToScore) * 100 : 0}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  🎓 IELTS Sensei is reviewing all {mockTotalToScore} recordings — please wait
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ── Results ── */}
+          {mockPhase === "results" && mockResults && (
+            <div id="mock-results-top" className="space-y-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Mock Test Results</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <MockResultsView results={mockResults} onRetry={startMockTest} />
             </div>
-            <p className="text-sm text-muted-foreground animate-pulse font-medium">IELTS Sensei is analysing your speaking…</p>
-          </div>
-          <SpeakingSkeletonLoader />
-        </div>
-      )}
-
-      {/* Results */}
-      {result && !loading && (
-        <div id="speaking-results" className="pt-2">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Your Results</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-          <SpeakingResultView result={result} />
-        </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -6,31 +6,31 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { GraduationCap, Loader2, Eye, EyeOff } from "lucide-react";
+import { GraduationCap, Loader2, Eye, EyeOff, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ResetPasswordPage() {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [password, setPassword]   = useState("");
+  const [confirm, setConfirm]     = useState("");
+  const [showPass, setShowPass]   = useState(false);
+  const [loading, setLoading]     = useState(false);
   const router = useRouter();
-
   const supabase = createClient();
+
+  const passwordOk = password.length >= 6;
+  const confirmOk  = password === confirm && confirm.length > 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
-    if (password !== confirm) { toast.error("Passwords do not match"); return; }
-
+    if (!passwordOk) { toast.error("Password must be at least 6 characters"); return; }
+    if (!confirmOk)  { toast.error("Passwords do not match"); return; }
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("Password updated! Redirecting…");
+        toast.success("Password updated! Taking you to your dashboard…");
         setTimeout(() => router.push("/dashboard"), 1500);
       }
     } finally {
@@ -39,71 +39,144 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-violet-500 flex items-center justify-center">
-            <GraduationCap className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-xl font-bold">IELTS AI Coach</h1>
-          <p className="text-sm text-muted-foreground">Set a new password</p>
-        </div>
+    <div className="min-h-screen flex" style={{ background: "oklch(0.982 0.005 285)" }}>
+      {/* Left panel */}
+      <div
+        className="hidden lg:flex flex-col items-center justify-center w-[480px] shrink-0 p-10 relative overflow-hidden"
+        style={{ background: "oklch(0.155 0.032 278)" }}
+      >
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, oklch(0.546 0.245 274 / 18%), transparent 70%)" }} />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, oklch(0.65 0.18 160 / 12%), transparent 70%)" }} />
 
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base">New password</CardTitle>
-            <CardDescription className="text-xs">
-              Choose a strong password with at least 6 characters.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="password">New password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPass ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="6+ characters"
-                    required
-                    autoFocus
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+        <div className="relative z-10 text-center space-y-5 max-w-xs">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
+            style={{
+              background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))",
+              boxShadow: "0 4px 24px oklch(0.546 0.245 274 / 40%)",
+            }}
+          >
+            <ShieldCheck className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold mb-2" style={{ color: "oklch(0.94 0.01 278)" }}>
+              Set a new password
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: "oklch(0.62 0.015 278)" }}>
+              Choose a strong password to secure your account and get back to practising.
+            </p>
+          </div>
+          <div className="space-y-2 text-left">
+            {[
+              "At least 6 characters long",
+              "Mix letters and numbers for strength",
+              "Avoid using personal information",
+            ].map((tip) => (
+              <div key={tip} className="flex items-center gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: "oklch(0.72 0.18 160)" }} />
+                <p className="text-xs" style={{ color: "oklch(0.65 0.012 278)" }}>{tip}</p>
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="confirm">Confirm password</Label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right panel */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+        <div className="w-full max-w-[400px]">
+
+          {/* Mobile logo */}
+          <div className="flex items-center gap-3 mb-8 lg:hidden">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))" }}
+            >
+              <GraduationCap className="w-4.5 h-4.5 text-white" />
+            </div>
+            <p className="font-bold text-base">IELTS AI Coach</p>
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold tracking-tight">New password</h1>
+            <p className="text-sm text-muted-foreground mt-1">Choose something strong and memorable</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-sm font-medium">New password</Label>
+              <div className="relative">
                 <Input
-                  id="confirm"
-                  type="password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  placeholder="Same password again"
+                  id="password"
+                  type={showPass ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="6+ characters"
                   required
+                  autoFocus
+                  className="h-11 pr-10"
                 />
-                {confirm && password !== confirm && (
-                  <p className="text-xs text-red-500">Passwords don&apos;t match</p>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-violet-500 hover:bg-violet-600 text-white"
-                disabled={loading || password !== confirm || password.length < 6}
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update password"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+              {/* Strength indicator */}
+              {password.length > 0 && (
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="flex gap-1 flex-1">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300"
+                        style={{
+                          background: password.length >= i * 3
+                            ? i === 3 ? "oklch(0.65 0.18 160)" : i === 2 ? "oklch(0.75 0.18 55)" : "oklch(0.65 0.2 27)"
+                            : "oklch(0.912 0.012 285)"
+                        }} />
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    {password.length < 3 ? "Weak" : password.length < 6 ? "Fair" : "Good"}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="confirm" className="text-sm font-medium">Confirm password</Label>
+              <Input
+                id="confirm"
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                placeholder="Same password again"
+                required
+                className="h-11"
+              />
+              {confirm && !confirmOk && (
+                <p className="text-xs text-destructive">Passwords don&apos;t match</p>
+              )}
+              {confirmOk && (
+                <p className="text-xs" style={{ color: "oklch(0.65 0.18 160)" }}>✓ Passwords match</p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 font-semibold mt-2"
+              disabled={loading || !passwordOk || !confirmOk}
+              style={{
+                background: "linear-gradient(135deg, oklch(0.546 0.245 274), oklch(0.52 0.22 300))",
+                boxShadow: "0 4px 16px oklch(0.546 0.245 274 / 35%)",
+              }}
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update password"}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );

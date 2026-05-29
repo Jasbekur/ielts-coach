@@ -44,7 +44,12 @@ Return ONLY a JSON object matching this exact shape — no markdown, no preamble
   "corrections": [
     { "original": "exact phrase from essay", "fixed": "corrected version", "reason": "clear explanation why this is wrong", "category": "grammar|vocabulary|cohesion|task" }
   ],
-  "band_8_rewrite": "full rewritten essay at Band 8 level using the same arguments and approximate length",
+  "model_answers": {
+    "band5": "Rewrite the essay at Band 5 level: short simple sentences, basic everyday vocabulary (good/bad/many/people/think), frequent grammar errors that do not block meaning, minimal cohesive devices, 150-180 words — sounds like a real Band 5 student",
+    "band6": "Rewrite at Band 6: mix of simple and some complex sentences, adequate vocabulary with occasional misuse, mostly clear organisation with some linking words (however/therefore/in addition), 200-240 words — competent but not impressive",
+    "band7": "Rewrite at Band 7: good range of vocabulary and structures, mostly accurate grammar, clear paragraphing, effective use of cohesive devices, 250-290 words — clearly organised and convincing",
+    "band8": "Rewrite at Band 8+: sophisticated vocabulary and idiomatic language, wide range of complex structures used accurately, seamless cohesion, fully developed arguments, 270-320 words — examiner-level quality"
+  },
   "next_actions": [
     "Very specific drill — e.g. 'Write 5 sentences using articles correctly: a/an for first mention, the for second'",
     "Specific drill — e.g. 'Practice these 10 uncountable nouns: information, advice, knowledge, research, homework, weather, traffic, furniture, equipment, luggage'",
@@ -59,7 +64,7 @@ Make next_actions extremely specific and actionable — not generic phrases like
 
 export const writingTask1Prompt = (essay: string, question: string, hasImage = false) => `
 You are an official IELTS examiner. Score this Academic Task 1 report against public band descriptors.
-${hasImage ? "\nA chart/diagram image has been provided. Analyse the image carefully to evaluate whether the student has accurately described the data, selected the key features, and made correct comparisons. Reference specific data points from the image in your corrections and band_8_rewrite.\n" : ""}
+${hasImage ? "\nA chart/diagram image has been provided. Analyse the image carefully to evaluate whether the student has accurately described the data, selected the key features, and made correct comparisons. Reference specific data points from the image in your corrections and model_answers.\n" : ""}
 TASK INSTRUCTIONS:
 ${question}
 
@@ -98,7 +103,12 @@ Return ONLY JSON matching this exact shape — no markdown, no preamble:
   "corrections": [
     { "original": "exact phrase from report", "fixed": "corrected version", "reason": "clear explanation", "category": "grammar|vocabulary|cohesion|task" }
   ],
-  "band_8_rewrite": "full rewritten report at Band 8 level",
+  "model_answers": {
+    "band5": "Rewrite the report at Band 5: short simple sentences, basic data vocabulary (go up/go down/stay), some data errors OK, missing or weak overview, ~120-140 words",
+    "band6": "Rewrite at Band 6: adequate overview, selects main features, uses some comparison language (while/whereas/compared to), some missing data or imprecise numbers, ~150-170 words",
+    "band7": "Rewrite at Band 7: clear overview, good selection of key features, accurate data references, varied vocabulary (rose/fell/peaked/levelled off), logical grouping, ~170-190 words",
+    "band8": "Rewrite at Band 8+: sophisticated overview, precise data throughout, seamless cohesion, wide range of reporting vocabulary, fully accurate, ~185-210 words — examiner-level"
+  },
   "next_actions": [
     "Specific drill 1 — e.g. 'Write an overview sentence for this chart using: Overall, it is clear that...'",
     "Specific drill 2 — e.g. 'Practice these trend verbs: rose, fell, peaked, levelled off, fluctuated'",
@@ -165,7 +175,12 @@ Return ONLY this JSON shape — no markdown, no preamble:
   "vocabulary_suggestions": [
     { "basic_word": "word they used", "better_word": "more impressive alternative", "example": "example sentence with the better word" }
   ],
-  "model_answer": "A Band 8+ response to this exact question — natural, fluent, varied vocabulary (2-3 sentences for Part 1, full 1.5-2 min response for Part 2, 4-5 sentences for Part 3)",
+  "model_answers": {
+    "band5": "A Band 5 response to this exact question — short simple sentences, basic vocabulary (go/like/think/good/because), some grammar errors that don't block meaning, sounds like a real Band 5 student. Part 1: 1-2 sentences. Part 2: ~60-80 words. Part 3: 2 short sentences.",
+    "band6": "A Band 6 response — mix of simple and some complex sentences, adequate vocabulary, generally clear but not impressive, some repetition. Part 1: 2-3 sentences. Part 2: ~90-110 words. Part 3: 2-3 sentences with one reason.",
+    "band7": "A Band 7 response — good vocabulary range, mostly accurate grammar, clear structure, uses some linking phrases (Moreover/However/For instance). Part 1: 3-4 sentences. Part 2: ~120-140 words. Part 3: 3-4 sentences well developed.",
+    "band8": "A Band 8+ response — sophisticated, natural, idiomatic language, complex structures, seamless fluency. Part 1: 3-4 polished sentences. Part 2: ~150-170 words. Part 3: 4-5 sentences with nuanced argument."
+  },
   "next_actions": [
     "Specific drill — e.g. 'Practice the /θ/ sound: put your tongue between your teeth and say: the, this, that, think, three, throw'",
     "Specific drill — e.g. 'Extend your Part 1 answers: use the AREA technique — Answer, Reason, Example, Alternative'",

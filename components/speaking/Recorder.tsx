@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Mic, Square, RefreshCw } from "lucide-react";
+import { Mic, Square, RefreshCw, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpeakingTimer } from "./SpeakingTimer";
 import { getSupportedMimeType } from "@/lib/utils/audio";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface RecorderProps {
   limitSeconds: number;
@@ -13,6 +14,7 @@ interface RecorderProps {
   onRecordingComplete: (blob: Blob) => void;
   disabled?: boolean;
   label?: string;
+  autoStart?: boolean;
 }
 
 type RecordState = "idle" | "recording" | "done";
@@ -23,6 +25,7 @@ export function Recorder({
   onRecordingComplete,
   disabled = false,
   label,
+  autoStart = false,
 }: RecorderProps) {
   const [state, setState] = useState<RecordState>("idle");
   const [elapsed, setElapsed] = useState(0);
@@ -38,6 +41,14 @@ export function Recorder({
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  // Auto-start recording when the parent signals it's time
+  useEffect(() => {
+    if (autoStart && stateRef.current === "idle" && !disabled) {
+      startRecording();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart]);
 
   function stopRecording() {
     if (mediaRecorderRef.current && stateRef.current === "recording") {
@@ -92,8 +103,15 @@ export function Recorder({
       timerRef.current = setInterval(() => {
         setElapsed((prev) => prev + 1);
       }, 1000);
-    } catch {
-      alert("Please allow microphone access to record your answer.");
+    } catch (err) {
+      const isDenied = err instanceof DOMException &&
+        (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
+      toast.error(
+        isDenied
+          ? "Microphone access denied. Please allow microphone in your browser settings and try again."
+          : "Could not start recording. Check your microphone is connected and try again.",
+        { duration: 6000 }
+      );
     }
   }
 

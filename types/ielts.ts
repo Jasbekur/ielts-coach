@@ -38,6 +38,13 @@ export interface GrammarIssue {
   reason: string;
 }
 
+export interface ModelAnswers {
+  band5: string;
+  band6: string;
+  band7: string;
+  band8: string;
+}
+
 export interface WritingResult {
   essay_type?: "opinion" | "discuss_both_views" | "problem_solution" | "advantages_disadvantages" | "direct_question";
   has_overview?: boolean;
@@ -46,7 +53,9 @@ export interface WritingResult {
   strengths: string[];
   weaknesses: string[];
   corrections: Correction[];
-  band_8_rewrite: string;
+  /** @deprecated use model_answers */
+  band_8_rewrite?: string;
+  model_answers?: ModelAnswers;
   next_actions: string[];
 }
 
@@ -68,7 +77,9 @@ export interface SpeakingResult {
   pronunciation_issues: PronunciationIssue[];
   grammar_issues: GrammarIssue[];
   vocabulary_suggestions?: VocabSuggestion[];
-  model_answer: string;
+  /** @deprecated use model_answers */
+  model_answer?: string;
+  model_answers?: ModelAnswers;
   next_actions: string[];
 }
 

@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, JetBrains_Mono, Plus_Jakarta_Sans, Lora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -13,6 +13,31 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-lora",
+  display: "swap",
+});
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,   // prevents auto-zoom on input focus on iOS
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f9f8ff" },
+    { media: "(prefers-color-scheme: dark)",  color: "#1e1b2e" },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "IELTS AI Coach",
   description:
@@ -20,7 +45,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "IELTS AI Coach",
     description: "AI-powered IELTS preparation for Writing & Speaking",
+    type: "website",
+    locale: "en_US",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "IELTS AI Coach",
+    description: "AI-powered IELTS preparation for Writing & Speaking",
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -29,10 +62,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${plusJakartaSans.variable} ${lora.variable}`}>
       <body className="font-sans antialiased bg-background text-foreground">
         {children}
-        <Toaster richColors closeButton position="top-right" />
+        {/* Bottom-center on mobile so toasts don't clash with browser chrome */}
+        <Toaster richColors closeButton position="bottom-center"
+          toastOptions={{ classNames: { toast: "md:!translate-x-0" } }} />
       </body>
     </html>
   );

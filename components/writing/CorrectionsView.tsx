@@ -28,7 +28,7 @@ function CorrectionItem({ correction }: { correction: Correction }) {
     <button
       type="button"
       onClick={() => setOpen(!open)}
-      className="w-full text-left border rounded-lg p-3 bg-card hover:border-violet-300 transition-colors"
+      className="w-full text-left border rounded-lg p-3 bg-card hover:border-emerald-300 transition-colors"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <Badge
@@ -100,7 +100,7 @@ export function CorrectionsView({ result }: CorrectionsViewProps) {
           <button
             type="button"
             onClick={() => setShowAll(!showAll)}
-            className="w-full text-xs text-violet-500 hover:text-violet-600 py-2 border border-dashed border-violet-200 rounded-lg transition-colors"
+            className="w-full text-xs text-emerald-600 hover:text-emerald-600 py-2 border border-dashed border-emerald-200 rounded-lg transition-colors"
           >
             {showAll
               ? "Show less"

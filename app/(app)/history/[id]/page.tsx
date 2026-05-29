@@ -94,13 +94,25 @@ export default async function AttemptDetailPage({
             })}
           </p>
         </div>
-        <span
-          className={`font-mono font-bold text-2xl ${getBandTailwind(
-            attempt.overall_band
-          )}`}
-        >
-          {attempt.overall_band.toFixed(1)}
-        </span>
+        <div className="text-right shrink-0">
+          <span
+            className={`font-mono font-bold text-2xl ${getBandTailwind(
+              attempt.overall_band
+            )}`}
+          >
+            {attempt.overall_band.toFixed(1)}
+          </span>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {attempt.overall_band >= 8.5 ? "Very Good+" :
+             attempt.overall_band >= 8   ? "Very Good" :
+             attempt.overall_band >= 7.5 ? "Good+" :
+             attempt.overall_band >= 7   ? "Good" :
+             attempt.overall_band >= 6.5 ? "Competent+" :
+             attempt.overall_band >= 6   ? "Competent" :
+             attempt.overall_band >= 5.5 ? "Modest+" :
+             attempt.overall_band >= 5   ? "Modest" : "Limited"}
+          </p>
+        </div>
       </div>
 
       {/* Task 1 overview warning */}

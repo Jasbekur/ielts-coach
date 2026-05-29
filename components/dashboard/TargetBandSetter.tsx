@@ -9,11 +9,11 @@ const BAND_OPTIONS = [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0];
 interface Props {
   userId: string;
   currentTarget: number | null;
-  currentAvg?: number | null; // user's recent average band
+  currentAvg?: number | null;
 }
 
 export function TargetBandSetter({ userId, currentTarget, currentAvg }: Props) {
-  const [editing, setEditing] = useState(!currentTarget); // open picker if no target set yet
+  const [editing, setEditing] = useState(!currentTarget);
   const [selected, setSelected] = useState<number | null>(currentTarget);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -22,10 +22,7 @@ export function TargetBandSetter({ userId, currentTarget, currentAvg }: Props) {
   function handleSave(band: number) {
     setSelected(band);
     startTransition(async () => {
-      await supabase
-        .from("profiles")
-        .update({ target_band: band })
-        .eq("id", userId);
+      await supabase.from("profiles").update({ target_band: band }).eq("id", userId);
       setSaved(true);
       setEditing(false);
       setTimeout(() => setSaved(false), 2000);
@@ -36,33 +33,41 @@ export function TargetBandSetter({ userId, currentTarget, currentAvg }: Props) {
 
   if (!editing) {
     return (
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
-            <Target className="w-3.5 h-3.5 text-violet-500" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground leading-tight">Target Band</p>
-            <p className="font-mono font-bold text-lg leading-tight">{selected?.toFixed(1) ?? "—"}</p>
+      <div>
+        {/* Header row */}
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Target</p>
+          <div className="flex items-center gap-1">
+            <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+              <Target className="w-3 h-3 text-emerald-600" />
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {gap !== null && (
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              gap <= 0
-                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
-                : "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
-            }`}>
-              {gap <= 0 ? "✓ Goal reached!" : `+${gap.toFixed(1)} to go`}
-            </span>
-          )}
+        {/* Band number */}
+        <p className="text-3xl font-display leading-none tracking-nums mb-1.5">
+          {selected?.toFixed(1) ?? "—"}
+        </p>
+
+        {/* Gap status + edit */}
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {gap === null ? (
+              <span>band goal</span>
+            ) : gap <= 0 ? (
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">✓ Reached!</span>
+            ) : (
+              <span className="text-amber-600 dark:text-amber-400 font-medium">+{gap.toFixed(1)} to go</span>
+            )}
+          </p>
           <button
             onClick={() => setEditing(true)}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             title="Change target band"
           >
-            {saved ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Pencil className="w-3.5 h-3.5" />}
+            {saved
+              ? <Check className="w-3 h-3 text-emerald-500" />
+              : <Pencil className="w-3 h-3" />}
           </button>
         </div>
       </div>
@@ -70,26 +75,23 @@ export function TargetBandSetter({ userId, currentTarget, currentAvg }: Props) {
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Target className="w-4 h-4 text-violet-500" />
-        <p className="text-sm font-medium">
-          {currentTarget ? "Change your target band" : "Set your target band score"}
+    <div className="space-y-2 -mt-0.5">
+      <div className="flex items-center gap-1.5">
+        <Target className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+        <p className="text-xs font-semibold">
+          {currentTarget ? "Change target" : "Set target band"}
         </p>
       </div>
-      <p className="text-xs text-muted-foreground">
-        What IELTS band score do you need? (e.g. university usually requires 6.5 or 7.0)
-      </p>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-1">
         {BAND_OPTIONS.map((band) => (
           <button
             key={band}
             onClick={() => handleSave(band)}
             disabled={isPending}
-            className={`text-xs px-3 py-1.5 rounded-full border transition-all font-mono font-semibold ${
+            className={`text-[11px] px-2 py-1 rounded-lg border transition-all font-mono font-bold ${
               selected === band
-                ? "bg-violet-500 text-white border-violet-500 shadow-sm"
-                : "border-border hover:border-violet-300 hover:bg-violet-50 dark:hover:bg-violet-950/50"
+                ? "bg-emerald-600 text-white border-emerald-600"
+                : "border-border hover:border-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
             }`}
           >
             {band.toFixed(1)}
@@ -98,9 +100,9 @@ export function TargetBandSetter({ userId, currentTarget, currentAvg }: Props) {
         {currentTarget && (
           <button
             onClick={() => setEditing(false)}
-            className="text-xs px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground transition-colors"
+            className="text-[11px] px-2 py-1 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors"
           >
-            Cancel
+            ✕
           </button>
         )}
       </div>

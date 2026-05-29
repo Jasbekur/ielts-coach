@@ -32,7 +32,13 @@ export function EssayEditor({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="min-h-[280px] resize-none font-mono text-sm leading-relaxed"
+        className="min-h-[280px] resize-none"
+        style={{
+          fontFamily: "'Lora', Georgia, serif",
+          fontSize: "16px",
+          lineHeight: "1.8",
+          letterSpacing: "0.01em",
+        }}
       />
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">
