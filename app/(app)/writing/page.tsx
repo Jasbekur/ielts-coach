@@ -535,61 +535,54 @@ export default function WritingPage() {
 
             {/* Question */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <label className="text-sm font-medium">
                   {taskType === "task1" ? "Question / task instructions" : "Essay question"}
                 </label>
-                <button
-                  type="button"
-                  onClick={pickRandomQuestion}
-                  className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
-                >
-                  <Shuffle className="w-3 h-3" />
-                  {taskType === "task1" ? "Practice question + chart" : "Practice question"}
-                </button>
-              </div>
-              <div className="relative">
-                <Textarea
-                  value={question}
-                  onChange={(e) => {
-                    setIsGeneratedQuestion(false);
-                    setQuestion(e.target.value);
-                  }}
-                  readOnly={isGeneratedQuestion}
-                  placeholder={
-                    taskType === "task1"
-                      ? "Paste the task instructions here, e.g. 'The graph below shows... Summarise the information by selecting and reporting the main features...'"
-                      : "Paste the essay question here, or click 'Practice question' for a sample..."
-                  }
-                  className={`resize-none min-h-[100px] text-sm ${isGeneratedQuestion ? "bg-muted/50 cursor-default select-text" : ""}`}
-                />
-                {isGeneratedQuestion && question && (
+                <div className="flex items-center gap-2 shrink-0">
+                  {/* Clear button — only shown when a generated question is loaded */}
+                  {isGeneratedQuestion && question && (
+                    <button
+                      type="button"
+                      onClick={() => { setIsGeneratedQuestion(false); setQuestion(""); setChartFile(null); setChartPreview(null); }}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all duration-150 hover:scale-105 active:scale-95"
+                      style={{
+                        background: "rgba(239,68,68,0.08)",
+                        color: "#ef4444",
+                        border: "1px solid rgba(239,68,68,0.18)",
+                      }}
+                    >
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" className="shrink-0">
+                        <line x1="1" y1="1" x2="7" y2="7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                        <line x1="7" y1="1" x2="1" y2="7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                      </svg>
+                      Clear
+                    </button>
+                  )}
                   <button
                     type="button"
-                    onClick={() => { setIsGeneratedQuestion(false); setQuestion(""); }}
-                    className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold transition-all duration-150 hover:scale-105 active:scale-95"
-                    style={{
-                      background: "rgba(239,68,68,0.1)",
-                      color: "#ef4444",
-                      border: "1px solid rgba(239,68,68,0.2)",
-                    }}
-                    onMouseEnter={e => {
-                      (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.18)";
-                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(239,68,68,0.4)";
-                    }}
-                    onMouseLeave={e => {
-                      (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.1)";
-                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(239,68,68,0.2)";
-                    }}
+                    onClick={pickRandomQuestion}
+                    className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
                   >
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="shrink-0">
-                      <line x1="1.5" y1="1.5" x2="8.5" y2="8.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                      <line x1="8.5" y1="1.5" x2="1.5" y2="8.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                    </svg>
-                    Clear
+                    <Shuffle className="w-3 h-3" />
+                    {taskType === "task1" ? "Practice question + chart" : "Practice question"}
                   </button>
-                )}
+                </div>
               </div>
+              <Textarea
+                value={question}
+                onChange={(e) => {
+                  setIsGeneratedQuestion(false);
+                  setQuestion(e.target.value);
+                }}
+                readOnly={isGeneratedQuestion}
+                placeholder={
+                  taskType === "task1"
+                    ? "Paste the task instructions here, e.g. 'The graph below shows... Summarise the information by selecting and reporting the main features...'"
+                    : "Paste the essay question here, or click 'Practice question' for a sample..."
+                }
+                className={`resize-none min-h-[100px] text-sm ${isGeneratedQuestion ? "bg-muted/50 cursor-default select-text" : ""}`}
+              />
             </div>
 
             {/* Task 1: Chart / diagram upload */}

@@ -329,97 +329,159 @@ export interface ProcessConfig {
 }
 
 export function processDiagram(c: ProcessConfig): string {
-  const col = c.color ?? "#7c3aed";
+  // Vibrant multi-step palette — each card gets its own colour
+  const PALETTE = [
+    ["#6366f1","#4f46e5"], // indigo
+    ["#0ea5e9","#0284c7"], // sky
+    ["#10b981","#059669"], // emerald
+    ["#f59e0b","#d97706"], // amber
+    ["#ef4444","#dc2626"], // red
+    ["#8b5cf6","#7c3aed"], // violet
+    ["#06b6d4","#0891b2"], // cyan
+    ["#84cc16","#65a30d"], // lime
+  ];
   const n = c.steps.length;
   const layout = c.layout ?? (n <= 5 ? "horizontal" : "snake");
 
-  let out = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" style="font-family:Arial,sans-serif;background:#fff;">`;
+  // card dimensions
+  const GAP = 28;
+  const BH = 100; // card height
+  const BW_H = Math.min(130, Math.floor((IW - GAP * (n - 1)) / n)); // horizontal card width
+  const HEADER_H = 36; // coloured top band height
+  const R = 12; // corner radius
+
+  function wrapText(text: string, maxChars: number): string[] {
+    const words = text.split(" ");
+    const lines: string[] = [];
+    let cur = "";
+    words.forEach(w => {
+      if (cur && (cur + " " + w).length > maxChars) { lines.push(cur); cur = w; }
+      else cur = cur ? cur + " " + w : w;
+    });
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  function drawCard(x: number, y: number, step: string, idx: number): string {
+    const [c1, c2] = PALETTE[idx % PALETTE.length];
+    const mid = x + BW_H / 2;
+    let s = "";
+    const uid = `g${idx}`;
+    // shadow
+    s += `<rect x="${x+3}" y="${y+3}" width="${BW_H}" height="${BH}" rx="${R}" fill="rgba(0,0,0,0.12)"/>`;
+    // card body (white)
+    s += `<rect x="${x}" y="${y}" width="${BW_H}" height="${BH}" rx="${R}" fill="#fff" stroke="#e5e7eb" stroke-width="1"/>`;
+    // coloured header band
+    s += `<defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs>`;
+    s += `<path d="M${x+R},${y} h${BW_H-2*R} a${R},${R} 0 0 1 ${R},${R} v${HEADER_H-R} h-${BW_H} v-${HEADER_H-R} a${R},${R} 0 0 1 ${R},-${R}z" fill="url(#${uid})"/>`;
+    // step number badge
+    s += `<circle cx="${mid}" cy="${y + HEADER_H / 2}" r="13" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>`;
+    s += `<text x="${mid}" y="${y + HEADER_H / 2 + 4.5}" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">${idx + 1}</text>`;
+    // step text (wrapped, centred in lower card area)
+    const lines = wrapText(step, Math.floor(BW_H / 7.5));
+    const textAreaY = y + HEADER_H;
+    const textAreaH = BH - HEADER_H;
+    const lineH = 14;
+    const totalTextH = lines.length * lineH;
+    const startY = textAreaY + (textAreaH - totalTextH) / 2 + 11;
+    lines.forEach((line, li) => {
+      s += `<text x="${mid}" y="${startY + li * lineH}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#374151">${esc(line)}</text>`;
+    });
+    return s;
+  }
+
+  function drawArrowH(x: number, cy: number, col: string): string {
+    return (
+      `<line x1="${x}" y1="${cy}" x2="${x + GAP - 6}" y2="${cy}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>` +
+      `<polygon points="${x+GAP-6},${cy-5} ${x+GAP+1},${cy} ${x+GAP-6},${cy+5}" fill="${col}"/>`
+    );
+  }
+
+  function drawArrowDown(cx: number, y1: number, y2: number, col: string): string {
+    return (
+      `<line x1="${cx}" y1="${y1}" x2="${cx}" y2="${y2-6}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>` +
+      `<polygon points="${cx-5},${y2-6} ${cx},${y2+1} ${cx+5},${y2-6}" fill="${col}"/>`
+    );
+  }
+
+  let out = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" style="font-family:Arial,sans-serif;background:#f8fafc;">`;
+  // light grid bg
+  out += `<rect width="${W}" height="${H}" fill="#f8fafc"/>`;
   out += header(c.title, c.sub);
 
   if (layout === "horizontal") {
-    const bw = Math.min(110, (IW - 20 * (n - 1)) / n);
-    const bh = 60;
-    const totalW = bw * n + 20 * (n - 1);
+    const totalW = BW_H * n + GAP * (n - 1);
     const sx = (W - totalW) / 2;
-    const cy = PT + IH / 2;
+    const cardY = PT + (IH - BH) / 2;
 
     c.steps.forEach((step, i) => {
-      const x = sx + i * (bw + 20);
-      out += `<rect x="${x}" y="${cy - bh / 2}" width="${bw}" height="${bh}" rx="8" fill="${col}" opacity="0.15" stroke="${col}" stroke-width="1.5"/>`;
-      // wrap text
-      const words = step.split(" ");
-      const lines: string[] = [];
-      let cur = "";
-      words.forEach(w => {
-        if ((cur + " " + w).length > 14 && cur) { lines.push(cur); cur = w; }
-        else cur = cur ? cur + " " + w : w;
-      });
-      lines.push(cur);
-      lines.forEach((line, li) => {
-        const lineY = cy - ((lines.length - 1) * 13) / 2 + li * 13 + 4;
-        out += `<text x="${x + bw / 2}" y="${lineY}" text-anchor="middle" font-size="10" fill="${col}" font-weight="bold">${esc(line)}</text>`;
-      });
-      // Step number
-      out += `<circle cx="${x + 14}" cy="${cy - bh / 2 - 10}" r="10" fill="${col}"/>`;
-      out += `<text x="${x + 14}" y="${cy - bh / 2 - 6}" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">${i + 1}</text>`;
-      // Arrow
+      const x = sx + i * (BW_H + GAP);
+      out += drawCard(x, cardY, step, i);
       if (i < n - 1) {
-        const ax = x + bw + 10;
-        out += `<line x1="${x + bw}" y1="${cy}" x2="${ax}" y2="${cy}" stroke="${col}" stroke-width="2"/>`;
-        out += `<polygon points="${ax},${cy - 5} ${ax + 8},${cy} ${ax},${cy + 5}" fill="${col}"/>`;
+        const [c1] = PALETTE[i % PALETTE.length];
+        out += drawArrowH(x + BW_H, cardY + BH / 2, c1);
       }
     });
+
   } else {
-    // Snake layout: top row L→R, bottom row R→L
+    // Snake: top row L→R, bottom row R→L
     const half = Math.ceil(n / 2);
-    const bw = Math.min(110, (IW - 20 * (half - 1)) / half);
-    const bh = 56;
-    const totalW = bw * half + 20 * (half - 1);
+    const BW_S = Math.min(120, Math.floor((IW - GAP * (half - 1)) / half));
+    const totalW = BW_S * half + GAP * (half - 1);
     const sx = (W - totalW) / 2;
-    const row1Y = PT + 60;
-    const row2Y = PT + 60 + bh + 60;
+    const ROW_GAP = 44;
+    const row1Y = PT + 18;
+    const row2Y = row1Y + BH + ROW_GAP;
+
+    // override BW_H for snake (local helper)
+    function drawCardS(x: number, y: number, step: string, idx: number): string {
+      const [c1, c2] = PALETTE[idx % PALETTE.length];
+      const mid = x + BW_S / 2;
+      let s = "";
+      const uid = `gs${idx}`;
+      s += `<rect x="${x+3}" y="${y+3}" width="${BW_S}" height="${BH}" rx="${R}" fill="rgba(0,0,0,0.10)"/>`;
+      s += `<rect x="${x}" y="${y}" width="${BW_S}" height="${BH}" rx="${R}" fill="#fff" stroke="#e5e7eb" stroke-width="1"/>`;
+      s += `<defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs>`;
+      s += `<path d="M${x+R},${y} h${BW_S-2*R} a${R},${R} 0 0 1 ${R},${R} v${HEADER_H-R} h-${BW_S} v-${HEADER_H-R} a${R},${R} 0 0 1 ${R},-${R}z" fill="url(#${uid})"/>`;
+      s += `<circle cx="${mid}" cy="${y + HEADER_H / 2}" r="12" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>`;
+      s += `<text x="${mid}" y="${y + HEADER_H / 2 + 4.5}" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">${idx + 1}</text>`;
+      const lines = wrapText(step, Math.floor(BW_S / 7));
+      const textAreaY = y + HEADER_H;
+      const textAreaH = BH - HEADER_H;
+      const lineH = 14;
+      const totalTextH = lines.length * lineH;
+      const startY = textAreaY + (textAreaH - totalTextH) / 2 + 11;
+      lines.forEach((line, li) => {
+        s += `<text x="${mid}" y="${startY + li * lineH}" text-anchor="middle" font-size="10" font-weight="600" fill="#374151">${esc(line)}</text>`;
+      });
+      return s;
+    }
 
     c.steps.forEach((step, i) => {
       const inRow2 = i >= half;
       const rowIdx = inRow2 ? (n - 1 - i) : i;
-      const x = sx + rowIdx * (bw + 20);
-      const cy = inRow2 ? row2Y : row1Y;
+      const x = sx + rowIdx * (BW_S + GAP);
+      const y = inRow2 ? row2Y : row1Y;
+      out += drawCardS(x, y, step, i);
 
-      out += `<rect x="${x}" y="${cy}" width="${bw}" height="${bh}" rx="8" fill="${col}" opacity="0.15" stroke="${col}" stroke-width="1.5"/>`;
-      const words = step.split(" ");
-      const lines: string[] = [];
-      let cur = "";
-      words.forEach(w => {
-        if ((cur + " " + w).length > 14 && cur) { lines.push(cur); cur = w; }
-        else cur = cur ? cur + " " + w : w;
-      });
-      lines.push(cur);
-      lines.forEach((line, li) => {
-        const lineY = cy + bh / 2 - ((lines.length - 1) * 13) / 2 + li * 13 + 2;
-        out += `<text x="${x + bw / 2}" y="${lineY}" text-anchor="middle" font-size="10" fill="${col}" font-weight="bold">${esc(line)}</text>`;
-      });
-      out += `<circle cx="${x + 14}" cy="${cy - 10}" r="10" fill="${col}"/>`;
-      out += `<text x="${x + 14}" y="${cy - 6}" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">${i + 1}</text>`;
+      const [col1] = PALETTE[i % PALETTE.length];
 
-      // Arrow forward (within rows)
-      if (i < half - 1) {
-        const ax = x + bw + 10;
-        out += `<line x1="${x + bw}" y1="${cy + bh / 2}" x2="${ax}" y2="${cy + bh / 2}" stroke="${col}" stroke-width="2"/>`;
-        out += `<polygon points="${ax},${cy + bh / 2 - 5} ${ax + 8},${cy + bh / 2} ${ax},${cy + bh / 2 + 5}" fill="${col}"/>`;
+      if (!inRow2 && i < half - 1) {
+        // right arrow on row 1
+        out += drawArrowH(x + BW_S, y + BH / 2, col1);
       }
       if (i === half - 1 && n > half) {
-        // Down arrow
-        const fx = x + bw / 2;
-        out += `<line x1="${fx}" y1="${cy + bh}" x2="${fx}" y2="${row2Y - 10}" stroke="${col}" stroke-width="2"/>`;
-        out += `<polygon points="${fx - 5},${row2Y - 10} ${fx},${row2Y} ${fx + 5},${row2Y - 10}" fill="${col}"/>`;
+        // down arrow at end of row 1
+        const cx = x + BW_S / 2;
+        out += drawArrowDown(cx, y + BH, row2Y, col1);
       }
       if (inRow2 && i < n - 1) {
-        const nextRowIdx = n - 1 - (i + 1);
-        const nx = sx + nextRowIdx * (bw + 20);
-        const arrowX = x - 10;
-        out += `<line x1="${x}" y1="${cy + bh / 2}" x2="${arrowX}" y2="${cy + bh / 2}" stroke="${col}" stroke-width="2"/>`;
-        out += `<polygon points="${arrowX},${cy + bh / 2 - 5} ${arrowX - 8},${cy + bh / 2} ${arrowX},${cy + bh / 2 + 5}" fill="${col}"/>`;
-        void nx;
+        // left arrow on row 2
+        const arrowEndX = x - GAP + 6;
+        out += (
+          `<line x1="${x}" y1="${y + BH / 2}" x2="${arrowEndX + 6}" y2="${y + BH / 2}" stroke="${col1}" stroke-width="2.5" stroke-linecap="round"/>` +
+          `<polygon points="${arrowEndX+6},${y+BH/2-5} ${arrowEndX-1},${y+BH/2} ${arrowEndX+6},${y+BH/2+5}" fill="${col1}"/>`
+        );
       }
     });
   }
