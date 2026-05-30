@@ -236,13 +236,19 @@ function AdminContent() {
         <div className="mt-4 rounded-2xl overflow-hidden"
           style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
 
-          {/* Table header */}
-          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-widest"
-            style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          {/* Table header — 6 cols: Type | Question | Difficulty | Status | Date | Actions */}
+          <div className="grid gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-widest"
+            style={{
+              gridTemplateColumns: "auto 1fr auto auto auto auto",
+              background: "rgba(255,255,255,0.04)",
+              color: "rgba(255,255,255,0.3)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}>
+            <span>Type</span>
             <span>Question</span>
-            <span className="text-center">Type</span>
             <span className="text-center">Difficulty</span>
             <span className="text-center">Status</span>
+            <span className="text-center">Date added</span>
             <span className="text-center">Actions</span>
           </div>
 
@@ -252,66 +258,84 @@ function AdminContent() {
                 const cfg         = typeConfig(q.type);
                 const Icon        = cfg.icon;
                 const diff        = q.content?.difficulty;
-                const diffLabel   = diff ? DIFFICULTY_LABEL[diff]  : "—";
-                const diffColor   = diff ? DIFFICULTY_COLOR[diff]  : "rgba(255,255,255,0.3)";
+                const diffLabel   = diff ? DIFFICULTY_LABEL[diff] : "—";
+                const diffColor   = diff ? DIFFICULTY_COLOR[diff] : "rgba(255,255,255,0.3)";
                 const isPublished = q.content?.status === "published";
+                const preview     = q.title.length > 60
+                  ? q.title.slice(0, 60).trimEnd() + "…"
+                  : q.title;
 
                 return (
                   <li key={q.id}
-                    className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 items-center px-5 py-4 transition-colors"
+                    className="grid gap-3 items-center px-5 py-4 transition-colors"
                     style={{
+                      gridTemplateColumns: "auto 1fr auto auto auto auto",
                       borderBottom: i < questions.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
                       background: "transparent",
                     }}
                     onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
-                    {/* Title + image indicator */}
-                    <div className="flex items-center gap-2 pr-2 min-w-0">
+                    {/* Col 1 — Type badge */}
+                    <span
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap"
+                      style={{ background: `${cfg.color}18`, color: cfg.color, border: `1px solid ${cfg.color}30` }}
+                    >
+                      <Icon className="w-3 h-3" />
+                      {cfg.label}
+                    </span>
+
+                    {/* Col 2 — Question preview (60 chars) + optional thumbnail */}
+                    <div className="flex items-center gap-2.5 min-w-0">
                       {q.content?.image_url && (
-                        <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border"
+                        <div className="w-7 h-7 rounded-md overflow-hidden shrink-0 border"
                           style={{ borderColor: "rgba(255,255,255,0.1)" }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={q.content.image_url} alt="" className="w-full h-full object-cover" />
                         </div>
                       )}
-                      <p className="text-sm font-medium text-white leading-snug line-clamp-2">
-                        {q.title}
+                      <p className="text-sm text-white leading-snug truncate" title={q.title}>
+                        {preview}
                       </p>
                     </div>
 
-                    {/* Type */}
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap"
-                      style={{ background: `${cfg.color}18`, color: cfg.color, border: `1px solid ${cfg.color}30` }}>
-                      <Icon className="w-3 h-3" />
-                      {cfg.label}
-                    </span>
-
-                    {/* Difficulty */}
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md whitespace-nowrap text-center"
-                      style={{ color: diffColor, background: `${diffColor}15` }}>
+                    {/* Col 3 — Difficulty */}
+                    <span
+                      className="text-[11px] font-semibold px-2.5 py-1 rounded-lg whitespace-nowrap text-center"
+                      style={{ color: diffColor, background: `${diffColor}15`, border: `1px solid ${diffColor}25` }}
+                    >
                       {diffLabel}
                     </span>
 
-                    {/* Status */}
-                    <span className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap"
+                    {/* Col 4 — Status */}
+                    <span
+                      className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap"
                       style={{
                         background: isPublished ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.06)",
                         color:      isPublished ? "#10b981"               : "rgba(255,255,255,0.4)",
                         border:     `1px solid ${isPublished ? "rgba(16,185,129,0.25)" : "rgba(255,255,255,0.08)"}`,
-                      }}>
+                      }}
+                    >
                       <span className="w-1.5 h-1.5 rounded-full shrink-0"
                         style={{ background: isPublished ? "#10b981" : "rgba(255,255,255,0.3)" }} />
                       {isPublished ? "Published" : "Draft"}
                     </span>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-1">
+                    {/* Col 5 — Date added */}
+                    <span
+                      className="text-[11px] whitespace-nowrap text-center tabular-nums"
+                      style={{ color: "rgba(255,255,255,0.35)" }}
+                    >
+                      {formatDate(q.created_at)}
+                    </span>
+
+                    {/* Col 6 — Actions */}
+                    <div className="flex items-center gap-1 justify-center">
                       <ActionBtn label="Edit"   color="#0ea5e9" onClick={() => openEdit(q)}>
-                        <Pencil  className="w-3.5 h-3.5" />
+                        <Pencil className="w-3.5 h-3.5" />
                       </ActionBtn>
                       <ActionBtn label="Delete" color="#ef4444" onClick={() => setDeleteTarget(q)}>
-                        <Trash2  className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </ActionBtn>
                     </div>
                   </li>
@@ -792,16 +816,28 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
 }
 
 function TableSkeleton() {
+  const widths = ["55%", "72%", "63%", "80%"];
   return (
     <ul>
       {[...Array(4)].map((_, i) => (
-        <li key={i} className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 items-center px-5 py-4"
-          style={{ borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-          <div className="h-4 rounded-md animate-pulse" style={{ background: "rgba(255,255,255,0.06)", width: `${60 + (i * 7) % 30}%` }} />
+        <li key={i}
+          className="grid gap-3 items-center px-5 py-4"
+          style={{
+            gridTemplateColumns: "auto 1fr auto auto auto auto",
+            borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none",
+          }}>
+          {/* Type */}
           <div className="h-6 w-24 rounded-lg animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
-          <div className="h-5 w-16 rounded-md animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
+          {/* Question */}
+          <div className="h-4 rounded-md animate-pulse" style={{ background: "rgba(255,255,255,0.06)", width: widths[i] }} />
+          {/* Difficulty */}
+          <div className="h-5 w-16 rounded-lg animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
+          {/* Status */}
           <div className="h-6 w-20 rounded-full animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
-          <div className="flex gap-1">
+          {/* Date */}
+          <div className="h-4 w-16 rounded-md animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
+          {/* Actions */}
+          <div className="flex gap-1 justify-center">
             <div className="h-7 w-7 rounded-lg animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
             <div className="h-7 w-7 rounded-lg animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
           </div>
