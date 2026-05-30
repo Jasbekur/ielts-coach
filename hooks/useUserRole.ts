@@ -6,8 +6,9 @@
  * Fetches the current authenticated user's role from public.profiles.
  *
  * Returns:
- *   role      — the raw role string ("student" | "admin" | null)
+ *   role      — the raw role string ("student" | "admin" | "editor" | null)
  *   isAdmin   — true when role === "admin"
+ *   isEditor  — true when role === "editor"
  *   loading   — true while the network request is in flight
  *   error     — error message string, or null if no error
  *   refresh   — call this to manually re-fetch (e.g. after a role change)
@@ -16,14 +17,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-type Role = "student" | "admin" | string | null;
+type Role = "student" | "admin" | "editor" | string | null;
 
 interface UseUserRoleResult {
-  role: Role;
-  isAdmin: boolean;
-  loading: boolean;
-  error: string | null;
-  refresh: () => void;
+  role:     Role;
+  isAdmin:  boolean;
+  isEditor: boolean;
+  loading:  boolean;
+  error:    string | null;
+  refresh:  () => void;
 }
 
 export function useUserRole(): UseUserRoleResult {
@@ -90,7 +92,8 @@ export function useUserRole(): UseUserRoleResult {
 
   return {
     role,
-    isAdmin: role === "admin",
+    isAdmin:  role === "admin",
+    isEditor: role === "editor",
     loading,
     error,
     refresh: fetchRole,

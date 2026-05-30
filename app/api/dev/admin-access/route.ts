@@ -28,9 +28,9 @@ export async function POST(req: NextRequest) {
   if (!email || typeof email !== "string") {
     return NextResponse.json({ error: "email is required." }, { status: 400 });
   }
-  if (action !== "grant" && action !== "revoke") {
+  if (!["grant", "grant-editor", "revoke"].includes(action ?? "")) {
     return NextResponse.json(
-      { error: 'action must be "grant" or "revoke".' },
+      { error: 'action must be "grant", "grant-editor", or "revoke".' },
       { status: 400 }
     );
   }
@@ -85,7 +85,9 @@ export async function POST(req: NextRequest) {
   }
 
   // ── 4. Update profiles table ─────────────────────────────────────────────
-  const newRole = action === "grant" ? "admin" : "student";
+  const newRole =
+    action === "grant"        ? "admin"   :
+    action === "grant-editor" ? "editor"  : "student";
 
   const { error: updateErr } = await svc
     .from("profiles")

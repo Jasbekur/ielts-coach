@@ -23,7 +23,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { ProtectedAdminRoute } from "@/components/shared/ProtectedAdminRoute";
-import { grantAdminAccess, revokeAdminAccess } from "@/lib/utils/admin-access";
+import { grantAdminAccess, grantEditorAccess, revokeAdminAccess } from "@/lib/utils/admin-access";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -51,22 +51,27 @@ function DevContent() {
       // @ts-expect-error — intentional global for dev console use
       window.grantAdminAccess  = grantAdminAccess;
       // @ts-expect-error — intentional global for dev console use
+      window.grantEditorAccess = grantEditorAccess;
+      // @ts-expect-error — intentional global for dev console use
       window.revokeAdminAccess = revokeAdminAccess;
 
       console.log(
-        "%c🛡 Admin utilities loaded",
+        "%c🛡 Role utilities loaded",
         "color:#7c3aed;font-weight:bold;font-size:14px;"
       );
       console.log(
         "%cAvailable in this console:\n" +
-        "  await grantAdminAccess(\"email@example.com\")\n" +
-        "  await revokeAdminAccess(\"email@example.com\")",
+        "  await grantAdminAccess(\"email@example.com\")   // → admin\n" +
+        "  await grantEditorAccess(\"email@example.com\")  // → editor\n" +
+        "  await revokeAdminAccess(\"email@example.com\")  // → student",
         "color:#a78bfa;"
       );
     }
     return () => {
       // @ts-expect-error
       delete window.grantAdminAccess;
+      // @ts-expect-error
+      delete window.grantEditorAccess;
       // @ts-expect-error
       delete window.revokeAdminAccess;
     };
@@ -112,25 +117,36 @@ function DevContent() {
         style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.07)" }}>
         <p style={{ color: "rgba(255,255,255,0.3)" }}>// Open DevTools (⌥⌘I) and run:</p>
         <p><span style={{ color: "#a78bfa" }}>await</span> <span style={{ color: "#10b981" }}>grantAdminAccess</span>(<span style={{ color: "#fbbf24" }}>&quot;email@example.com&quot;</span>)</p>
+        <p><span style={{ color: "#a78bfa" }}>await</span> <span style={{ color: "#f59e0b" }}>grantEditorAccess</span>(<span style={{ color: "#fbbf24" }}>&quot;email@example.com&quot;</span>)</p>
         <p><span style={{ color: "#a78bfa" }}>await</span> <span style={{ color: "#ef4444" }}>revokeAdminAccess</span>(<span style={{ color: "#fbbf24" }}>&quot;email@example.com&quot;</span>)</p>
       </div>
 
-      {/* Grant card */}
+      {/* Grant admin card */}
       <AdminAccessCard
         action="grant"
         title="Grant Admin Access"
-        description="Promotes a user to admin role. They will see the Content Manager and /dev pages."
+        description="Full access — can add, edit, and delete questions. Sees /dev and Content Manager."
         buttonLabel="Grant Admin"
         icon={<ShieldCheck className="w-4 h-4" />}
         accentColor="#7c3aed"
       />
 
+      {/* Grant editor card */}
+      <AdminAccessCard
+        action="grant-editor"
+        title="Grant Editor Access"
+        description="Can add and edit questions but cannot delete them. Sees Content Manager, not /dev."
+        buttonLabel="Grant Editor"
+        icon={<ShieldCheck className="w-4 h-4" />}
+        accentColor="#f59e0b"
+      />
+
       {/* Revoke card */}
       <AdminAccessCard
         action="revoke"
-        title="Revoke Admin Access"
-        description="Resets a user back to the student role. All admin UI will be hidden for them."
-        buttonLabel="Revoke Admin"
+        title="Revoke Access"
+        description="Resets a user back to student role. All elevated UI will be hidden for them."
+        buttonLabel="Revoke Role"
         icon={<ShieldX className="w-4 h-4" />}
         accentColor="#ef4444"
       />
@@ -148,7 +164,7 @@ function AdminAccessCard({
   icon,
   accentColor,
 }: {
-  action:      "grant" | "revoke";
+  action:      "grant" | "grant-editor" | "revoke";
   title:       string;
   description: string;
   buttonLabel: string;
@@ -165,7 +181,10 @@ function AdminAccessCard({
     setLoading(true);
     setResult(null);
 
-    const fn  = action === "grant" ? grantAdminAccess : revokeAdminAccess;
+    const fn =
+      action === "grant"        ? grantAdminAccess  :
+      action === "grant-editor" ? grantEditorAccess :
+                                  revokeAdminAccess;
     const res = await fn(email.trim());
     setResult({ ok: res.ok, message: res.message });
     setLoading(false);

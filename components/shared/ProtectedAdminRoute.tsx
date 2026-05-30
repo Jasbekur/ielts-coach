@@ -3,16 +3,23 @@
 /**
  * ProtectedAdminRoute
  * -------------------
- * Wrap any page (or section) with this component to restrict access to admins.
+ * Wraps any page and restricts access to users whose role is in `allowedRoles`.
+ * Defaults to ["admin", "editor"] so both roles reach the Content Manager.
  *
  * Behaviour:
- *   • While role is loading  → centred spinner
- *   • Role fetched, not admin → silent redirect to /dashboard
- *   • Role fetched, is admin  → renders children
+ *   • While role is loading          → centred spinner
+ *   • Role not in allowedRoles       → silent redirect to /dashboard
+ *   • Role is allowed                → renders children
  *
  * Usage:
+ *   // Admin + editor (default)
  *   <ProtectedAdminRoute>
- *     <YourAdminPage />
+ *     <AdminPage />
+ *   </ProtectedAdminRoute>
+ *
+ *   // Admin only
+ *   <ProtectedAdminRoute allowedRoles={["admin"]}>
+ *     <SuperSecretPage />
  *   </ProtectedAdminRoute>
  */
 
@@ -21,20 +28,27 @@ import { useRouter } from "next/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
 
 interface ProtectedAdminRouteProps {
-  children: React.ReactNode;
+  children:     React.ReactNode;
+  /** Roles that may access this route. Defaults to ["admin", "editor"]. */
+  allowedRoles?: string[];
 }
 
-export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
-  const { isAdmin, loading } = useUserRole();
+export function ProtectedAdminRoute({
+  children,
+  allowedRoles = ["admin", "editor"],
+}: ProtectedAdminRouteProps) {
+  const { role, loading } = useUserRole();
   const router = useRouter();
 
+  const hasAccess = role !== null && allowedRoles.includes(role);
+
   useEffect(() => {
-    if (!loading && !isAdmin) {
+    if (!loading && !hasAccess) {
       router.replace("/dashboard");
     }
-  }, [loading, isAdmin, router]);
+  }, [loading, hasAccess, router]);
 
-  /* ── Loading state ─────────────────────────────────────────────────── */
+  /* ── Loading ── */
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -48,14 +62,14 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
     );
   }
 
-  /* ── Not admin — render nothing while redirect fires ──────────────── */
-  if (!isAdmin) return null;
+  /* ── No access — render nothing while redirect fires ── */
+  if (!hasAccess) return null;
 
-  /* ── Admin — render the protected content ─────────────────────────── */
+  /* ── Allowed ── */
   return <>{children}</>;
 }
 
-/* ── Spinner ────────────────────────────────────────────────────────────── */
+/* ── Spinner ── */
 function Spinner() {
   return (
     <svg
@@ -66,22 +80,10 @@ function Spinner() {
       viewBox="0 0 40 40"
       fill="none"
     >
-      {/* Track */}
-      <circle
-        cx="20"
-        cy="20"
-        r="16"
-        stroke="currentColor"
-        strokeWidth="3"
-        className="text-muted-foreground/20"
-      />
-      {/* Arc */}
-      <path
-        d="M36 20a16 16 0 0 0-16-16"
-        stroke="#059669"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
+      <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3"
+        className="text-muted-foreground/20" />
+      <path d="M36 20a16 16 0 0 0-16-16" stroke="#059669" strokeWidth="3"
+        strokeLinecap="round" />
     </svg>
   );
 }

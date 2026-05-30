@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { ProtectedAdminRoute } from "@/components/shared/ProtectedAdminRoute";
+import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -97,6 +98,7 @@ export default function AdminPage() {
 
 function AdminContent() {
   const supabase = createClient();
+  const { isAdmin } = useUserRole();
 
   // questions list
   const [questions,   setQuestions]   = useState<Question[]>([]);
@@ -227,10 +229,18 @@ function AdminContent() {
       <section className="pb-8">
         <div className="flex items-center justify-between">
           <SectionHeading number="2" title="Manage Questions" />
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
-            style={{ background: "rgba(124,58,237,0.15)", color: "#a78bfa" }}>
-            {questions.length} total
-          </span>
+          <div className="flex items-center gap-2">
+            {!isAdmin && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                style={{ background: "rgba(245,158,11,0.12)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>
+                Editor — read &amp; add only
+              </span>
+            )}
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(124,58,237,0.15)", color: "#a78bfa" }}>
+              {questions.length} total
+            </span>
+          </div>
         </div>
 
         <div className="mt-4 rounded-2xl overflow-hidden"
@@ -329,14 +339,16 @@ function AdminContent() {
                       {formatDate(q.created_at)}
                     </span>
 
-                    {/* Col 6 — Actions */}
+                    {/* Col 6 — Actions (Delete hidden for editors) */}
                     <div className="flex items-center gap-1 justify-center">
-                      <ActionBtn label="Edit"   color="#0ea5e9" onClick={() => openEdit(q)}>
+                      <ActionBtn label="Edit" color="#0ea5e9" onClick={() => openEdit(q)}>
                         <Pencil className="w-3.5 h-3.5" />
                       </ActionBtn>
-                      <ActionBtn label="Delete" color="#ef4444" onClick={() => setDeleteTarget(q)}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </ActionBtn>
+                      {isAdmin && (
+                        <ActionBtn label="Delete" color="#ef4444" onClick={() => setDeleteTarget(q)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </ActionBtn>
+                      )}
                     </div>
                   </li>
                 );

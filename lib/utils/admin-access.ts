@@ -1,16 +1,17 @@
 /**
  * admin-access.ts
  * ───────────────
- * Utility functions for granting / revoking admin role by email.
+ * Utility functions for granting / revoking roles by email.
  * Calls the server-side API route which uses the service-role key,
  * so RLS is bypassed safely on the server.
  *
- * Usage from browser console (after the dev page has loaded):
- *   await grantAdminAccess("someone@example.com")
- *   await revokeAdminAccess("someone@example.com")
+ * Usage from browser console (after the /dev page has loaded):
+ *   await grantAdminAccess("someone@example.com")   // → "admin"
+ *   await grantEditorAccess("someone@example.com")  // → "editor"
+ *   await revokeAdminAccess("someone@example.com")  // → "student"
  *
- * Or import them directly in any client component:
- *   import { grantAdminAccess } from "@/lib/utils/admin-access";
+ * Or import directly in any client component:
+ *   import { grantAdminAccess, grantEditorAccess } from "@/lib/utils/admin-access";
  */
 
 interface AdminAccessResult {
@@ -24,7 +25,7 @@ interface AdminAccessResult {
 
 async function callAdminAccessApi(
   email: string,
-  action: "grant" | "revoke"
+  action: "grant" | "grant-editor" | "revoke"
 ): Promise<AdminAccessResult> {
   if (!email?.trim()) {
     const result = { ok: false, message: "❌ email is required.", error: "email is required." };
@@ -67,7 +68,20 @@ export async function grantAdminAccess(email: string): Promise<AdminAccessResult
 }
 
 /**
- * Revoke admin role from a user by email (resets to "student").
+ * Grant editor role to a user by email.
+ * Editors can INSERT and UPDATE questions but cannot DELETE.
+ * The caller must already be authenticated as an admin.
+ *
+ * @example
+ *   await grantEditorAccess("jasurbek@example.com")
+ */
+export async function grantEditorAccess(email: string): Promise<AdminAccessResult> {
+  return callAdminAccessApi(email, "grant-editor");
+}
+
+/**
+ * Revoke elevated role from a user by email (resets to "student").
+ * Works for both admin and editor roles.
  * The caller must already be authenticated as an admin.
  *
  * @example

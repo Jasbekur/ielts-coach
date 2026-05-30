@@ -47,7 +47,7 @@ export function Sidebar() {
   const supabase = createClient();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isEditor } = useUserRole();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -119,15 +119,15 @@ export function Sidebar() {
           );
         })}
 
-        {/* ── Admin section ── */}
-        {isAdmin && (
+        {/* ── Admin / Editor section ── */}
+        {(isAdmin || isEditor) && (
           <>
             {/* Divider */}
             <div className="my-3 mx-3 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
 
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 mb-2"
               style={{ color: "rgba(255,255,255,0.3)" }}>
-              Admin
+              {isAdmin ? "Admin" : "Editor"}
             </p>
 
             {(() => {
