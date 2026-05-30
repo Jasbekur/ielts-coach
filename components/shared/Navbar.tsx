@@ -11,9 +11,11 @@ import {
   LogOut,
   BookMarked,
   ChevronUp,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard",  icon: LayoutDashboard, description: "Overview & stats" },
@@ -45,6 +47,7 @@ export function Sidebar() {
   const supabase = createClient();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { isAdmin } = useUserRole();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -115,6 +118,48 @@ export function Sidebar() {
             </Link>
           );
         })}
+
+        {/* ── Admin section ── */}
+        {isAdmin && (
+          <>
+            {/* Divider */}
+            <div className="my-3 mx-3 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
+
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 mb-2"
+              style={{ color: "rgba(255,255,255,0.3)" }}>
+              Admin
+            </p>
+
+            {(() => {
+              const href   = "/admin";
+              const active = pathname === href || pathname.startsWith(href + "/");
+              return (
+                <Link
+                  href={href}
+                  prefetch={true}
+                  className={cn(
+                    "flex items-center gap-3.5 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-150",
+                    active ? "text-white shadow-lg" : "hover:text-white"
+                  )}
+                  style={
+                    active
+                      ? { background: "#7c3aed", boxShadow: "0 4px 14px rgba(124,58,237,0.35)" }
+                      : { color: "rgba(255,255,255,0.6)" }
+                  }
+                  onMouseEnter={e => {
+                    if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.12)";
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
+                  }}
+                >
+                  <ShieldCheck className="w-4 h-4 shrink-0" />
+                  <span className="font-semibold">Content Manager</span>
+                </Link>
+              );
+            })()}
+          </>
+        )}
       </nav>
 
       {/* ── Profile card ── */}
