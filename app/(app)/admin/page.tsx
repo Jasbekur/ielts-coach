@@ -18,6 +18,9 @@ import {
   Globe,
   FileX2,
   ChevronDown,
+  Clock,
+  PlusCircle,
+  Trash,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { ProtectedAdminRoute } from "@/components/shared/ProtectedAdminRoute";
@@ -42,6 +45,15 @@ interface Question {
   type:       QuestionType;
   content:    QuestionContent;
   created_at: string;
+}
+
+interface AdminLog {
+  id:             string;
+  admin_email:    string;
+  action:         "added" | "deleted";
+  question_id:    string | null;
+  question_title: string;
+  created_at:     string;
 }
 
 // ── Lookup maps ───────────────────────────────────────────────────────────────
@@ -82,6 +94,15 @@ function formatDate(iso: string) {
   });
 }
 
+function timeAgo(iso: string): string {
+  const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (secs < 60)   return "just now";
+  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+  if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+  if (secs < 604800) return `${Math.floor(secs / 86400)}d ago`;
+  return formatDate(iso);
+}
+
 const STORAGE_BUCKET = "question-images";
 
 // ── Root page ─────────────────────────────────────────────────────────────────
@@ -103,6 +124,11 @@ function AdminContent() {
   // questions list
   const [questions,   setQuestions]   = useState<Question[]>([]);
   const [loadingList, setLoadingList] = useState(true);
+
+  // activity log
+  const [logs,        setLogs]        = useState<AdminLog[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(true);
+  const [userEmail,   setUserEmail]   = useState<string>("");
 
   // edit modal
   const [editItem,       setEditItem]       = useState<Question | null>(null);
@@ -130,7 +156,43 @@ function AdminContent() {
     setLoadingList(false);
   }, [supabase]);
 
-  useEffect(() => { fetchQuestions(); }, [fetchQuestions]);
+  const fetchLogs = useCallback(async () => {
+    setLoadingLogs(true);
+    const { data, error } = await supabase
+      .from("admin_logs")
+      .select("id, admin_email, action, question_id, question_title, created_at")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (!error) setLogs((data as AdminLog[]) ?? []);
+    setLoadingLogs(false);
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchQuestions();
+    fetchLogs();
+    // cache caller email for logging
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? "");
+    });
+  }, [fetchQuestions, fetchLogs, supabase]);
+
+  // ── Log action ─────────────────────────────────────────────────────────────
+
+  const logAction = useCallback(async (
+    action: "added" | "deleted",
+    questionId: string,
+    questionTitle: string,
+  ) => {
+    if (!userEmail) return;
+    await supabase.from("admin_logs").insert({
+      admin_email:    userEmail,
+      action,
+      question_id:    questionId,
+      question_title: questionTitle,
+    });
+    fetchLogs();
+  }, [supabase, userEmail, fetchLogs]);
 
   // ── Open edit modal ────────────────────────────────────────────────────────
 
@@ -184,7 +246,12 @@ function AdminContent() {
       .eq("id", deleteTarget.id);
 
     if (error) toast.error("Failed to delete: " + error.message);
-    else { toast.success("Question deleted."); setDeleteTarget(null); fetchQuestions(); }
+    else {
+      toast.success("Question deleted.");
+      logAction("deleted", deleteTarget.id, deleteTarget.title);
+      setDeleteTarget(null);
+      fetchQuestions();
+    }
     setDeleting(false);
   }
 
@@ -222,7 +289,7 @@ function AdminContent() {
       {/* ── Section 1: Add New Question ── */}
       <section>
         <SectionHeading number="1" title="Add New Question" />
-        <AddQuestionForm onSuccess={fetchQuestions} />
+        <AddQuestionForm onSuccess={fetchQuestions} onLog={logAction} />
       </section>
 
       {/* ── Section 2: Manage Questions ── */}
@@ -358,6 +425,83 @@ function AdminContent() {
         </div>
       </section>
 
+      {/* ── Section 3: Activity Feed ── */}
+      <section className="pb-8">
+        <div className="flex items-center justify-between">
+          <SectionHeading number="3" title="Activity Log" />
+          <span className="flex items-center gap-1.5 text-[11px] font-medium"
+            style={{ color: "rgba(255,255,255,0.3)" }}>
+            <Clock className="w-3 h-3" />
+            Last 20 actions
+          </span>
+        </div>
+
+        <div className="mt-4 rounded-2xl overflow-hidden"
+          style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+
+          {loadingLogs ? (
+            <LogSkeleton />
+          ) : logs.length === 0 ? (
+            <LogEmpty />
+          ) : (
+            <ul>
+              {logs.map((log, i) => {
+                const isAdded   = log.action === "added";
+                const iconColor = isAdded ? "#10b981" : "#ef4444";
+                const bgColor   = isAdded ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)";
+                const preview   = log.question_title.length > 55
+                  ? log.question_title.slice(0, 55).trimEnd() + "…"
+                  : log.question_title;
+
+                return (
+                  <li key={log.id}
+                    className="flex items-start gap-3.5 px-5 py-3.5 transition-colors"
+                    style={{
+                      borderBottom: i < logs.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                      background: "transparent",
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.015)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    {/* Icon */}
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                      style={{ background: bgColor }}>
+                      {isAdded
+                        ? <PlusCircle className="w-3.5 h-3.5" style={{ color: iconColor }} />
+                        : <Trash      className="w-3.5 h-3.5" style={{ color: iconColor }} />}
+                    </div>
+
+                    {/* Text */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-1.5 flex-wrap">
+                        <span className="text-xs font-bold"
+                          style={{ color: iconColor }}>
+                          {isAdded ? "Added" : "Deleted"}
+                        </span>
+                        <span className="text-xs text-white font-medium truncate" title={log.question_title}>
+                          {preview}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[11px] font-mono truncate max-w-[180px]"
+                          style={{ color: "rgba(255,255,255,0.35)" }}>
+                          {log.admin_email}
+                        </span>
+                        <span style={{ color: "rgba(255,255,255,0.15)" }}>·</span>
+                        <span className="text-[11px] whitespace-nowrap tabular-nums"
+                          style={{ color: "rgba(255,255,255,0.3)" }}>
+                          {timeAgo(log.created_at)}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </section>
+
       {/* ── Edit Modal ── */}
       {editItem && (
         <Modal onClose={() => setEditItem(null)}>
@@ -437,7 +581,10 @@ function AdminContent() {
 
 // ── Add Question Form ─────────────────────────────────────────────────────────
 
-function AddQuestionForm({ onSuccess }: { onSuccess: () => void }) {
+function AddQuestionForm({ onSuccess, onLog }: {
+  onSuccess: () => void;
+  onLog:     (action: "added" | "deleted", id: string, title: string) => void;
+}) {
   const supabase = createClient();
   const fileRef  = useRef<HTMLInputElement>(null);
 
@@ -490,19 +637,20 @@ function AddQuestionForm({ onSuccess }: { onSuccess: () => void }) {
       imageUrl = urlData.publicUrl;
     }
 
-    // 2. Insert row
+    // 2. Insert row — use .select() to get the created id back
     const content: QuestionContent = { difficulty, status, ...(imageUrl ? { image_url: imageUrl } : {}) };
-    const { error } = await supabase.from("test_materials").insert({
-      title:   qText.trim(),
-      type:    qType,
-      content,
-    });
+    const { data: inserted, error } = await supabase
+      .from("test_materials")
+      .insert({ title: qText.trim(), type: qType, content })
+      .select("id")
+      .single();
 
     setUploading(false);
 
     if (error) return toast.error("Failed to save question: " + error.message);
 
     toast.success("Question added!");
+    onLog("added", inserted.id, qText.trim());
     setQText("");
     removeImage();
     setDifficulty("band_6_7");
@@ -868,6 +1016,37 @@ function EmptyState() {
       <p className="text-sm font-semibold text-white">No questions yet</p>
       <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
         Use the form above to add your first question.
+      </p>
+    </div>
+  );
+}
+
+function LogSkeleton() {
+  return (
+    <ul>
+      {[...Array(5)].map((_, i) => (
+        <li key={i} className="flex items-start gap-3.5 px-5 py-3.5"
+          style={{ borderBottom: i < 4 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+          <div className="w-7 h-7 rounded-lg shrink-0 animate-pulse"
+            style={{ background: "rgba(255,255,255,0.06)" }} />
+          <div className="flex-1 space-y-1.5 pt-0.5">
+            <div className="h-3.5 rounded animate-pulse"
+              style={{ background: "rgba(255,255,255,0.06)", width: `${50 + (i * 9) % 35}%` }} />
+            <div className="h-3 rounded animate-pulse w-32"
+              style={{ background: "rgba(255,255,255,0.04)" }} />
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function LogEmpty() {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 gap-2">
+      <Clock className="w-6 h-6" style={{ color: "rgba(255,255,255,0.15)" }} />
+      <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
+        No activity yet — actions will appear here.
       </p>
     </div>
   );
