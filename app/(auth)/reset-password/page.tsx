@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
             >
               <GraduationCap className="w-4.5 h-4.5 text-white" />
             </div>
-            <p className="font-bold text-base">IELTS AI Coach</p>
+            <p className="font-bold text-base">IELTS Sensei</p>
           </div>
 
           <div className="mb-8">

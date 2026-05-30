@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   BookOpen,
   Mic,
   LayoutDashboard,
   History,
   LogOut,
-  GraduationCap,
   BookMarked,
+  ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -22,19 +23,42 @@ const navItems = [
   { href: "/history",   label: "History",    icon: History,         description: "All attempts" },
 ];
 
-// Primary green colour – matches design system
 const PRIMARY = "#059669";
+
+// ── Sensei logo mark ─────────────────────────────────────────────────────────
+function SenseiLogo({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+      <rect width="40" height="40" rx="12" fill={PRIMARY} />
+      {/* Graduation cap */}
+      <polygon points="20,9 32,15 20,21 8,15" fill="white" opacity="0.95" />
+      <rect x="17" y="21" width="6" height="7" rx="1" fill="white" opacity="0.7" />
+      <line x1="32" y1="15" x2="32" y2="22" stroke="white" strokeWidth="2.2" strokeLinecap="round" opacity="0.8" />
+      <circle cx="32" cy="23" r="1.5" fill="white" opacity="0.8" />
+    </svg>
+  );
+}
 
 export function Sidebar() {
   const pathname = usePathname();
   const router   = useRouter();
   const supabase = createClient();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null);
+    });
+  }, [supabase]);
 
   async function handleLogout() {
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
   }
+
+  const initials = userEmail ? userEmail[0].toUpperCase() : "?";
 
   return (
     <aside
@@ -46,14 +70,9 @@ export function Sidebar() {
     >
       {/* ── Logo ── */}
       <div className="px-6 py-5 flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: PRIMARY, boxShadow: `0 4px 12px ${PRIMARY}55` }}
-        >
-          <GraduationCap className="w-5 h-5 text-white" />
-        </div>
+        <SenseiLogo size={40} />
         <div>
-          <p className="font-bold text-sm leading-none text-white">IELTS AI</p>
+          <p className="font-bold text-sm leading-none text-white tracking-wide">IELTS Sensei</p>
           <p className="text-[10px] mt-0.5 uppercase tracking-widest font-bold"
             style={{ color: `${PRIMARY}cc` }}>
             AI Exam Coach
@@ -98,24 +117,62 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* ── Bottom ── */}
-      <div className="px-3 py-4 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+      {/* ── Profile card ── */}
+      <div className="px-3 pb-4 pt-2 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+        {/* Profile toggle button */}
         <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-150"
-          style={{ color: "rgba(255,255,255,0.45)" }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.color = "#f87171";
-            (e.currentTarget as HTMLElement).style.background = "rgba(248,113,113,0.1)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.45)";
-            (e.currentTarget as HTMLElement).style.background = "transparent";
-          }}
+          onClick={() => setProfileOpen(o => !o)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group"
+          style={{ background: profileOpen ? "rgba(255,255,255,0.07)" : "transparent" }}
+          onMouseEnter={e => { if (!profileOpen) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)"; }}
+          onMouseLeave={e => { if (!profileOpen) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
         >
-          <LogOut className="w-4 h-4 shrink-0" />
-          <span>Sign out</span>
+          {/* Avatar */}
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-white text-sm font-bold"
+            style={{ background: `linear-gradient(135deg, ${PRIMARY}, #0d9488)` }}
+          >
+            {initials}
+          </div>
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-xs font-semibold text-white truncate">
+              {userEmail ?? "Loading…"}
+            </p>
+            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>Free plan</p>
+          </div>
+          <ChevronUp
+            className="w-3.5 h-3.5 shrink-0 transition-transform duration-200"
+            style={{
+              color: "rgba(255,255,255,0.4)",
+              transform: profileOpen ? "rotate(0deg)" : "rotate(180deg)",
+            }}
+          />
         </button>
+
+        {/* Dropdown */}
+        {profileOpen && (
+          <div
+            className="mt-1 rounded-xl overflow-hidden"
+            style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
+          >
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-150"
+              style={{ color: "rgba(255,255,255,0.55)" }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.color = "#f87171";
+                (e.currentTarget as HTMLElement).style.background = "rgba(248,113,113,0.08)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)";
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+              }}
+            >
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
+              <span className="font-medium">Sign out</span>
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

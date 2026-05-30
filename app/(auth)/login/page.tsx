@@ -89,7 +89,7 @@ export default function LoginPage() {
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-bold text-sm leading-none text-white">IELTS AI</p>
+              <p className="font-bold text-sm leading-none text-white">IELTS Sensei</p>
               <p className="text-[10px] mt-0.5 uppercase tracking-widest font-bold"
                 style={{ color: `${PRIMARY}cc` }}>AI Exam Coach</p>
             </div>
@@ -179,7 +179,7 @@ export default function LoginPage() {
             >
               <GraduationCap className="w-4 h-4 text-white" />
             </div>
-            <p className="font-bold text-base">IELTS AI Coach</p>
+            <p className="font-bold text-base">IELTS Sensei</p>
           </div>
 
           {/* Heading */}

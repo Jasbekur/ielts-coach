@@ -221,7 +221,7 @@ export default function LandingPage() {
               <GraduationCap className="w-4.5 h-4.5 text-white w-5 h-5" />
             </div>
             <div>
-              <p className="font-bold text-sm leading-none text-gray-900">IELTS AI</p>
+              <p className="font-bold text-sm leading-none text-gray-900">IELTS Sensei</p>
               <p className="text-[9px] font-bold tracking-widest uppercase leading-none mt-0.5" style={{ color: G }}>AI Exam Coach</p>
             </div>
           </Link>
@@ -326,7 +326,7 @@ export default function LandingPage() {
                       style={{ background: G }}>
                       <GraduationCap className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="text-white text-xs font-bold">IELTS AI</span>
+                    <span className="text-white text-xs font-bold">IELTS Sensei</span>
                   </div>
                   {[
                     { label: "Dashboard", icon: BarChart3, active: false },
@@ -522,7 +522,7 @@ export default function LandingPage() {
         <SectionHeading
           badge="Student Reviews"
           title="Real students. Real band improvements."
-          sub="See what students from around the world say about practising with IELTS AI."
+          sub="See what students from around the world say about practising with IELTS Sensei."
         />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -691,7 +691,7 @@ export default function LandingPage() {
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: G }}>
               <GraduationCap className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-sm font-bold text-gray-800">IELTS AI</span>
+            <span className="text-sm font-bold text-gray-800">IELTS Sensei</span>
           </Link>
 
           {/* Links */}

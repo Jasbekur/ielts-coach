@@ -85,7 +85,7 @@ export default function SignupPage() {
       if (error) {
         toast.error("Wrong or expired code. Check your email or click Resend.");
       } else {
-        toast.success("Email verified! Welcome to IELTS AI Coach 🎉");
+        toast.success("Email verified! Welcome to IELTS Sensei 🎉");
         router.push("/dashboard");
         router.refresh();
       }
@@ -225,7 +225,7 @@ export default function SignupPage() {
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <p className="font-bold text-sm leading-none text-white">IELTS AI</p>
+            <p className="font-bold text-sm leading-none text-white">IELTS Sensei</p>
             <p className="text-[10px] mt-0.5 uppercase tracking-widest font-bold"
               style={{ color: `${PRIMARY}cc` }}>AI Exam Coach</p>
           </div>
@@ -284,7 +284,7 @@ export default function SignupPage() {
             >
               <GraduationCap className="w-4 h-4 text-white" />
             </div>
-            <p className="font-bold text-base">IELTS AI Coach</p>
+            <p className="font-bold text-base">IELTS Sensei</p>
           </div>
 
           <div className="mb-8">

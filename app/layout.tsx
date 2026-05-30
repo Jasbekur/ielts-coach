@@ -39,18 +39,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "IELTS AI Coach",
+  title: "IELTS Sensei",
   description:
     "Instant, examiner-grade feedback on IELTS Writing and Speaking. Get band scores per criterion + actionable corrections in under 15 seconds.",
   openGraph: {
-    title: "IELTS AI Coach",
+    title: "IELTS Sensei",
     description: "AI-powered IELTS preparation for Writing & Speaking",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "IELTS AI Coach",
+    title: "IELTS Sensei",
     description: "AI-powered IELTS preparation for Writing & Speaking",
   },
   robots: { index: true, follow: true },

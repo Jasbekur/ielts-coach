@@ -567,8 +567,25 @@ export default function WritingPage() {
                   <button
                     type="button"
                     onClick={() => { setIsGeneratedQuestion(false); setQuestion(""); }}
-                    className="absolute top-2 right-2 text-[10px] text-muted-foreground hover:text-red-500 underline transition-colors"
+                    className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold transition-all duration-150 hover:scale-105 active:scale-95"
+                    style={{
+                      background: "rgba(239,68,68,0.1)",
+                      color: "#ef4444",
+                      border: "1px solid rgba(239,68,68,0.2)",
+                    }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.18)";
+                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(239,68,68,0.4)";
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.1)";
+                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(239,68,68,0.2)";
+                    }}
                   >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="shrink-0">
+                      <line x1="1.5" y1="1.5" x2="8.5" y2="8.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                      <line x1="8.5" y1="1.5" x2="1.5" y2="8.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                    </svg>
                     Clear
                   </button>
                 )}
