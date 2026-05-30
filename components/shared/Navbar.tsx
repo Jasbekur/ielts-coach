@@ -183,7 +183,10 @@ export function Sidebar() {
             <p className="text-xs font-semibold text-white truncate">
               {userEmail ?? "Loading…"}
             </p>
-            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>Free plan</p>
+            <p className="text-[10px] font-semibold"
+              style={{ color: isAdmin ? "#a78bfa" : isEditor ? "#fbbf24" : "rgba(255,255,255,0.35)" }}>
+              {isAdmin ? "Admin" : isEditor ? "Editor" : "Student"}
+            </p>
           </div>
           <ChevronUp
             className="w-3.5 h-3.5 shrink-0 transition-transform duration-200"
