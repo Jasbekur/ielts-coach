@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -670,6 +671,8 @@ export default function ReadingPage() {
   if (phase === "results" && results) {
     const band = results.band;
     const pct = Math.round((results.correct / results.total) * 100);
+    // For practice (single passage), show raw score only — no band
+    const isPractice = practiceOnly !== null;
 
     return (
       <div className="space-y-6">
@@ -677,19 +680,32 @@ export default function ReadingPage() {
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 mb-4">
             <BookOpen className="w-3.5 h-3.5" />
-            {practiceOnly !== null
+            {isPractice
               ? `Passage ${practiceOnly + 1} Practice Result`
               : "Academic Reading Result"}
           </div>
-          <div
-            className={cn("text-6xl font-black font-mono tracking-tight", getBandTailwind(band))}
-          >
-            {band.toFixed(1)}
-          </div>
-          <p className="text-lg font-semibold mt-1 text-gray-700">{bandLabel(band)}</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {results.correct} / {results.total} correct ({pct}%)
-          </p>
+          {isPractice ? (
+            /* Practice: show raw score without band */
+            <>
+              <div className="text-6xl font-black font-mono tracking-tight text-emerald-600">
+                {results.correct}<span className="text-3xl text-muted-foreground font-bold">/{results.total}</span>
+              </div>
+              <p className="text-lg font-semibold mt-1 text-gray-700">
+                {results.correct === results.total ? "Perfect Score! 🎉" : `${pct}% correct`}
+              </p>
+            </>
+          ) : (
+            /* Full test: show band score */
+            <>
+              <div className={cn("text-6xl font-black font-mono tracking-tight", getBandTailwind(band))}>
+                {band.toFixed(1)}
+              </div>
+              <p className="text-lg font-semibold mt-1 text-gray-700">{bandLabel(band)}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {results.correct} / {results.total} correct ({pct}%)
+              </p>
+            </>
+          )}
         </div>
 
         {/* Progress bar */}
@@ -792,7 +808,7 @@ export default function ReadingPage() {
 
   const isUrgent = timeLeft < 5 * 60;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[9999] flex flex-col"
       style={{ background: "oklch(0.982 0.005 285)" }}
@@ -1005,6 +1021,7 @@ export default function ReadingPage() {
           Next <ChevronRight className="w-4 h-4" />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

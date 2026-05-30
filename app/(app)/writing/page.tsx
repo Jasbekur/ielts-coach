@@ -267,6 +267,7 @@ function ChartUpload({
 export default function WritingPage() {
   const [taskType, setTaskType] = useState<"task1" | "task2">("task2");
   const [question, setQuestion] = useState("");
+  const [isGeneratedQuestion, setIsGeneratedQuestion] = useState(false);
   const [essay, setEssay] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WritingResult | null>(null);
@@ -335,6 +336,7 @@ export default function WritingPage() {
   }, []);
 
   function pickRandomQuestion() {
+    setIsGeneratedQuestion(true);
     if (taskType === "task2") {
       const q = TASK2_QUESTIONS[Math.floor(Math.random() * TASK2_QUESTIONS.length)];
       setQuestion(q.q);
@@ -485,6 +487,7 @@ export default function WritingPage() {
           setResult(null);
           setEssay("");
           setQuestion("");
+          setIsGeneratedQuestion(false);
           setTimerSeconds(0);
           if (timerRef.current) clearInterval(timerRef.current);
           setTimerActive(false);
@@ -545,16 +548,31 @@ export default function WritingPage() {
                   {taskType === "task1" ? "Practice question + chart" : "Practice question"}
                 </button>
               </div>
-              <Textarea
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder={
-                  taskType === "task1"
-                    ? "Paste the task instructions here, e.g. 'The graph below shows... Summarise the information by selecting and reporting the main features...'"
-                    : "Paste the essay question here, or click 'Practice question' for a sample..."
-                }
-                className="resize-none min-h-[100px] text-sm"
-              />
+              <div className="relative">
+                <Textarea
+                  value={question}
+                  onChange={(e) => {
+                    setIsGeneratedQuestion(false);
+                    setQuestion(e.target.value);
+                  }}
+                  readOnly={isGeneratedQuestion}
+                  placeholder={
+                    taskType === "task1"
+                      ? "Paste the task instructions here, e.g. 'The graph below shows... Summarise the information by selecting and reporting the main features...'"
+                      : "Paste the essay question here, or click 'Practice question' for a sample..."
+                  }
+                  className={`resize-none min-h-[100px] text-sm ${isGeneratedQuestion ? "bg-muted/50 cursor-default select-text" : ""}`}
+                />
+                {isGeneratedQuestion && question && (
+                  <button
+                    type="button"
+                    onClick={() => { setIsGeneratedQuestion(false); setQuestion(""); }}
+                    className="absolute top-2 right-2 text-[10px] text-muted-foreground hover:text-red-500 underline transition-colors"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Task 1: Chart / diagram upload */}
