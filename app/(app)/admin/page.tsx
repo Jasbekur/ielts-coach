@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard, ChevronRight, ShieldCheck, Plus, Pencil, Trash2,
@@ -179,7 +179,7 @@ export default function AdminPage() {
 }
 
 function AdminContent() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { isAdmin } = useUserRole();
 
   const [questions,   setQuestions]   = useState<Question[]>([]);
@@ -314,6 +314,7 @@ function AdminContent() {
             <StatPill icon={<FileText className="w-4 h-4"/>}     label="Writing" value={bySection("writing")}  color="#38bdf8" bg="#0c2a3d" />
             <StatPill icon={<BookMarked className="w-4 h-4"/>}   label="Reading" value={bySection("reading")}  color="#34d399" bg="#0a2d22" />
             <StatPill icon={<Mic className="w-4 h-4"/>}          label="Speaking" value={bySection("speaking")} color="#c084fc" bg="#1d0d38" />
+            <StatPill icon={<Headphones className="w-4 h-4"/>}   label="Listening" value={bySection("listening")} color="#fb923c" bg="#2d1408" />
           </div>
         </div>
       </div>
@@ -338,7 +339,7 @@ function AdminContent() {
 
         {/* Section filter tabs */}
         <div className="flex items-center gap-2 mb-3">
-          {(["all","writing","reading","speaking"] as const).map(s => {
+          {(["all","writing","reading","speaking","listening"] as const).map(s => {
             const active = filterSection === s;
             const sec = s !== "all" ? SECTIONS.find(x => x.value === s) : null;
             const count = s === "all" ? questions.length : bySection(s as Section);

@@ -14,7 +14,7 @@
  *   refresh   — call this to manually re-fetch (e.g. after a role change)
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Role = "student" | "admin" | "editor" | string | null;
@@ -33,7 +33,7 @@ export function useUserRole(): UseUserRoleResult {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError]     = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchRole = useCallback(async () => {
     setLoading(true);

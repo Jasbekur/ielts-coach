@@ -20,9 +20,9 @@ export default function ResetPasswordPage() {
 
   // Guard: only allow access when Supabase has set a recovery session via the email link
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setValidSession(!!session);
-      if (!session) {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setValidSession(!!user);
+      if (!user) {
         // No recovery session — redirect to forgot-password so user can request a new link
         router.replace("/forgot-password");
       }
@@ -50,8 +50,12 @@ export default function ResetPasswordPage() {
     }
   }
 
-  // Show nothing while we verify the session to avoid flash
-  if (validSession === null) return null;
+  // Show spinner while we verify the session to avoid flash
+  if (validSession === null) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "oklch(0.982 0.005 285)" }}>
+      <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex" style={{ background: "oklch(0.982 0.005 285)" }}>

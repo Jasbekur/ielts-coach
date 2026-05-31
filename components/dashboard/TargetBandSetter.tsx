@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Target, Check, Pencil } from "lucide-react";
+import { toast } from "sonner";
 
 const BAND_OPTIONS = [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0];
 
@@ -22,7 +23,9 @@ export function TargetBandSetter({ userId, currentTarget, currentAvg }: Props) {
   function handleSave(band: number) {
     setSelected(band);
     startTransition(async () => {
-      await supabase.from("profiles").update({ target_band: band }).eq("id", userId);
+      const { error } = await supabase.from("profiles").update({ target_band: band }).eq("id", userId);
+      if (error) { toast.error("Failed to save target band"); return; }
+      toast.success("Target band saved!");
       setSaved(true);
       setEditing(false);
       setTimeout(() => setSaved(false), 2000);

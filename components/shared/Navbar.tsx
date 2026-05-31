@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   BookOpen,
   Mic,
@@ -46,7 +46,7 @@ function SenseiLogo({ size = 40 }: { size?: number }) {
 export function Sidebar() {
   const pathname = usePathname();
   const router   = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const { isAdmin, isEditor } = useUserRole();

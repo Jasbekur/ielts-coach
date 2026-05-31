@@ -5,7 +5,7 @@ import {
   Headphones, Play, Pause, Volume2, VolumeX, Clock,
   CheckCircle2, XCircle, Users, Mic2, GraduationCap,
   BookOpen, RotateCcw, ChevronLeft, Trophy, AlertCircle,
-  AlignLeft, List,
+  AlignLeft,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -245,6 +245,7 @@ export default function ListeningPage() {
           user_id: user.id,
           mode: "listening",
           task_type: `section_${section.num}`,
+          overall_band: scoreToBand(correct, questions.length),
           result: {
             correct,
             total: questions.length,

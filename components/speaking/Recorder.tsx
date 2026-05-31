@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Mic, Square, RefreshCw, MicOff } from "lucide-react";
+import { Mic, Square, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpeakingTimer } from "./SpeakingTimer";
 import { getSupportedMimeType } from "@/lib/utils/audio";
@@ -64,6 +64,13 @@ export function Recorder({
     }
     setState("done");
   }
+
+  // Revoke audio URL on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    };
+  }, [audioUrl]);
 
   // Auto-stop at limit using a ref-based timer check
   useEffect(() => {

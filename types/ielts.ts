@@ -1,6 +1,6 @@
 export type TaskType = "task1" | "task2";
 export type SpeakingPart = 1 | 2 | 3;
-export type AttemptMode = "writing" | "speaking";
+export type AttemptMode = "writing" | "speaking" | "listening" | "reading";
 
 export interface WritingScores {
   task_response?: number;

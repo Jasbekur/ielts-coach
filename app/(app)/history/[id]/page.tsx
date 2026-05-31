@@ -1,7 +1,7 @@
 export const revalidate = 0;
 
 import { createClient } from "@/lib/supabase/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ScoreCard } from "@/components/writing/ScoreCard";
 import { CorrectionsView } from "@/components/writing/CorrectionsView";
 import { BandRewrite } from "@/components/writing/BandRewrite";
@@ -31,12 +31,9 @@ export default async function AttemptDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    const { redirect } = await import("next/navigation");
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
-  const userId = user!.id;
+  const userId = user.id;
 
   const { data: attempt, error } = await supabase
     .from("attempts")

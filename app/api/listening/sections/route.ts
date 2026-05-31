@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 export async function GET() {
+  const client = await createClient();
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) return NextResponse.json({ data: [] }, { status: 401 });
+
   const svc = await createServiceClient();
 
   const { data, error } = await svc

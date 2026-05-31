@@ -292,7 +292,7 @@ export default function WritingPage() {
 
   function toggleTimer() {
     if (timerActive) {
-      clearInterval(timerRef.current!);
+      if (timerRef.current) clearInterval(timerRef.current);
       setTimerActive(false);
     } else {
       timerStartedRef.current = true;
@@ -304,7 +304,7 @@ export default function WritingPage() {
   // Auto-start timer on first keystroke in essay box
   function handleEssayChange(val: string) {
     setEssay(val);
-    if (val.length === 1) startTimer(); // first character typed
+    if (val.length > 0 && !timerStartedRef.current) startTimer();
   }
 
   useEffect(() => {
@@ -313,7 +313,7 @@ export default function WritingPage() {
 
   useEffect(() => {
     if (timerSeconds < timeLimit || !timerActive) return;
-    clearInterval(timerRef.current!);
+    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = null;
     const t = setTimeout(() => {
       setTimerActive(false);
@@ -403,7 +403,7 @@ export default function WritingPage() {
 
     setLoading(true);
     setResult(null);
-    if (timerActive) { clearInterval(timerRef.current!); setTimerActive(false); }
+    if (timerActive) { if (timerRef.current) clearInterval(timerRef.current); setTimerActive(false); }
 
     try {
       let imageBase64: string | undefined;
