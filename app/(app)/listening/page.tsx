@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import {
   Headphones, Play, Pause, Volume2, VolumeX, Clock,
   CheckCircle2, XCircle, Users, Mic2, GraduationCap,
@@ -122,8 +121,6 @@ function fmtTime(s: number) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ListeningPage() {
-  const supabase = createClient();
-
   const [phase,          setPhase]          = useState<Phase>("selector");
   const [mode,           setMode]           = useState<ExamMode>("practice");
   const [available,      setAvailable]      = useState<Record<string, LMaterial[]>>({});
@@ -154,22 +151,21 @@ export default function ListeningPage() {
   useEffect(() => {
     (async () => {
       setLoadingDB(true);
-      const { data } = await supabase
-        .from("test_materials")
-        .select("id,title,type,content,created_at")
-        .in("type", ["listening_s1","listening_s2","listening_s3","listening_s4"])
-        .order("created_at", { ascending: false });
-
-      const grouped: Record<string, LMaterial[]> = {};
-      (data ?? []).forEach((m: LMaterial) => {
-        if (m.content?.status !== "published") return;
-        if (!grouped[m.type]) grouped[m.type] = [];
-        grouped[m.type].push(m);
-      });
-      setAvailable(grouped);
+      try {
+        const res  = await fetch("/api/listening/sections");
+        const json = await res.json();
+        const grouped: Record<string, LMaterial[]> = {};
+        (json.data ?? []).forEach((m: LMaterial) => {
+          if (!grouped[m.type]) grouped[m.type] = [];
+          grouped[m.type].push(m);
+        });
+        setAvailable(grouped);
+      } catch {
+        // silently fall through — sections will show "No content yet"
+      }
       setLoadingDB(false);
     })();
-  }, [supabase]);
+  }, []);
 
   // ── Timer ───────────────────────────────────────────────────────────────────
 
