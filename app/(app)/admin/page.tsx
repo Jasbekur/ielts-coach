@@ -701,7 +701,7 @@ function AddQuestionForm({ onSuccess, onLog }: {
                 : "Some people think universities should focus on teaching academic subjects. Others believe they should prepare students for work. Discuss both views and give your own opinion."} />
           </FieldLabel>
 
-          <FieldLabel label={<>Chart / Diagram <span className="font-normal normal-case tracking-normal" style={{ color:T3 }}>— optional · max 5 MB</span></>}>
+          {qType === "writing_task1" && <FieldLabel label={<>Chart / Diagram <span className="font-normal normal-case tracking-normal" style={{ color:T3 }}>— optional · max 5 MB</span></>}>
             {imagePreview ? (
               <div className="relative rounded-xl overflow-hidden" style={{ border:`1px solid ${BD}` }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -738,7 +738,7 @@ function AddQuestionForm({ onSuccess, onLog }: {
             )}
             <input ref={fileRef} type="file" accept="image/*" className="hidden"
               onChange={e => { const f = e.target.files?.[0]; if (f) pickFile(f); }} />
-          </FieldLabel>
+          </FieldLabel>}
         </>)}
 
         {/* ── Reading fields ── */}
