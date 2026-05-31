@@ -315,9 +315,9 @@ export default function ListeningPage() {
         style={{ background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.15)" }}>
         <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" style={{ color:"#38bdf8" }} />
         <p className="text-xs leading-relaxed" style={{ color:"#94a3b8" }}>
-          <span className="font-bold text-white">IELTS Examiner tip:</span> In the real exam, you hear each recording <span className="text-white font-semibold">only once</span>.
-          Read the questions carefully <span className="text-white font-semibold">before</span> the audio starts. Write your answers as you listen — you&apos;ll have 10 minutes
-          at the end to transfer them to the answer sheet. Use <span className="text-white font-semibold">Exam mode</span> above to simulate real conditions.
+          <span style={{ fontWeight:700, color:"#f1f5f9" }}>IELTS Examiner tip:</span> In the real exam, you hear each recording <span style={{ fontWeight:600, color:"#f1f5f9" }}>only once</span>.
+          Read the questions carefully <span style={{ fontWeight:600, color:"#f1f5f9" }}>before</span> the audio starts. Write your answers as you listen — you&apos;ll have 10 minutes
+          at the end to transfer them to the answer sheet. Use <span style={{ fontWeight:600, color:"#38bdf8" }}>Exam mode</span> above to simulate real conditions.
         </p>
       </div>
 
