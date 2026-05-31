@@ -7,6 +7,7 @@ import {
   BookOpen, RotateCcw, ChevronLeft, Trophy, AlertCircle,
   AlignLeft, List,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -15,19 +16,28 @@ type ExamMode = "practice" | "exam";
 
 interface LQuestion {
   number:     number;
-  type:       "form" | "mcq" | "short";
+  type?:      string;
   text:       string;       // question stem or field label
+  prefix?:    string;       // sentence completion: text before blank
+  suffix?:    string;       // sentence completion: text after blank
   options?:   string[];     // MCQ: ["A. …", "B. …", "C. …", "D. …"]
   answer:     string;
   acceptable?: string[];
 }
 
+interface LGroup {
+  type: string;
+  instruction: string;
+  questions: LQuestion[];
+}
+
 interface LContent {
-  status:       "published" | "draft";
-  audio_url:    string;
-  context?:     string;
-  transcript?:  string;
-  questions:    LQuestion[];
+  status:           "published" | "draft";
+  audio_url:        string;
+  context?:         string;
+  transcript?:      string;
+  questions?:       LQuestion[];
+  question_groups?: LGroup[];
 }
 
 interface LMaterial {
@@ -120,7 +130,15 @@ function fmtTime(s: number) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+function getQuestions(mat: LMaterial): LQuestion[] {
+  if (mat.content.question_groups?.length) {
+    return mat.content.question_groups.flatMap(g => g.questions);
+  }
+  return mat.content.questions ?? [];
+}
+
 export default function ListeningPage() {
+  const supabase = createClient();
   const [phase,          setPhase]          = useState<Phase>("selector");
   const [mode,           setMode]           = useState<ExamMode>("practice");
   const [available,      setAvailable]      = useState<Record<string, LMaterial[]>>({});
@@ -203,9 +221,9 @@ export default function ListeningPage() {
 
   // ── Submit ──────────────────────────────────────────────────────────────────
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!material) return;
-    const questions = material.content.questions ?? [];
+    const questions = getQuestions(material);
     const details = questions.map(q => {
       const given   = (answers[q.number] ?? "").trim().toLowerCase();
       const correct = q.answer.trim().toLowerCase();
@@ -218,7 +236,32 @@ export default function ListeningPage() {
     if (timerRef.current) clearInterval(timerRef.current);
     if (audioRef.current) { audioRef.current.pause(); setPlaying(false); }
     setPhase("results");
-  }, [material, answers]);
+
+    // Save to attempts table
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && section) {
+        await supabase.from("attempts").insert({
+          user_id: user.id,
+          mode: "listening",
+          task_type: `section_${section.num}`,
+          result: {
+            correct,
+            total: questions.length,
+            band: scoreToBand(correct, questions.length),
+            section: section.label,
+            details: details.map(d => ({
+              number: d.q.number,
+              question: d.q.text,
+              given: d.given,
+              correct: d.q.answer,
+              ok: d.ok,
+            }))
+          }
+        });
+      }
+    } catch { /* silently ignore — don't block results page */ }
+  }, [material, answers, supabase, section]);
 
   // ── Audio controls ──────────────────────────────────────────────────────────
 
@@ -379,7 +422,7 @@ export default function ListeningPage() {
   // ── Listening phase ──────────────────────────────────────────────────────────
 
   if (phase === "listening" && material && section) {
-    const questions = material.content.questions ?? [];
+    const questions = getQuestions(material);
     const progress  = dur > 0 ? (curTime / dur) * 100 : 0;
     const answered  = Object.values(answers).filter(v => v.trim()).length;
 
@@ -489,11 +532,35 @@ export default function ListeningPage() {
             </span>
           </div>
 
-          {questions.map(q => (
-            <QuestionCard key={q.number} q={q}
-              value={answers[q.number]??""}
-              onChange={v => setAnswers(a => ({...a,[q.number]:v}))} />
-          ))}
+          {material.content.question_groups?.length ? (
+            <div className="space-y-6">
+              {material.content.question_groups.map((group, gi) => (
+                <div key={gi} className="space-y-3">
+                  {/* Group header */}
+                  <div className="rounded-xl px-4 py-3 space-y-1" style={{ background: "#071826", border: "1px solid rgba(56,189,248,0.15)" }}>
+                    <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#38bdf8" }}>
+                      {group.type.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())} · Q{group.questions[0]?.number}–{group.questions[group.questions.length-1]?.number}
+                    </p>
+                    <p className="text-xs leading-relaxed" style={{ color: "#94a3b8" }}>{group.instruction}</p>
+                  </div>
+                  {/* Questions in group */}
+                  {group.questions.map(q => (
+                    <QuestionCard key={q.number} q={q}
+                      value={answers[q.number] ?? ""}
+                      onChange={v => setAnswers(a => ({ ...a, [q.number]: v }))} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {questions.map(q => (
+                <QuestionCard key={q.number} q={q}
+                  value={answers[q.number]??""}
+                  onChange={v => setAnswers(a => ({...a,[q.number]:v}))} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Submit */}
@@ -633,6 +700,18 @@ function QuestionCard({ q, value, onChange }: {
   q: LQuestion; value: string; onChange: (v: string) => void;
 }) {
   const filled = value.trim().length > 0;
+  const isMcqSingle = q.type === "mcq" || q.type === "mcq_single";
+  const isMcqMulti  = q.type === "mcq_multi";
+  const isSentence  = q.type === "sentence";
+
+  // mcq_multi: comma-separated letters
+  const selectedLetters = isMcqMulti ? value.split(",").map(s => s.trim()).filter(Boolean) : [];
+
+  function toggleMulti(letter: string) {
+    const cur = value.split(",").map(s => s.trim()).filter(Boolean);
+    const next = cur.includes(letter) ? cur.filter(l => l !== letter) : [...cur, letter];
+    onChange(next.sort().join(","));
+  }
 
   return (
     <div className="rounded-xl p-4 transition-all duration-150"
@@ -645,45 +724,90 @@ function QuestionCard({ q, value, onChange }: {
         </span>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm mb-2.5 leading-snug" style={{ color:"#94a3b8" }}>{q.text}</p>
-
-          {/* MCQ */}
-          {q.type === "mcq" && q.options && (
-            <div className="space-y-1.5">
-              {q.options.map((opt, i) => {
-                const letter = ["A","B","C","D"][i];
-                const selected = value === letter;
-                return (
-                  <button key={i} type="button" onClick={() => onChange(selected ? "" : letter)}
-                    className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all duration-100"
-                    style={{
-                      background: selected ? "rgba(56,189,248,0.12)" : "#0f172a",
-                      border: `1px solid ${selected ? "rgba(56,189,248,0.35)" : "#1e293b"}`,
-                      color: selected ? "#38bdf8" : "#64748b",
-                    }}>
-                    <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black shrink-0"
-                      style={{ background:selected?"rgba(56,189,248,0.25)":"#1e293b", color:selected?"#38bdf8":"#334155" }}>
-                      {letter}
-                    </span>
-                    {opt}
-                  </button>
-                );
-              })}
+          {/* Sentence completion layout */}
+          {isSentence ? (
+            <div className="flex items-center flex-wrap gap-1.5 text-sm leading-relaxed" style={{ color:"#94a3b8" }}>
+              {q.prefix && <span>{q.prefix}</span>}
+              <input
+                type="text"
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                placeholder="…"
+                className="px-2 py-1 rounded-md text-sm focus:outline-none transition-all duration-150 min-w-[100px] flex-1"
+                style={{ background:"#0f172a", border:`1px solid ${filled?"rgba(56,189,248,0.3)":"#1e293b"}`, color:"#e2e8f0", caretColor:"#38bdf8" }}
+                onFocus={e => (e.currentTarget.style.borderColor = "#38bdf8")}
+                onBlur={e  => (e.currentTarget.style.borderColor = filled?"rgba(56,189,248,0.3)":"#1e293b")}
+              />
+              {q.suffix && <span>{q.suffix}</span>}
             </div>
-          )}
+          ) : (
+            <>
+              <p className="text-sm mb-2.5 leading-snug" style={{ color:"#94a3b8" }}>{q.text}</p>
 
-          {/* Form / Short answer */}
-          {(q.type === "form" || q.type === "short") && (
-            <input
-              type="text"
-              value={value}
-              onChange={e => onChange(e.target.value)}
-              placeholder={q.type === "form" ? "Write your answer…" : "No more than three words…"}
-              className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none transition-all duration-150"
-              style={{ background:"#0f172a", border:`1px solid ${filled?"rgba(56,189,248,0.3)":"#1e293b"}`, color:"#e2e8f0", caretColor:"#38bdf8" }}
-              onFocus={e => (e.currentTarget.style.borderColor = "#38bdf8")}
-              onBlur={e  => (e.currentTarget.style.borderColor = filled?"rgba(56,189,248,0.3)":"#1e293b")}
-            />
+              {/* MCQ single */}
+              {isMcqSingle && q.options && (
+                <div className="space-y-1.5">
+                  {q.options.map((opt, i) => {
+                    const letter = ["A","B","C","D","E"][i];
+                    const selected = value === letter;
+                    return (
+                      <button key={i} type="button" onClick={() => onChange(selected ? "" : letter)}
+                        className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all duration-100"
+                        style={{
+                          background: selected ? "rgba(56,189,248,0.12)" : "#0f172a",
+                          border: `1px solid ${selected ? "rgba(56,189,248,0.35)" : "#1e293b"}`,
+                          color: selected ? "#38bdf8" : "#64748b",
+                        }}>
+                        <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black shrink-0"
+                          style={{ background:selected?"rgba(56,189,248,0.25)":"#1e293b", color:selected?"#38bdf8":"#334155" }}>
+                          {letter}
+                        </span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* MCQ multi — checkboxes */}
+              {isMcqMulti && q.options && (
+                <div className="space-y-1.5">
+                  {q.options.map((opt, i) => {
+                    const letter = ["A","B","C","D","E"][i];
+                    const selected = selectedLetters.includes(letter);
+                    return (
+                      <button key={i} type="button" onClick={() => toggleMulti(letter)}
+                        className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all duration-100"
+                        style={{
+                          background: selected ? "rgba(167,139,250,0.12)" : "#0f172a",
+                          border: `1px solid ${selected ? "rgba(167,139,250,0.35)" : "#1e293b"}`,
+                          color: selected ? "#a78bfa" : "#64748b",
+                        }}>
+                        <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black shrink-0"
+                          style={{ background:selected?"rgba(167,139,250,0.25)":"#1e293b", color:selected?"#a78bfa":"#334155" }}>
+                          {letter}
+                        </span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Form / Short / Notes / Table answer */}
+              {!isMcqSingle && !isMcqMulti && (
+                <input
+                  type="text"
+                  value={value}
+                  onChange={e => onChange(e.target.value)}
+                  placeholder={q.type === "short" ? "No more than three words…" : "Write your answer…"}
+                  className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none transition-all duration-150"
+                  style={{ background:"#0f172a", border:`1px solid ${filled?"rgba(56,189,248,0.3)":"#1e293b"}`, color:"#e2e8f0", caretColor:"#38bdf8" }}
+                  onFocus={e => (e.currentTarget.style.borderColor = "#38bdf8")}
+                  onBlur={e  => (e.currentTarget.style.borderColor = filled?"rgba(56,189,248,0.3)":"#1e293b")}
+                />
+              )}
+            </>
           )}
         </div>
       </div>

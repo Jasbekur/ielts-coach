@@ -27,14 +27,34 @@ type Difficulty    = "band_5_6" | "band_6_7" | "band_7_8" | "band_8_9";
 type PassageLevel  = "level_1" | "level_2" | "level_3";
 type Status        = "published" | "draft";
 
-interface LQuestionItem {
-  number:   number;
-  type:     "form" | "mcq" | "short";
-  text:     string;
-  options?: string[];
-  answer:   string;
+type LGroupType = "form" | "notes" | "table" | "mcq_single" | "mcq_multi" | "short" | "sentence";
+
+interface LQuestion {
+  number:     number;
+  text:       string;       // question stem, field label, or sentence fragment
+  prefix?:    string;       // sentence_completion: text before blank
+  suffix?:    string;       // sentence_completion: text after blank
+  options?:   string[];     // mcq: ["A. option text", "B. ...", ...]
+  answer:     string;       // correct answer (for mcq_single: "A", mcq_multi: "A,C")
   acceptable?: string[];
 }
+
+interface LGroup {
+  id:           string;       // uuid for React key
+  type:         LGroupType;
+  instruction:  string;
+  questions:    LQuestion[];
+}
+
+const LGROUP_META: Record<LGroupType, { label: string; instruction: string; color: string }> = {
+  form:       { label: "Form Completion",     instruction: "Complete the form below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.", color: "#38bdf8" },
+  notes:      { label: "Note Completion",     instruction: "Complete the notes below. Write NO MORE THAN TWO WORDS for each answer.",                color: "#34d399" },
+  table:      { label: "Table Completion",    instruction: "Complete the table below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.", color: "#fbbf24" },
+  mcq_single: { label: "Multiple Choice",     instruction: "Choose the correct letter, A, B or C.",                                                   color: "#c084fc" },
+  mcq_multi:  { label: "MCQ — Choose TWO",   instruction: "Choose TWO correct letters, A–E.",                                                         color: "#a78bfa" },
+  short:      { label: "Short Answer",        instruction: "Answer the questions below. Write NO MORE THAN THREE WORDS AND/OR A NUMBER for each answer.", color: "#fb923c" },
+  sentence:   { label: "Sentence Completion", instruction: "Complete the sentences below. Write NO MORE THAN TWO WORDS for each answer.",              color: "#f472b6" },
+};
 
 interface QuestionContent {
   difficulty?:    Difficulty;
@@ -52,7 +72,6 @@ interface QuestionContent {
   audio_url?:     string;
   context?:       string;
   transcript?:    string;
-  lquestions?:    LQuestionItem[];
 }
 
 interface Question {
@@ -568,10 +587,11 @@ function AddQuestionForm({ onSuccess, onLog }: {
   const audioRef2     = useRef<HTMLInputElement>(null);
   const [audioFile,    setAudioFile]    = useState<File | null>(null);
   const [audioName,    setAudioName]    = useState("");
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
   const [lContext,     setLContext]     = useState("");
   const [lTranscript,  setLTranscript]  = useState("");
-  const [lQuestions,   setLQuestions]   = useState<LQuestionItem[]>([
-    { number: 1, type: "form", text: "", answer: "", acceptable: [] },
+  const [lGroups,      setLGroups]      = useState<LGroup[]>([
+    { id: crypto.randomUUID(), type: "form", instruction: LGROUP_META.form.instruction, questions: [{ number: 1, text: "", answer: "", acceptable: [] }] },
   ]);
   const [lUploading,   setLUploading]   = useState(false);
   const [uploading,  setUploading]  = useState(false);
@@ -592,15 +612,34 @@ function AddQuestionForm({ onSuccess, onLog }: {
   const [followUp,    setFollowUp]    = useState("");
 
   // Listening helpers
-  function addLQuestion() {
-    const lastNum = lQuestions[lQuestions.length - 1]?.number ?? 0;
-    setLQuestions(q => [...q, { number: lastNum + 1, type: "form", text: "", answer: "", acceptable: [] }]);
+  function nextQNum(groups: LGroup[]): number {
+    const all = groups.flatMap(g => g.questions.map(q => q.number));
+    return all.length > 0 ? Math.max(...all) + 1 : 1;
   }
-  function removeLQuestion(i: number) {
-    setLQuestions(q => q.filter((_,idx)=>idx!==i));
+  function addLGroup() {
+    setLGroups(g => [...g, { id: crypto.randomUUID(), type: "form", instruction: LGROUP_META.form.instruction, questions: [{ number: nextQNum(g), text: "", answer: "" }] }]);
   }
-  function updateLQuestion(i: number, patch: Partial<LQuestionItem>) {
-    setLQuestions(q => q.map((item,idx)=> idx===i ? {...item,...patch} : item));
+  function removeLGroup(gi: number) {
+    setLGroups(g => g.filter((_,i) => i !== gi));
+  }
+  function updateLGroup(gi: number, patch: Partial<LGroup>) {
+    setLGroups(g => g.map((grp, i) => i === gi ? { ...grp, ...patch } : grp));
+  }
+  function addQuestionToGroup(gi: number) {
+    setLGroups(g => g.map((grp, i) => {
+      if (i !== gi) return grp;
+      const allNums = g.flatMap(x => x.questions.map(q => q.number));
+      const next = allNums.length > 0 ? Math.max(...allNums) + 1 : 1;
+      return { ...grp, questions: [...grp.questions, { number: next, text: "", answer: "" }] };
+    }));
+  }
+  function removeQuestionFromGroup(gi: number, qi: number) {
+    setLGroups(g => g.map((grp, i) => i !== gi ? grp : { ...grp, questions: grp.questions.filter((_,j) => j !== qi) }));
+  }
+  function updateQuestion(gi: number, qi: number, patch: Partial<LQuestion>) {
+    setLGroups(g => g.map((grp, i) => i !== gi ? grp : {
+      ...grp, questions: grp.questions.map((q, j) => j !== qi ? q : { ...q, ...patch })
+    }));
   }
 
   // Switch section → set default type
@@ -611,12 +650,13 @@ function AddQuestionForm({ onSuccess, onLog }: {
     if (s === "speaking")  setQType("speaking_part1");
     if (s === "listening") {
       setQType("listening_s1");
-      // reset question numbers to section 1 range
-      setLQuestions([{ number: 1, type: "form", text: "", answer: "", acceptable: [] }]);
+      // reset groups with section 1 start number
+      setLGroups([{ id: crypto.randomUUID(), type: "form", instruction: LGROUP_META.form.instruction, questions: [{ number: 1, text: "", answer: "", acceptable: [] }] }]);
     }
     // clear cross-section state
     setTitle(""); setPassageText(""); setQuestionsText(""); setBulletsText(""); setFollowUp("");
     setLContext(""); setLTranscript(""); setAudioFile(null); setAudioName("");
+    if (audioPreviewUrl) { URL.revokeObjectURL(audioPreviewUrl); setAudioPreviewUrl(null); }
   }
 
   function pickFile(file: File) {
@@ -663,7 +703,7 @@ function AddQuestionForm({ onSuccess, onLog }: {
 
     if (section === "listening") {
       if (!audioFile && !lContext) { setUploading(false); return toast.error("Audio file is required."); }
-      if (lQuestions.length === 0) { setUploading(false); return toast.error("Add at least one question."); }
+      if (lGroups.length === 0 || lGroups.every(g => g.questions.length === 0)) { setUploading(false); return toast.error("Add at least one question."); }
       setLUploading(true);
 
       let audioUrl = "";
@@ -680,14 +720,16 @@ function AddQuestionForm({ onSuccess, onLog }: {
       content.audio_url  = audioUrl;
       content.context    = lContext.trim();
       content.transcript = lTranscript.trim() || undefined;
-      // Store as "questions" (same key the listening page reads)
-      (content as unknown as Record<string, unknown>)["questions"] = lQuestions.map(q => ({
-        number:     q.number,
-        type:       q.type,
-        text:       q.text.trim(),
-        options:    q.options,
-        answer:     q.answer.trim(),
-        acceptable: (q.acceptable ?? []).filter(Boolean),
+      (content as unknown as Record<string,unknown>)["question_groups"] = lGroups.map(g => ({
+        type: g.type,
+        instruction: g.instruction,
+        questions: g.questions.map(q => ({
+          number: q.number, text: q.text.trim(),
+          prefix: q.prefix, suffix: q.suffix,
+          options: q.options,
+          answer: q.answer.trim().toLowerCase(),
+          acceptable: (q.acceptable ?? []).filter(Boolean),
+        }))
       }));
       setLUploading(false);
     }
@@ -718,7 +760,8 @@ function AddQuestionForm({ onSuccess, onLog }: {
     // reset
     setTitle(""); setPassageText(""); setQuestionsText(""); setBulletsText(""); setFollowUp("");
     setLContext(""); setLTranscript(""); setAudioFile(null); setAudioName("");
-    setLQuestions([{ number: 1, type: "form", text: "", answer: "", acceptable: [] }]);
+    if (audioPreviewUrl) { URL.revokeObjectURL(audioPreviewUrl); setAudioPreviewUrl(null); }
+    setLGroups([{ id: crypto.randomUUID(), type: "form", instruction: LGROUP_META.form.instruction, questions: [{ number: 1, text: "", answer: "", acceptable: [] }] }]);
     removeImage(); setDifficulty("band_6_7"); setStatus("draft");
     onSuccess();
   }
@@ -925,8 +968,8 @@ function AddQuestionForm({ onSuccess, onLog }: {
                   <button key={sec.type} type="button"
                     onClick={() => {
                       setQType(sec.type);
-                      // auto-number questions from section start
-                      setLQuestions(q => q.map((item, i) => ({ ...item, number: sec.start + i })));
+                      // reset groups with section start number
+                      setLGroups([{ id: crypto.randomUUID(), type: "form", instruction: LGROUP_META.form.instruction, questions: [{ number: sec.start, text: "", answer: "", acceptable: [] }] }]);
                     }}
                     className="flex flex-col gap-0.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150"
                     style={{
@@ -962,14 +1005,20 @@ function AddQuestionForm({ onSuccess, onLog }: {
           {/* Audio upload */}
           <FieldLabel label={<>Audio File <span className="font-normal normal-case tracking-normal" style={{ color:T3 }}>— MP3 / WAV / M4A · max 20 MB</span></>}>
             {audioFile ? (
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl"
-                style={{ background: "#071826", border: "1px solid rgba(56,189,248,0.3)" }}>
-                <Music2 className="w-4 h-4 shrink-0" style={{ color: "#38bdf8" }} />
-                <span className="text-sm flex-1 truncate" style={{ color: "#94a3b8" }}>{audioName}</span>
-                <button type="button" onClick={() => { setAudioFile(null); setAudioName(""); if(audioRef2.current) audioRef2.current.value=""; }}
-                  className="p-1 rounded-lg transition-colors" style={{ color: "#f87171" }}>
-                  <X className="w-3.5 h-3.5" />
-                </button>
+              <div className="rounded-xl overflow-hidden" style={{ background: "#071826", border: "1px solid rgba(56,189,248,0.3)" }}>
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <Music2 className="w-4 h-4 shrink-0" style={{ color: "#38bdf8" }} />
+                  <span className="text-sm flex-1 truncate" style={{ color: "#94a3b8" }}>{audioName}</span>
+                  <button type="button" onClick={() => { setAudioFile(null); setAudioName(""); if(audioRef2.current) audioRef2.current.value=""; if(audioPreviewUrl){URL.revokeObjectURL(audioPreviewUrl);setAudioPreviewUrl(null);} }}
+                    className="p-1 rounded-lg transition-colors" style={{ color: "#f87171" }}>
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {audioPreviewUrl && (
+                  <div className="px-4 pb-3">
+                    <audio controls src={audioPreviewUrl} className="w-full h-8" style={{ accentColor: "#38bdf8" }} />
+                  </div>
+                )}
               </div>
             ) : (
               <div onClick={() => audioRef2.current?.click()}
@@ -991,97 +1040,156 @@ function AddQuestionForm({ onSuccess, onLog }: {
                 const f = e.target.files?.[0];
                 if (!f) return;
                 if (f.size > 20 * 1024 * 1024) return toast.error("Audio must be under 20 MB.");
+                if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
                 setAudioFile(f); setAudioName(f.name);
+                setAudioPreviewUrl(URL.createObjectURL(f));
               }} />
           </FieldLabel>
 
-          {/* Questions */}
-          <FieldLabel label="Questions">
-            <div className="space-y-3">
-              {lQuestions.map((q, i) => (
-                <div key={i} className="rounded-xl p-4 space-y-3"
-                  style={{ background: S2, border: `1px solid ${BD}` }}>
-                  <div className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-black shrink-0"
-                      style={{ background: "#0c2a3d", color: "#38bdf8", border: "1px solid rgba(56,189,248,0.3)" }}>
-                      {q.number}
-                    </span>
-                    {/* Type selector */}
-                    <div className="flex gap-1.5 flex-1">
-                      {(["form","mcq","short"] as const).map(t => (
-                        <button key={t} type="button"
-                          onClick={() => updateLQuestion(i, { type: t, options: t==="mcq"?["","","",""] : undefined })}
-                          className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all"
-                          style={{
-                            background: q.type===t ? "#0c2a3d" : S3,
-                            border: `1px solid ${q.type===t ? "rgba(56,189,248,0.4)" : BD}`,
-                            color: q.type===t ? "#38bdf8" : T3,
-                          }}>
-                          {t==="form" ? "Form fill" : t==="mcq" ? "MCQ" : "Short answer"}
+          {/* Question Groups */}
+          <FieldLabel label="Question Groups">
+            <div className="space-y-4">
+              {lGroups.map((grp, gi) => {
+                const gMeta = LGROUP_META[grp.type];
+                return (
+                  <div key={grp.id} className="rounded-xl overflow-hidden" style={{ border: `1px solid ${gMeta.color}30`, background: S2 }}>
+                    {/* Group header */}
+                    <div className="flex items-center justify-between px-4 py-3" style={{ background: S3, borderBottom: `1px solid ${gMeta.color}20` }}>
+                      <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: gMeta.color }}>
+                        Group {gi + 1} · {gMeta.label}
+                      </span>
+                      {lGroups.length > 1 && (
+                        <button type="button" onClick={() => removeLGroup(gi)}
+                          className="p-1 rounded-lg transition-colors" style={{ color: "#f87171" }}>
+                          <X className="w-3.5 h-3.5" />
                         </button>
-                      ))}
+                      )}
                     </div>
-                    {lQuestions.length > 1 && (
-                      <button type="button" onClick={() => removeLQuestion(i)}
-                        className="p-1.5 rounded-lg" style={{ color: "#f87171" }}>
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
 
-                  {/* Question text */}
-                  <StyledInput value={q.text} onChange={e => updateLQuestion(i, { text: e.target.value })}
-                    placeholder={q.type==="form" ? "e.g. Campsite name: ___" : q.type==="mcq" ? "e.g. Why does the woman call?" : "e.g. What time does the tour start?"} />
-
-                  {/* MCQ options */}
-                  {q.type === "mcq" && (
-                    <div className="space-y-1.5">
-                      {(q.options ?? ["","","",""]).map((opt, oi) => (
-                        <div key={oi} className="flex items-center gap-2">
-                          <span className="text-[11px] font-bold w-5 text-center shrink-0" style={{ color: "#38bdf8" }}>
-                            {["A","B","C","D"][oi]}
-                          </span>
-                          <StyledInput value={opt}
-                            onChange={e => {
-                              const opts = [...(q.options??["","","",""])];
-                              opts[oi] = e.target.value;
-                              updateLQuestion(i, { options: opts });
-                            }}
-                            placeholder={`Option ${["A","B","C","D"][oi]}`} />
+                    <div className="p-4 space-y-4">
+                      {/* Group type selector */}
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: T3 }}>Question Type</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(Object.keys(LGROUP_META) as LGroupType[]).map(t => {
+                            const m = LGROUP_META[t];
+                            const active = grp.type === t;
+                            return (
+                              <button key={t} type="button"
+                                onClick={() => updateLGroup(gi, { type: t, instruction: LGROUP_META[t].instruction })}
+                                className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all"
+                                style={{
+                                  background: active ? `${m.color}18` : S3,
+                                  border: `1px solid ${active ? m.color+"50" : BD}`,
+                                  color: active ? m.color : T3,
+                                }}>
+                                {m.label}
+                              </button>
+                            );
+                          })}
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
 
-                  {/* Answer */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: "#38bdf8" }}>
-                        Correct Answer {q.type==="mcq"?"(A/B/C/D)":""}
-                      </p>
-                      <StyledInput value={q.answer}
-                        onChange={e => updateLQuestion(i, { answer: e.target.value })}
-                        placeholder={q.type==="mcq" ? "A" : "e.g. nine thirty"} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: T3 }}>
-                        Also accept <span className="font-normal normal-case tracking-normal">(comma-separated)</span>
-                      </p>
-                      <StyledInput
-                        value={(q.acceptable??[]).join(", ")}
-                        onChange={e => updateLQuestion(i, { acceptable: e.target.value.split(",").map(s=>s.trim()).filter(Boolean) })}
-                        placeholder="9:30, 9.30, half nine" />
+                      {/* Instruction */}
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: T3 }}>Instruction</p>
+                        <StyledTextarea value={grp.instruction} rows={2}
+                          onChange={e => updateLGroup(gi, { instruction: e.target.value })} />
+                      </div>
+
+                      {/* Questions in group */}
+                      <div className="space-y-3">
+                        {grp.questions.map((q, qi) => {
+                          const isMcq = grp.type === "mcq_single" || grp.type === "mcq_multi";
+                          const isSentence = grp.type === "sentence";
+                          return (
+                            <div key={qi} className="rounded-xl p-3 space-y-3" style={{ background: S1, border: `1px solid ${BD}` }}>
+                              <div className="flex items-center gap-2">
+                                <span className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-black shrink-0"
+                                  style={{ background: `${gMeta.color}18`, color: gMeta.color, border: `1px solid ${gMeta.color}30` }}>
+                                  {q.number}
+                                </span>
+                                <div className="flex-1">
+                                  {isSentence ? (
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <StyledInput value={q.prefix ?? ""} onChange={e => updateQuestion(gi, qi, { prefix: e.target.value })} placeholder="Text before blank…" />
+                                      <StyledInput value={q.suffix ?? ""} onChange={e => updateQuestion(gi, qi, { suffix: e.target.value })} placeholder="Text after blank…" />
+                                    </div>
+                                  ) : (
+                                    <StyledInput value={q.text} onChange={e => updateQuestion(gi, qi, { text: e.target.value })}
+                                      placeholder={isMcq ? "e.g. Why does the speaker mention…?" : "e.g. Name of the booking: ___"} />
+                                  )}
+                                </div>
+                                {grp.questions.length > 1 && (
+                                  <button type="button" onClick={() => removeQuestionFromGroup(gi, qi)}
+                                    className="p-1 rounded-lg shrink-0" style={{ color: "#f87171" }}>
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* MCQ options */}
+                              {isMcq && (
+                                <div className="space-y-1.5 pl-9">
+                                  {(q.options ?? ["","","",""]).map((opt, oi) => (
+                                    <div key={oi} className="flex items-center gap-2">
+                                      <span className="text-[11px] font-bold w-5 text-center shrink-0" style={{ color: gMeta.color }}>
+                                        {["A","B","C","D","E"][oi]}
+                                      </span>
+                                      <StyledInput value={opt}
+                                        onChange={e => {
+                                          const opts = [...(q.options ?? ["","","",""])];
+                                          opts[oi] = e.target.value;
+                                          updateQuestion(gi, qi, { options: opts });
+                                        }}
+                                        placeholder={`Option ${["A","B","C","D","E"][oi]}`} />
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Answer + acceptable */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-9">
+                                <div>
+                                  <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: gMeta.color }}>
+                                    Answer {isMcq ? (grp.type === "mcq_multi" ? "(A,C)" : "(A/B/C)") : ""}
+                                  </p>
+                                  <StyledInput value={q.answer} onChange={e => updateQuestion(gi, qi, { answer: e.target.value })}
+                                    placeholder={grp.type === "mcq_single" ? "A" : grp.type === "mcq_multi" ? "A,C" : "e.g. nine thirty"} />
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: T3 }}>
+                                    Also accept <span className="font-normal normal-case tracking-normal">(comma-separated)</span>
+                                  </p>
+                                  <StyledInput
+                                    value={(q.acceptable ?? []).join(", ")}
+                                    onChange={e => updateQuestion(gi, qi, { acceptable: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })}
+                                    placeholder="9:30, 9.30, half nine" />
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        <button type="button" onClick={() => addQuestionToGroup(gi)}
+                          className="w-full py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-150"
+                          style={{ background: S1, border: `1px dashed ${gMeta.color}40`, color: T3 }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = gMeta.color; (e.currentTarget as HTMLElement).style.borderColor = gMeta.color+"80"; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = T3; (e.currentTarget as HTMLElement).style.borderColor = gMeta.color+"40"; }}>
+                          <Plus className="w-3.5 h-3.5" /> Add question to group
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
-              <button type="button" onClick={addLQuestion}
+              <button type="button" onClick={addLGroup}
                 className="w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-150"
                 style={{ background: S2, border: `1px dashed ${BDL}`, color: T2 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#38bdf8"; (e.currentTarget as HTMLElement).style.color = "#38bdf8"; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#fb923c"; (e.currentTarget as HTMLElement).style.color = "#fb923c"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = BDL; (e.currentTarget as HTMLElement).style.color = T2; }}>
-                <Plus className="w-3.5 h-3.5" /> Add Question
+                <Plus className="w-3.5 h-3.5" /> Add question group
               </button>
             </div>
           </FieldLabel>
