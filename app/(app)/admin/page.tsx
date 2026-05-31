@@ -20,12 +20,14 @@ type QuestionType =
   | "reading_passage"
   | "speaking_part1" | "speaking_part2" | "speaking_part3";
 
-type Section    = "writing" | "reading" | "speaking";
-type Difficulty = "band_5_6" | "band_6_7" | "band_7_8" | "band_8_9";
-type Status     = "published" | "draft";
+type Section       = "writing" | "reading" | "speaking";
+type Difficulty    = "band_5_6" | "band_6_7" | "band_7_8" | "band_8_9";
+type PassageLevel  = "level_1" | "level_2" | "level_3";
+type Status        = "published" | "draft";
 
 interface QuestionContent {
   difficulty?:    Difficulty;
+  passage_level?: PassageLevel;
   status:         Status;
   image_url?:     string;
   // reading
@@ -92,6 +94,12 @@ const DIFFICULTY_OPTIONS = [
   { value: "band_6_7" as Difficulty, label: "Band 6–7", color: "#34d399" },
   { value: "band_7_8" as Difficulty, label: "Band 7–8", color: "#38bdf8" },
   { value: "band_8_9" as Difficulty, label: "Band 8–9", color: "#c084fc" },
+];
+
+const PASSAGE_LEVEL_OPTIONS: { value: PassageLevel; label: string; desc: string; color: string }[] = [
+  { value: "level_1", label: "Passage 1", desc: "Easier · Factual",          color: "#34d399" },
+  { value: "level_2", label: "Passage 2", desc: "Medium · Descriptive",      color: "#38bdf8" },
+  { value: "level_3", label: "Passage 3", desc: "Harder · Argumentative",    color: "#c084fc" },
 ];
 const DIFFICULTY_LABEL: Record<Difficulty,string> = { band_5_6:"Band 5–6", band_6_7:"Band 6–7", band_7_8:"Band 7–8", band_8_9:"Band 8–9" };
 const DIFFICULTY_COLOR: Record<Difficulty,string> = { band_5_6:"#fbbf24", band_6_7:"#34d399", band_7_8:"#38bdf8", band_8_9:"#c084fc" };
@@ -318,9 +326,11 @@ function AdminContent() {
                 const meta = TYPE_META[q.type as QuestionType];
                 const Icon = typeIcon(q.type as QuestionType);
                 const diff = q.content?.difficulty;
-                const diffLabel = diff ? DIFFICULTY_LABEL[diff] : "—";
-                const diffColor = diff ? DIFFICULTY_COLOR[diff] : T3;
-                const diffBg    = diff ? DIFFICULTY_BG[diff]    : S2;
+                const pl   = q.content?.passage_level;
+                const plMeta = pl ? PASSAGE_LEVEL_OPTIONS.find(p => p.value === pl) : null;
+                const diffLabel = diff ? DIFFICULTY_LABEL[diff] : plMeta ? plMeta.label : "—";
+                const diffColor = diff ? DIFFICULTY_COLOR[diff] : plMeta ? plMeta.color : T3;
+                const diffBg    = diff ? DIFFICULTY_BG[diff]    : pl === "level_1" ? "#062d1e" : pl === "level_2" ? "#062630" : pl === "level_3" ? "#1d0d38" : S2;
                 const isPublished = q.content?.status === "published";
                 const preview = q.title.length > 60 ? q.title.slice(0,60).trimEnd() + "…" : q.title;
 
@@ -518,11 +528,12 @@ function AddQuestionForm({ onSuccess, onLog }: {
   const supabase = createClient();
   const fileRef  = useRef<HTMLInputElement>(null);
 
-  const [section,    setSection]    = useState<Section>("writing");
-  const [qType,      setQType]      = useState<QuestionType>("writing_task1");
-  const [title,      setTitle]      = useState("");
-  const [difficulty, setDifficulty] = useState<Difficulty>("band_6_7");
-  const [status,     setStatus]     = useState<Status>("draft");
+  const [section,      setSection]      = useState<Section>("writing");
+  const [qType,        setQType]        = useState<QuestionType>("writing_task1");
+  const [title,        setTitle]        = useState("");
+  const [difficulty,   setDifficulty]   = useState<Difficulty>("band_6_7");
+  const [passageLevel, setPassageLevel] = useState<PassageLevel>("level_1");
+  const [status,       setStatus]       = useState<Status>("draft");
   const [uploading,  setUploading]  = useState(false);
   const [dragOver,   setDragOver]   = useState(false);
 
@@ -588,8 +599,8 @@ function AddQuestionForm({ onSuccess, onLog }: {
 
     if (section === "reading") {
       if (!passageText.trim()) { setUploading(false); return toast.error("Passage text is required."); }
-      content.difficulty   = difficulty;
-      content.passage_text = passageText.trim();
+      content.passage_level = passageLevel;
+      content.passage_text  = passageText.trim();
     }
 
     if (section === "speaking") {
@@ -743,14 +754,30 @@ function AddQuestionForm({ onSuccess, onLog }: {
 
         {/* ── Reading fields ── */}
         {section === "reading" && (<>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <FieldLabel label="Difficulty Band">
-              <StyledSelect value={difficulty} onChange={v => setDifficulty(v as Difficulty)} options={DIFFICULTY_OPTIONS} />
-            </FieldLabel>
-            <FieldLabel label="Publish Status">
-              <StatusToggle value={status} onChange={setStatus} />
-            </FieldLabel>
-          </div>
+          <FieldLabel label="Passage Level">
+            <div className="grid grid-cols-3 gap-2">
+              {PASSAGE_LEVEL_OPTIONS.map(({ value, label, desc, color }) => {
+                const active = passageLevel === value;
+                const bg = value === "level_1" ? "#062d1e" : value === "level_2" ? "#062630" : "#1d0d38";
+                return (
+                  <button key={value} type="button" onClick={() => setPassageLevel(value)}
+                    className="flex flex-col items-center gap-1 px-3 py-3 rounded-xl text-xs font-bold transition-all duration-150"
+                    style={{
+                      background: active ? bg : S2,
+                      border:     `1px solid ${active ? color + "55" : BD}`,
+                      color:      active ? color : T3,
+                    }}>
+                    <span className="font-black">{label}</span>
+                    <span className="text-[10px] font-normal opacity-75 text-center leading-tight">{desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </FieldLabel>
+
+          <FieldLabel label="Publish Status">
+            <StatusToggle value={status} onChange={setStatus} />
+          </FieldLabel>
 
           <FieldLabel label="Passage Title">
             <StyledInput value={title} onChange={e => setTitle(e.target.value)}
