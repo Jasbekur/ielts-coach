@@ -71,14 +71,14 @@ export default function SignupPage() {
         return;
       }
       if (data.user?.identities?.length === 0) await supabase.auth.resend({ type: "signup", email });
-      toast.success("We sent a 6-digit code to " + email);
+      toast.success("We sent a 6-digit verification code to " + email);
       setStep("verify");
     } finally { setLoading(false); }
   }
 
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
-    if (otp.length !== 8) { toast.error("Please enter the 8-digit code from your email"); return; }
+    if (otp.length !== 6) { toast.error("Please enter the 6-digit code from your email"); return; }
     setLoading(true);
     try {
       const { error } = await supabase.auth.verifyOtp({ email, token: otp, type: "signup" });
@@ -142,7 +142,7 @@ export default function SignupPage() {
               </div>
               <h1 className="text-2xl font-bold tracking-tight">Verify your email</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Enter the 8-digit code we sent to <span className="font-medium text-foreground">{email}</span>
+                Enter the 6-digit code we sent to <span className="font-medium text-foreground">{email}</span>
               </p>
             </div>
 
@@ -152,21 +152,21 @@ export default function SignupPage() {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  maxLength={8}
+                  maxLength={6}
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                  placeholder="• • • • • • • •"
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="• • • • • •"
                   className="text-center text-2xl font-mono tracking-[0.4em] h-16 border-2 focus:border-emerald-400"
                   required
                   autoFocus
                 />
-                <p className="text-center text-xs text-muted-foreground">{otp.length}/8 digits entered</p>
+                <p className="text-center text-xs text-muted-foreground">{otp.length}/6 digits entered</p>
               </div>
 
               <Button
                 type="submit"
                 className="w-full h-11 gap-2 font-semibold text-white"
-                disabled={loading || otp.length !== 8}
+                disabled={loading || otp.length !== 6}
                 style={{
                   background: "#006c49",
                   boxShadow: `0 4px 0 #004d35, 0 6px 16px rgba(0,108,73,0.35)`,

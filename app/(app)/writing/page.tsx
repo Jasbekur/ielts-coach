@@ -397,7 +397,8 @@ export default function WritingPage() {
     if (!question.trim()) { toast.error("Please enter the question first"); return; }
     if (!essay.trim()) { toast.error("Please write your answer first"); return; }
     if (wc < minWords) {
-      toast.warning(`Your essay is only ${wc} words. IELTS requires at least ${minWords} words. Submit anyway?`);
+      toast.warning(`Your essay is only ${wc} words. IELTS requires at least ${minWords} words. Add more content before submitting.`);
+      return;
     }
 
     setLoading(true);

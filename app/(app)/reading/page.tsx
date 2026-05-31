@@ -461,6 +461,8 @@ export default function ReadingPage() {
   // ── Timer ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (phase !== "reading") return;
+    // Clear any existing interval before starting a new one (guards against Strict Mode double-invoke)
+    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
@@ -471,7 +473,9 @@ export default function ReadingPage() {
         return t - 1;
       });
     }, 1000);
-    return () => clearInterval(timerRef.current!);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 

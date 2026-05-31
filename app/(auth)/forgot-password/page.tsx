@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))" }}
             >
-              <GraduationCap className="w-4.5 h-4.5 text-white" />
+              <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <p className="font-bold text-base">IELTS Sensei</p>
           </div>

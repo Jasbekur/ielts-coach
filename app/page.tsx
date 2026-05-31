@@ -218,7 +218,7 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${G}, ${GD})`, boxShadow: `0 4px 12px ${G}44` }}>
-              <GraduationCap className="w-4.5 h-4.5 text-white w-5 h-5" />
+              <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div>
               <p className="font-bold text-sm leading-none text-gray-900">IELTS Sensei</p>

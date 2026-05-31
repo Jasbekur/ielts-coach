@@ -227,7 +227,13 @@ export function Sidebar() {
 }
 
 export function MobileNav() {
-  const pathname = usePathname();
+  const pathname  = usePathname();
+  const { isAdmin, isEditor } = useUserRole();
+
+  const adminItem = (isAdmin || isEditor)
+    ? [{ href: "/admin", label: "Admin", icon: ShieldCheck }]
+    : [];
+  const mobileItems = [...navItems, ...adminItem];
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
@@ -236,29 +242,31 @@ export function MobileNav() {
         borderColor: "rgba(255,255,255,0.08)",
       }}>
       <div className="flex items-center justify-around h-16 px-2">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + "/");
+        {mobileItems.map(({ href, label, icon: Icon }) => {
+          const active     = pathname === href || pathname.startsWith(href + "/");
+          const isAdminTab = href === "/admin";
+          const activeColor = isAdminTab ? "#7c3aed" : PRIMARY;
           return (
             <Link
               key={href}
               href={href}
               prefetch={true}
-              className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-150 min-w-[52px]"
+              className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-150 min-w-[44px]"
             >
               <Icon
                 className="w-5 h-5 transition-colors"
-                style={{ color: active ? PRIMARY : "rgba(255,255,255,0.45)" }}
+                style={{ color: active ? activeColor : "rgba(255,255,255,0.45)" }}
               />
               <span
                 className="text-[10px] font-semibold leading-none transition-colors"
-                style={{ color: active ? PRIMARY : "rgba(255,255,255,0.45)" }}
+                style={{ color: active ? activeColor : "rgba(255,255,255,0.45)" }}
               >
                 {label}
               </span>
               {active && (
                 <span
                   className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                  style={{ background: PRIMARY }}
+                  style={{ background: activeColor }}
                 />
               )}
             </Link>

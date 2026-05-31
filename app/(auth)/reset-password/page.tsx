@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,20 @@ export default function ResetPasswordPage() {
   const [confirm, setConfirm]     = useState("");
   const [showPass, setShowPass]   = useState(false);
   const [loading, setLoading]     = useState(false);
+  const [validSession, setValidSession] = useState<boolean | null>(null);
   const router = useRouter();
   const supabase = createClient();
+
+  // Guard: only allow access when Supabase has set a recovery session via the email link
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setValidSession(!!session);
+      if (!session) {
+        // No recovery session — redirect to forgot-password so user can request a new link
+        router.replace("/forgot-password");
+      }
+    });
+  }, [supabase, router]);
 
   const passwordOk = password.length >= 6;
   const confirmOk  = password === confirm && confirm.length > 0;
@@ -37,6 +49,9 @@ export default function ResetPasswordPage() {
       setLoading(false);
     }
   }
+
+  // Show nothing while we verify the session to avoid flash
+  if (validSession === null) return null;
 
   return (
     <div className="min-h-screen flex" style={{ background: "oklch(0.982 0.005 285)" }}>
@@ -93,7 +108,7 @@ export default function ResetPasswordPage() {
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))" }}
             >
-              <GraduationCap className="w-4.5 h-4.5 text-white" />
+              <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <p className="font-bold text-base">IELTS Sensei</p>
           </div>
