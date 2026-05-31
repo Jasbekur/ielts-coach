@@ -12,17 +12,19 @@ import {
   BookMarked,
   ChevronUp,
   ShieldCheck,
+  Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard",  icon: LayoutDashboard, description: "Overview & stats" },
-  { href: "/writing",   label: "Writing",    icon: BookOpen,        description: "Task 1 & Task 2" },
-  { href: "/speaking",  label: "Speaking",   icon: Mic,             description: "Parts 1, 2 & 3" },
-  { href: "/reading",   label: "Reading",    icon: BookMarked,      description: "3 passages, 40 Q" },
-  { href: "/history",   label: "History",    icon: History,         description: "All attempts" },
+  { href: "/dashboard",  label: "Dashboard",  icon: LayoutDashboard, description: "Overview & stats" },
+  { href: "/writing",    label: "Writing",    icon: BookOpen,        description: "Task 1 & Task 2" },
+  { href: "/listening",  label: "Listening",  icon: Headphones,      description: "4 sections, 40 Q" },
+  { href: "/speaking",   label: "Speaking",   icon: Mic,             description: "Parts 1, 2 & 3" },
+  { href: "/reading",    label: "Reading",    icon: BookMarked,      description: "3 passages, 40 Q" },
+  { href: "/history",    label: "History",    icon: History,         description: "All attempts" },
 ];
 
 const PRIMARY = "#059669";

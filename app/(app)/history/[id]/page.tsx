@@ -36,11 +36,13 @@ export default async function AttemptDetailPage({
     redirect("/login");
   }
 
+  const userId = user!.id;
+
   const { data: attempt, error } = await supabase
     .from("attempts")
     .select("*")
     .eq("id", id)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .single();
 
   if (error || !attempt) notFound();

@@ -6,7 +6,8 @@ import {
   LayoutDashboard, ChevronRight, ShieldCheck, Plus, Pencil, Trash2,
   X, Loader2, BookOpen, FileText, ImagePlus, AlertTriangle, Globe,
   FileX2, ChevronDown, Clock, PlusCircle, Trash, Sparkles, BarChart3,
-  CheckCircle2, FileEdit, Zap, BookMarked, Mic, AlignLeft,
+  CheckCircle2, FileEdit, Zap, BookMarked, Mic, AlignLeft, Headphones,
+  Users, Mic2, GraduationCap, Music2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { ProtectedAdminRoute } from "@/components/shared/ProtectedAdminRoute";
@@ -18,12 +19,22 @@ import { toast } from "sonner";
 type QuestionType =
   | "writing_task1" | "writing_task2"
   | "reading_passage"
-  | "speaking_part1" | "speaking_part2" | "speaking_part3";
+  | "speaking_part1" | "speaking_part2" | "speaking_part3"
+  | "listening_s1"  | "listening_s2"  | "listening_s3"  | "listening_s4";
 
-type Section       = "writing" | "reading" | "speaking";
+type Section       = "writing" | "reading" | "speaking" | "listening";
 type Difficulty    = "band_5_6" | "band_6_7" | "band_7_8" | "band_8_9";
 type PassageLevel  = "level_1" | "level_2" | "level_3";
 type Status        = "published" | "draft";
+
+interface LQuestionItem {
+  number:   number;
+  type:     "form" | "mcq" | "short";
+  text:     string;
+  options?: string[];
+  answer:   string;
+  acceptable?: string[];
+}
 
 interface QuestionContent {
   difficulty?:    Difficulty;
@@ -37,6 +48,11 @@ interface QuestionContent {
   // speaking part 2
   bullets?:       string[];
   follow_up?:     string;
+  // listening
+  audio_url?:     string;
+  context?:       string;
+  transcript?:    string;
+  lquestions?:    LQuestionItem[];
 }
 
 interface Question {
@@ -70,24 +86,37 @@ const ACG2 = "linear-gradient(135deg,#8b5cf6,#7c3aed)";
 // ── Config maps ───────────────────────────────────────────────────────────────
 
 const SECTIONS: { value: Section; label: string; icon: React.ElementType; color: string; bg: string }[] = [
-  { value: "writing",  label: "Writing",  icon: FileText,   color: "#38bdf8", bg: "#0c2a3d" },
-  { value: "reading",  label: "Reading",  icon: BookMarked, color: "#34d399", bg: "#0a2d22" },
-  { value: "speaking", label: "Speaking", icon: Mic,        color: "#c084fc", bg: "#1d0d38" },
+  { value: "writing",   label: "Writing",   icon: FileText,   color: "#38bdf8", bg: "#0c2a3d" },
+  { value: "reading",   label: "Reading",   icon: BookMarked, color: "#34d399", bg: "#0a2d22" },
+  { value: "speaking",  label: "Speaking",  icon: Mic,        color: "#c084fc", bg: "#1d0d38" },
+  { value: "listening", label: "Listening", icon: Headphones, color: "#fb923c", bg: "#2d1408" },
 ];
 
 const TYPE_META: Record<QuestionType, { label: string; color: string; bg: string; section: Section }> = {
-  writing_task1:   { label: "Task 1 Academic",  color: "#38bdf8", bg: "#0c2a3d", section: "writing"  },
-  writing_task2:   { label: "Task 2 Essay",     color: "#34d399", bg: "#0a2d22", section: "writing"  },
-  reading_passage: { label: "Reading Passage",  color: "#34d399", bg: "#0a2d22", section: "reading"  },
-  speaking_part1:  { label: "Speaking Part 1",  color: "#c084fc", bg: "#1d0d38", section: "speaking" },
-  speaking_part2:  { label: "Speaking Part 2",  color: "#a78bfa", bg: "#180d38", section: "speaking" },
-  speaking_part3:  { label: "Speaking Part 3",  color: "#818cf8", bg: "#0e0d38", section: "speaking" },
+  writing_task1:   { label: "Task 1 Academic",  color: "#38bdf8", bg: "#0c2a3d", section: "writing"   },
+  writing_task2:   { label: "Task 2 Essay",     color: "#34d399", bg: "#0a2d22", section: "writing"   },
+  reading_passage: { label: "Reading Passage",  color: "#34d399", bg: "#0a2d22", section: "reading"   },
+  speaking_part1:  { label: "Speaking Part 1",  color: "#c084fc", bg: "#1d0d38", section: "speaking"  },
+  speaking_part2:  { label: "Speaking Part 2",  color: "#a78bfa", bg: "#180d38", section: "speaking"  },
+  speaking_part3:  { label: "Speaking Part 3",  color: "#818cf8", bg: "#0e0d38", section: "speaking"  },
+  listening_s1:    { label: "Listening S1",     color: "#38bdf8", bg: "#071826", section: "listening" },
+  listening_s2:    { label: "Listening S2",     color: "#34d399", bg: "#061a10", section: "listening" },
+  listening_s3:    { label: "Listening S3",     color: "#fbbf24", bg: "#1a1206", section: "listening" },
+  listening_s4:    { label: "Listening S4",     color: "#c084fc", bg: "#130a20", section: "listening" },
 };
 
-const WRITING_TYPES:  QuestionType[] = ["writing_task1", "writing_task2"];
-const READING_TYPES:  QuestionType[] = ["reading_passage"];
-const SPEAKING_TYPES: QuestionType[] = ["speaking_part1", "speaking_part2", "speaking_part3"];
-const ALL_TYPES = [...WRITING_TYPES, ...READING_TYPES, ...SPEAKING_TYPES];
+const WRITING_TYPES:   QuestionType[] = ["writing_task1", "writing_task2"];
+const READING_TYPES:   QuestionType[] = ["reading_passage"];
+const SPEAKING_TYPES:  QuestionType[] = ["speaking_part1", "speaking_part2", "speaking_part3"];
+const LISTENING_TYPES: QuestionType[] = ["listening_s1", "listening_s2", "listening_s3", "listening_s4"];
+const ALL_TYPES = [...WRITING_TYPES, ...READING_TYPES, ...SPEAKING_TYPES, ...LISTENING_TYPES];
+
+const LISTENING_SECTION_META = [
+  { type: "listening_s1" as QuestionType, label: "Section 1", color: "#38bdf8", bg: "#071826", desc: "Everyday conversation", start: 1  },
+  { type: "listening_s2" as QuestionType, label: "Section 2", color: "#34d399", bg: "#061a10", desc: "Social monologue",      start: 11 },
+  { type: "listening_s3" as QuestionType, label: "Section 3", color: "#fbbf24", bg: "#1a1206", desc: "Academic discussion",   start: 21 },
+  { type: "listening_s4" as QuestionType, label: "Section 4", color: "#c084fc", bg: "#130a20", desc: "Academic lecture",      start: 31 },
+];
 
 const DIFFICULTY_OPTIONS = [
   { value: "band_5_6" as Difficulty, label: "Band 5–6", color: "#fbbf24" },
@@ -534,6 +563,17 @@ function AddQuestionForm({ onSuccess, onLog }: {
   const [difficulty,   setDifficulty]   = useState<Difficulty>("band_6_7");
   const [passageLevel, setPassageLevel] = useState<PassageLevel>("level_1");
   const [status,       setStatus]       = useState<Status>("draft");
+
+  // Listening
+  const audioRef2     = useRef<HTMLInputElement>(null);
+  const [audioFile,    setAudioFile]    = useState<File | null>(null);
+  const [audioName,    setAudioName]    = useState("");
+  const [lContext,     setLContext]     = useState("");
+  const [lTranscript,  setLTranscript]  = useState("");
+  const [lQuestions,   setLQuestions]   = useState<LQuestionItem[]>([
+    { number: 1, type: "form", text: "", answer: "", acceptable: [] },
+  ]);
+  const [lUploading,   setLUploading]   = useState(false);
   const [uploading,  setUploading]  = useState(false);
   const [dragOver,   setDragOver]   = useState(false);
 
@@ -551,14 +591,32 @@ function AddQuestionForm({ onSuccess, onLog }: {
   const [bulletsText, setBulletsText] = useState("");
   const [followUp,    setFollowUp]    = useState("");
 
+  // Listening helpers
+  function addLQuestion() {
+    const lastNum = lQuestions[lQuestions.length - 1]?.number ?? 0;
+    setLQuestions(q => [...q, { number: lastNum + 1, type: "form", text: "", answer: "", acceptable: [] }]);
+  }
+  function removeLQuestion(i: number) {
+    setLQuestions(q => q.filter((_,idx)=>idx!==i));
+  }
+  function updateLQuestion(i: number, patch: Partial<LQuestionItem>) {
+    setLQuestions(q => q.map((item,idx)=> idx===i ? {...item,...patch} : item));
+  }
+
   // Switch section → set default type
   function handleSectionChange(s: Section) {
     setSection(s);
-    if (s === "writing")  setQType("writing_task1");
-    if (s === "reading")  setQType("reading_passage");
-    if (s === "speaking") setQType("speaking_part1");
+    if (s === "writing")   setQType("writing_task1");
+    if (s === "reading")   setQType("reading_passage");
+    if (s === "speaking")  setQType("speaking_part1");
+    if (s === "listening") {
+      setQType("listening_s1");
+      // reset question numbers to section 1 range
+      setLQuestions([{ number: 1, type: "form", text: "", answer: "", acceptable: [] }]);
+    }
     // clear cross-section state
     setTitle(""); setPassageText(""); setQuestionsText(""); setBulletsText(""); setFollowUp("");
+    setLContext(""); setLTranscript(""); setAudioFile(null); setAudioName("");
   }
 
   function pickFile(file: File) {
@@ -603,6 +661,37 @@ function AddQuestionForm({ onSuccess, onLog }: {
       content.passage_text  = passageText.trim();
     }
 
+    if (section === "listening") {
+      if (!audioFile && !lContext) { setUploading(false); return toast.error("Audio file is required."); }
+      if (lQuestions.length === 0) { setUploading(false); return toast.error("Add at least one question."); }
+      setLUploading(true);
+
+      let audioUrl = "";
+      if (audioFile) {
+        const ext      = audioFile.name.split(".").pop() ?? "mp3";
+        const filePath = `${crypto.randomUUID()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage
+          .from("listening-audio").upload(filePath, audioFile, { contentType: audioFile.type, upsert: false });
+        if (uploadErr) { setUploading(false); setLUploading(false); return toast.error("Audio upload failed: " + uploadErr.message); }
+        const { data: urlData } = supabase.storage.from("listening-audio").getPublicUrl(filePath);
+        audioUrl = urlData.publicUrl;
+      }
+
+      content.audio_url  = audioUrl;
+      content.context    = lContext.trim();
+      content.transcript = lTranscript.trim() || undefined;
+      // Store as "questions" (same key the listening page reads)
+      (content as unknown as Record<string, unknown>)["questions"] = lQuestions.map(q => ({
+        number:     q.number,
+        type:       q.type,
+        text:       q.text.trim(),
+        options:    q.options,
+        answer:     q.answer.trim(),
+        acceptable: (q.acceptable ?? []).filter(Boolean),
+      }));
+      setLUploading(false);
+    }
+
     if (section === "speaking") {
       if (qType === "speaking_part2") {
         const bullets = bulletsText.split("\n").map(l => l.trim()).filter(Boolean);
@@ -628,6 +717,8 @@ function AddQuestionForm({ onSuccess, onLog }: {
     onLog("added", inserted.id, title.trim());
     // reset
     setTitle(""); setPassageText(""); setQuestionsText(""); setBulletsText(""); setFollowUp("");
+    setLContext(""); setLTranscript(""); setAudioFile(null); setAudioName("");
+    setLQuestions([{ number: 1, type: "form", text: "", answer: "", acceptable: [] }]);
     removeImage(); setDifficulty("band_6_7"); setStatus("draft");
     onSuccess();
   }
@@ -823,12 +914,191 @@ function AddQuestionForm({ onSuccess, onLog }: {
           </>)}
         </>)}
 
+        {/* ── Listening fields ── */}
+        {section === "listening" && (<>
+          {/* Section picker */}
+          <FieldLabel label="Listening Section">
+            <div className="grid grid-cols-2 gap-2">
+              {LISTENING_SECTION_META.map(sec => {
+                const active = qType === sec.type;
+                return (
+                  <button key={sec.type} type="button"
+                    onClick={() => {
+                      setQType(sec.type);
+                      // auto-number questions from section start
+                      setLQuestions(q => q.map((item, i) => ({ ...item, number: sec.start + i })));
+                    }}
+                    className="flex flex-col gap-0.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150"
+                    style={{
+                      background: active ? sec.bg : S2,
+                      border: `1px solid ${active ? sec.color + "50" : BD}`,
+                      color: active ? sec.color : T2,
+                    }}>
+                    <span className="font-black">{sec.label}</span>
+                    <span className="font-normal opacity-75">{sec.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </FieldLabel>
+
+          {/* Context + Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <FieldLabel label="Context / Scenario">
+              <StyledInput value={lContext} onChange={e => setLContext(e.target.value)}
+                placeholder="e.g. A couple booking a campsite" />
+            </FieldLabel>
+            <FieldLabel label="Publish Status">
+              <StatusToggle value={status} onChange={setStatus} />
+            </FieldLabel>
+          </div>
+
+          {/* Title (used as heading in practice page) */}
+          <FieldLabel label="Section Title">
+            <StyledInput value={title} onChange={e => setTitle(e.target.value)}
+              placeholder="e.g. Booking a Campsite" />
+          </FieldLabel>
+
+          {/* Audio upload */}
+          <FieldLabel label={<>Audio File <span className="font-normal normal-case tracking-normal" style={{ color:T3 }}>— MP3 / WAV / M4A · max 20 MB</span></>}>
+            {audioFile ? (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl"
+                style={{ background: "#071826", border: "1px solid rgba(56,189,248,0.3)" }}>
+                <Music2 className="w-4 h-4 shrink-0" style={{ color: "#38bdf8" }} />
+                <span className="text-sm flex-1 truncate" style={{ color: "#94a3b8" }}>{audioName}</span>
+                <button type="button" onClick={() => { setAudioFile(null); setAudioName(""); if(audioRef2.current) audioRef2.current.value=""; }}
+                  className="p-1 rounded-lg transition-colors" style={{ color: "#f87171" }}>
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div onClick={() => audioRef2.current?.click()}
+                className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl cursor-pointer transition-all duration-150"
+                style={{ border: `1.5px dashed ${BDL}`, background: S2 }}>
+                <div className="p-3 rounded-xl" style={{ background: "rgba(251,146,60,0.15)", border: "1px solid rgba(251,146,60,0.25)" }}>
+                  <Headphones className="w-5 h-5" style={{ color: "#fb923c" }} />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-semibold" style={{ color: T2 }}>
+                    Click to upload audio or <span style={{ color: "#fb923c" }}>browse</span>
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: T3 }}>MP3, WAV, M4A</p>
+                </div>
+              </div>
+            )}
+            <input ref={audioRef2} type="file" accept="audio/*" className="hidden"
+              onChange={e => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                if (f.size > 20 * 1024 * 1024) return toast.error("Audio must be under 20 MB.");
+                setAudioFile(f); setAudioName(f.name);
+              }} />
+          </FieldLabel>
+
+          {/* Questions */}
+          <FieldLabel label="Questions">
+            <div className="space-y-3">
+              {lQuestions.map((q, i) => (
+                <div key={i} className="rounded-xl p-4 space-y-3"
+                  style={{ background: S2, border: `1px solid ${BD}` }}>
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-black shrink-0"
+                      style={{ background: "#0c2a3d", color: "#38bdf8", border: "1px solid rgba(56,189,248,0.3)" }}>
+                      {q.number}
+                    </span>
+                    {/* Type selector */}
+                    <div className="flex gap-1.5 flex-1">
+                      {(["form","mcq","short"] as const).map(t => (
+                        <button key={t} type="button"
+                          onClick={() => updateLQuestion(i, { type: t, options: t==="mcq"?["","","",""] : undefined })}
+                          className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all"
+                          style={{
+                            background: q.type===t ? "#0c2a3d" : S3,
+                            border: `1px solid ${q.type===t ? "rgba(56,189,248,0.4)" : BD}`,
+                            color: q.type===t ? "#38bdf8" : T3,
+                          }}>
+                          {t==="form" ? "Form fill" : t==="mcq" ? "MCQ" : "Short answer"}
+                        </button>
+                      ))}
+                    </div>
+                    {lQuestions.length > 1 && (
+                      <button type="button" onClick={() => removeLQuestion(i)}
+                        className="p-1.5 rounded-lg" style={{ color: "#f87171" }}>
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Question text */}
+                  <StyledInput value={q.text} onChange={e => updateLQuestion(i, { text: e.target.value })}
+                    placeholder={q.type==="form" ? "e.g. Campsite name: ___" : q.type==="mcq" ? "e.g. Why does the woman call?" : "e.g. What time does the tour start?"} />
+
+                  {/* MCQ options */}
+                  {q.type === "mcq" && (
+                    <div className="space-y-1.5">
+                      {(q.options ?? ["","","",""]).map((opt, oi) => (
+                        <div key={oi} className="flex items-center gap-2">
+                          <span className="text-[11px] font-bold w-5 text-center shrink-0" style={{ color: "#38bdf8" }}>
+                            {["A","B","C","D"][oi]}
+                          </span>
+                          <StyledInput value={opt}
+                            onChange={e => {
+                              const opts = [...(q.options??["","","",""])];
+                              opts[oi] = e.target.value;
+                              updateLQuestion(i, { options: opts });
+                            }}
+                            placeholder={`Option ${["A","B","C","D"][oi]}`} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Answer */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: "#38bdf8" }}>
+                        Correct Answer {q.type==="mcq"?"(A/B/C/D)":""}
+                      </p>
+                      <StyledInput value={q.answer}
+                        onChange={e => updateLQuestion(i, { answer: e.target.value })}
+                        placeholder={q.type==="mcq" ? "A" : "e.g. nine thirty"} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: T3 }}>
+                        Also accept <span className="font-normal normal-case tracking-normal">(comma-separated)</span>
+                      </p>
+                      <StyledInput
+                        value={(q.acceptable??[]).join(", ")}
+                        onChange={e => updateLQuestion(i, { acceptable: e.target.value.split(",").map(s=>s.trim()).filter(Boolean) })}
+                        placeholder="9:30, 9.30, half nine" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button type="button" onClick={addLQuestion}
+                className="w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-150"
+                style={{ background: S2, border: `1px dashed ${BDL}`, color: T2 }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#38bdf8"; (e.currentTarget as HTMLElement).style.color = "#38bdf8"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = BDL; (e.currentTarget as HTMLElement).style.color = T2; }}>
+                <Plus className="w-3.5 h-3.5" /> Add Question
+              </button>
+            </div>
+          </FieldLabel>
+
+          {/* Transcript */}
+          <FieldLabel label={<>Transcript <span className="font-normal normal-case tracking-normal" style={{ color:T3 }}>— optional · shown after submission</span></>}>
+            <StyledTextarea value={lTranscript} onChange={e => setLTranscript(e.target.value)} rows={6}
+              placeholder={"Paste the full audio transcript here.\n\nShown to students after they submit so they can check their answers against the original audio."} />
+          </FieldLabel>
+        </>)}
+
         {/* Submit */}
         <div className="pt-2 flex items-center gap-4">
-          <PrimaryBtn type="submit" loading={uploading}
+          <PrimaryBtn type="submit" loading={uploading || lUploading}
             icon={<Plus className="w-4 h-4"/>}
             label={`Save ${section.charAt(0).toUpperCase() + section.slice(1)} Question`}
-            loadingLabel={section === "writing" && imageFile ? "Uploading…" : "Saving…"} />
+            loadingLabel={section === "listening" && audioFile ? "Uploading audio…" : section === "writing" && imageFile ? "Uploading image…" : "Saving…"} />
           <span className="text-xs" style={{ color:T3 }}>
             {status === "draft" ? "Will be saved as draft" : "Will go live immediately"}
           </span>
