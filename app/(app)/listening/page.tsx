@@ -399,18 +399,29 @@ export default function ListeningPage() {
           />
 
           <div className="flex items-center gap-4">
-            <button onClick={togglePlay}
-              className="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0 transition-all"
-              style={{ background: playing ? "#075985" : "linear-gradient(135deg,#0369a1,#0ea5e9)", boxShadow:"0 4px 14px rgba(14,165,233,0.35)" }}>
-              {playing ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5 ml-0.5"/>}
-            </button>
+
+            {/* Before audio starts: one-time START button. After: non-clickable LIVE badge */}
+            {!audioStarted ? (
+              <button
+                onClick={() => { audioRef.current?.play(); setAudioStarted(true); }}
+                className="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0 transition-all active:scale-95"
+                style={{ background:"linear-gradient(135deg,#0369a1,#0ea5e9)", boxShadow:"0 4px 14px rgba(14,165,233,0.35)" }}>
+                <Play className="w-5 h-5 ml-0.5"/>
+              </button>
+            ) : (
+              /* Audio is running — show LIVE dot, no stop/pause button */
+              <div className="w-12 h-12 rounded-full flex flex-col items-center justify-center shrink-0"
+                style={{ background:"#071826", border:"1px solid rgba(56,189,248,0.25)" }}>
+                <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ background:"#38bdf8" }} />
+                <span className="text-[9px] font-black mt-1" style={{ color:"#38bdf8" }}>LIVE</span>
+              </div>
+            )}
 
             <div className="flex-1 space-y-1.5">
               {/* Progress bar — display only, not interactive */}
               <div className="relative h-2.5 rounded-full overflow-hidden" style={{ background:"#1e293b", cursor:"default" }}>
                 <div className="absolute inset-y-0 left-0 rounded-full pointer-events-none"
                   style={{ width:`${dur > 0 ? (curTime/dur)*100 : 0}%`, background:"linear-gradient(90deg,#0369a1,#38bdf8)", transition:"width 0.3s linear" }} />
-                {/* No seek input — intentionally removed for IELTS exam conditions */}
               </div>
               <div className="flex justify-between text-[11px] font-mono" style={{ color:"#334155" }}>
                 <span>{fmtTime(curTime)}</span>
@@ -425,17 +436,16 @@ export default function ListeningPage() {
             </button>
           </div>
 
-          {/* Always show the no-seek warning in full test */}
           {!audioStarted && (
             <p className="text-xs text-center py-2 rounded-lg"
               style={{ color:"#64748b", background:"rgba(56,189,248,0.04)", border:"1px solid rgba(56,189,248,0.1)" }}>
-              🎧 Audio plays once — no rewind or fast-forward. Read the questions, then press play.
+              🎧 Press Play when ready — audio plays once, cannot be paused or rewound.
             </p>
           )}
-          {audioStarted && playing && (
+          {audioStarted && (
             <p className="text-xs text-center py-1.5 rounded-lg"
               style={{ color:"#38bdf8", background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.15)" }}>
-              ● Live — answer questions as you listen. Switch parts freely using tabs above.
+              ● Answer questions as you listen — switch parts freely using the tabs above.
             </p>
           )}
         </div>
