@@ -212,6 +212,65 @@ Return ONLY this JSON — no markdown, no preamble:
 }
 `;
 
+export const gtWritingTask1Prompt = (letter: string, question: string) => `
+You are an official IELTS examiner marking a General Training Writing Task 1 letter.
+
+TASK INSTRUCTIONS:
+${question}
+
+LETTER (${letter.split(/\s+/).length} words):
+${letter}
+
+STRICT RULES:
+- Under 150 words → cap Task Achievement at 5.0
+- No clear purpose established in opening → cap Task Achievement at 5.5
+- Wrong tone for the situation (e.g. formal language in informal letter) → cap Task Achievement at 6.0
+- Missing letter opening (Dear...) or closing (Yours sincerely / Yours faithfully / Best wishes) → note as weakness
+
+DETECT LETTER TYPE: formal | semi-formal | informal
+- Formal: to an organisation, authority, manager, or unknown person. Use "Dear Sir/Madam", "Yours faithfully"
+- Semi-formal: to someone known in a professional context. Use "Dear Mr/Ms [Name]", "Yours sincerely"
+- Informal: to a friend or family member. Use "Dear [first name]", "Best wishes" / "Kind regards"
+
+CRITICAL — flag these errors specific to Uzbek/Central Asian learners:
+- Mixing formal and informal register in the same letter
+- "I am writing to telling you" → "I am writing to tell you"
+- "I hope this letter find you" → "I hope this letter finds you"
+- Missing or incorrect letter format (no salutation, no closing)
+- "Please be informed that..." overused in informal letters
+- Direct translation of Uzbek formal phrases that sound unnatural in English
+
+Return ONLY JSON matching this exact shape — no markdown, no preamble:
+{
+  "letter_type": "formal|semi-formal|informal",
+  "scores": {
+    "task_achievement": number,
+    "coherence_cohesion": number,
+    "lexical_resource": number,
+    "grammatical_range": number,
+    "overall": number
+  },
+  "summary": "2-sentence verdict mentioning letter type and main issues",
+  "strengths": ["specific strength 1", "specific strength 2", "specific strength 3"],
+  "weaknesses": ["specific weakness 1", "specific weakness 2", "specific weakness 3"],
+  "corrections": [
+    { "original": "exact phrase", "fixed": "corrected version", "reason": "explanation", "category": "grammar|vocabulary|cohesion|task" }
+  ],
+  "model_answers": {
+    "band5": "Band 5 letter: simple vocabulary, some register errors, basic organisation, ~130-150 words",
+    "band6": "Band 6 letter: correct format, adequate vocabulary, mostly appropriate register, ~150-170 words",
+    "band7": "Band 7 letter: good range, appropriate tone throughout, clear purpose, ~160-180 words",
+    "band8": "Band 8+ letter: sophisticated, natural, idiomatic, perfect register and format, ~170-190 words"
+  },
+  "next_actions": [
+    "Specific actionable drill 1",
+    "Specific actionable drill 2",
+    "Specific actionable drill 3"
+  ]
+}
+Overall = average of 4 criteria rounded to nearest 0.5.
+`;
+
 // New: Generate Part 1 questions on a specific topic
 export const part1QuestionsPrompt = (topic: string) => `
 Generate 5 IELTS Speaking Part 1 questions on the topic: "${topic}".

@@ -12,12 +12,11 @@ import {
   FileText,
 } from "lucide-react";
 import {
-  READING_PASSAGES,
+  READING_TEST_SETS,
   EXAM_DURATION_SECONDS,
   TOTAL_QUESTIONS,
   rawScoreToBand,
   checkAnswer,
-  allQuestions,
   type ReadingPassage,
   type ReadingQuestion,
   type MatchingHeadingQuestion,
@@ -29,6 +28,11 @@ import { cn } from "@/lib/utils";
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Phase = "selector" | "reading" | "results";
 type Answers = Record<number, string>; // question number → student answer
+
+// Helper: get all questions from a given set of passages
+function questionsForPassages(passages: ReadingPassage[]): ReadingQuestion[] {
+  return passages.flatMap(p => p.questionGroups.flatMap(g => g.questions));
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatTime(secs: number) {
@@ -444,6 +448,7 @@ function QuestionsPanel({
 // ════════════════════════════════════════════════════════════════════════════════
 export default function ReadingPage() {
   const [phase, setPhase] = useState<Phase>("selector");
+  const [testSetIdx, setTestSetIdx] = useState(0);
   const [activePassage, setActivePassage] = useState(0);
   const [mobileView, setMobileView] = useState<"passage" | "questions">("passage");
   const [answers, setAnswers] = useState<Answers>({});
@@ -506,7 +511,8 @@ export default function ReadingPage() {
   // ── Submit ────────────────────────────────────────────────────────────────
   function handleSubmit() {
     clearInterval(timerRef.current!);
-    const qs = allQuestions();
+    const currentPassages = READING_TEST_SETS[testSetIdx];
+    const qs = questionsForPassages(currentPassages);
     const relevant = practiceOnly !== null
       ? qs.filter(q => {
           const r = PASSAGE_RANGES[practiceOnly];
@@ -537,10 +543,11 @@ export default function ReadingPage() {
   }
 
   // ── Passage tabs ──────────────────────────────────────────────────────────
+  const activeTestSetPassages = READING_TEST_SETS[testSetIdx];
   const passagesToShow =
     practiceOnly !== null
-      ? [READING_PASSAGES[practiceOnly]]
-      : READING_PASSAGES;
+      ? [activeTestSetPassages[practiceOnly]]
+      : activeTestSetPassages;
 
   // ── Keyboard shortcut (Esc to go back in selector) ───────────────────────
   useEffect(() => {
@@ -571,6 +578,32 @@ export default function ReadingPage() {
           <p className="text-base text-muted-foreground">
             IELTS Academic · 3 passages · 40 questions · 60 minutes
           </p>
+        </div>
+
+        {/* Test set picker */}
+        <div>
+          <p className="text-sm font-bold mb-3 uppercase tracking-widest text-[11px]" style={{ color: "#059669" }}>
+            Select Test Set
+          </p>
+          <div className="flex gap-2">
+            {["Test 1", "Test 2", "Test 3"].map((label, idx) => (
+              <button
+                key={idx}
+                onClick={() => setTestSetIdx(idx)}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-sm font-semibold border transition-all",
+                  testSetIdx === idx
+                    ? "text-white border-emerald-600"
+                    : "text-gray-600 border-gray-200 bg-card hover:border-emerald-300 hover:bg-emerald-50/30"
+                )}
+                style={testSetIdx === idx ? {
+                  background: "linear-gradient(135deg, #059669, #047857)",
+                } : {}}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Full test card */}
@@ -636,7 +669,7 @@ export default function ReadingPage() {
             Practice Individual Passages
           </p>
           <div className="space-y-3">
-            {READING_PASSAGES.map((p, i) => {
+            {activeTestSetPassages.map((p, i) => {
               const range = PASSAGE_RANGES[i];
               return (
                 <div
@@ -732,7 +765,7 @@ export default function ReadingPage() {
         {/* By passage breakdown */}
         {practiceOnly === null && (
           <div className="grid grid-cols-3 gap-3">
-            {READING_PASSAGES.map((p, i) => {
+            {activeTestSetPassages.map((p, i) => {
               const range = PASSAGE_RANGES[i];
               const total = range.end - range.start + 1;
               const correct = results.byPassage[i];
@@ -755,7 +788,7 @@ export default function ReadingPage() {
         {/* Review answers */}
         <div className="space-y-4">
           <h3 className="font-semibold text-sm text-gray-800">Review answers</h3>
-          {(practiceOnly !== null ? [READING_PASSAGES[practiceOnly]] : READING_PASSAGES).map(passage => (
+          {(practiceOnly !== null ? [activeTestSetPassages[practiceOnly]] : activeTestSetPassages).map(passage => (
             <div key={passage.id} className="space-y-3">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold"
@@ -846,7 +879,7 @@ export default function ReadingPage() {
         {/* Center: passage tabs (full test only) */}
         {practiceOnly === null && (
           <div className="flex gap-1 shrink-0">
-            {READING_PASSAGES.map((p, i) => {
+            {activeTestSetPassages.map((p, i) => {
               const r = PASSAGE_RANGES[i];
               const done = countAnswered(answers, r.start, r.end);
               const tot = r.end - r.start + 1;

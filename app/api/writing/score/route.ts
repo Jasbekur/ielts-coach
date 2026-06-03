@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { geminiFlash } from "@/lib/gemini/client";
-import { writingTask1Prompt, writingTask2Prompt } from "@/lib/gemini/prompts";
+import { writingTask1Prompt, writingTask2Prompt, gtWritingTask1Prompt } from "@/lib/gemini/prompts";
 import { writingResultSchema } from "@/lib/gemini/schemas";
 import { checkDailyLimit } from "@/lib/utils/rate-limit";
 import { roundBand } from "@/lib/utils/band-score";
@@ -9,6 +9,7 @@ import { z } from "zod";
 
 const requestSchema = z.object({
   taskType: z.enum(["task1", "task2"]),
+  moduleType: z.enum(["academic", "general"]).default("academic"),
   question: z.string().min(10),
   essay: z.string().min(20),
   imageBase64: z.string().optional(),
@@ -45,11 +46,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { taskType, question, essay, imageBase64, imageMimeType } = parsed.data;
+    const { taskType, moduleType, question, essay, imageBase64, imageMimeType } = parsed.data;
 
     const prompt =
       taskType === "task1"
-        ? writingTask1Prompt(essay, question, !!imageBase64)
+        ? (moduleType === "general"
+            ? gtWritingTask1Prompt(essay, question)
+            : writingTask1Prompt(essay, question, !!imageBase64))
         : writingTask2Prompt(essay, question);
 
     // Build content parts — include image for Task 1 if provided
@@ -113,7 +116,7 @@ export async function POST(req: NextRequest) {
       .insert({
         user_id: user.id,
         mode: "writing",
-        task_type: taskType,
+        task_type: `${moduleType === "general" ? "gt_" : ""}${taskType}`,
         input_text: essay,
         prompt_text: question,
         result,

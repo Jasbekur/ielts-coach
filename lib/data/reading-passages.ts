@@ -4,6 +4,10 @@
 // Passage 3 : Q 27 – 40  (harder, argumentative)
 // Total time : 60 minutes
 
+// Forward import — reading-test-sets.ts uses `import type` from this file
+// so there is no circular runtime dependency.
+import { testSet2Passages, testSet3Passages } from "./reading-test-sets";
+
 export type QuestionType =
   | "tfng"                // True / False / Not Given
   | "ynng"                // Yes / No / Not Given
@@ -637,3 +641,9 @@ export function allQuestions(): ReadingQuestion[] {
     p.questionGroups.flatMap(g => g.questions)
   );
 }
+
+export const READING_TEST_SETS: ReadingPassage[][] = [
+  READING_PASSAGES,
+  testSet2Passages,
+  testSet3Passages,
+];

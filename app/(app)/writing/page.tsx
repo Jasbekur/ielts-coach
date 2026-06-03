@@ -17,6 +17,18 @@ import confetti from "canvas-confetti";
 import { wordCount } from "@/lib/utils/word-count";
 import { TASK1_PRACTICE } from "@/lib/data/task1-practice";
 
+// ─── GT Task 1 Letter Questions ───────────────────────────────────────────
+const GT_TASK1_QUESTIONS = [
+  { type: "formal", q: "You recently stayed at a hotel and experienced serious problems with the service. Write a letter to the hotel manager. In your letter:\n• describe the problems you experienced\n• explain how they affected your stay\n• say what action you would like the hotel to take" },
+  { type: "informal", q: "A friend has asked for your advice about moving to the city where you live. Write a letter to your friend. In your letter:\n• describe what it is like to live in your city\n• suggest some things your friend could do to settle in\n• explain what challenges they might face" },
+  { type: "semi-formal", q: "You have seen an advertisement for a part-time job at a local company. Write a letter to the company manager. In your letter:\n• explain why you are interested in the job\n• describe your relevant experience and skills\n• say when you would be available for an interview" },
+  { type: "formal", q: "You recently bought a household appliance that stopped working after one week. Write a letter to the manufacturer. In your letter:\n• describe the product and when you bought it\n• explain what the problem is\n• say what you want the manufacturer to do" },
+  { type: "informal", q: "You are going abroad to study next year. Write a letter to your English-speaking pen friend who lives in that country. In your letter:\n• explain why you are coming to their country\n• ask for advice on finding accommodation\n• suggest meeting up when you arrive" },
+  { type: "formal", q: "You feel that a local park in your area needs to be improved. Write a letter to the local council. In your letter:\n• explain what the park is like now\n• describe the improvements you think should be made\n• explain the benefits these improvements would bring" },
+  { type: "semi-formal", q: "Your employer has asked staff to suggest ways to improve the working environment. Write a letter to your manager. In your letter:\n• describe the current working conditions\n• suggest two or three specific improvements\n• explain how these changes would benefit the company" },
+  { type: "informal", q: "You borrowed something important from a friend but unfortunately it was damaged. Write a letter to your friend. In your letter:\n• explain what happened to the item\n• apologise for the damage\n• say what you intend to do about it" },
+];
+
 // ─── Question banks ────────────────────────────────────────────────────────
 const TASK2_QUESTIONS = [
   { type: "discuss_both_views", q: "Some believe that lowering the speed limit will lead to maximum road safety; others believe there are many other ways to improve road safety. Discuss both views and give your opinion." },
@@ -265,6 +277,7 @@ function ChartUpload({
 }
 
 export default function WritingPage() {
+  const [moduleType, setModuleType] = useState<"academic" | "general">("academic");
   const [taskType, setTaskType] = useState<"task1" | "task2">("task2");
   const [question, setQuestion] = useState("");
   const [isGeneratedQuestion, setIsGeneratedQuestion] = useState(false);
@@ -339,6 +352,9 @@ export default function WritingPage() {
     setIsGeneratedQuestion(true);
     if (taskType === "task2") {
       const q = TASK2_QUESTIONS[Math.floor(Math.random() * TASK2_QUESTIONS.length)];
+      setQuestion(q.q);
+    } else if (moduleType === "general") {
+      const q = GT_TASK1_QUESTIONS[Math.floor(Math.random() * GT_TASK1_QUESTIONS.length)];
       setQuestion(q.q);
     } else {
       const practice = TASK1_PRACTICE[Math.floor(Math.random() * TASK1_PRACTICE.length)];
@@ -419,7 +435,7 @@ export default function WritingPage() {
       const res = await fetch("/api/writing/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ taskType, question, essay, imageBase64, imageMimeType }),
+        body: JSON.stringify({ taskType, moduleType, question, essay, imageBase64, imageMimeType }),
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Scoring failed. Please try again."); return; }
@@ -481,6 +497,36 @@ export default function WritingPage() {
         </div>
       )}
 
+      {/* Module selector: Academic / General Training */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl w-fit" style={{ background: "#f3f4f6" }}>
+        {(["academic", "general"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => {
+              setModuleType(m);
+              setResult(null);
+              setEssay("");
+              setQuestion("");
+              setIsGeneratedQuestion(false);
+              setTimerSeconds(0);
+              if (timerRef.current) clearInterval(timerRef.current);
+              setTimerActive(false);
+              timerStartedRef.current = false;
+              setChartFile(null);
+              setChartPreview(null);
+            }}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
+              moduleType === m
+                ? "bg-white text-emerald-700 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {m === "academic" ? "Academic" : "General Training"}
+          </button>
+        ))}
+      </div>
+
       <Tabs
         value={taskType}
         onValueChange={(v) => {
@@ -499,7 +545,9 @@ export default function WritingPage() {
       >
         <TabsList className="grid grid-cols-2 w-fit p-1.5 rounded-2xl h-auto gap-1.5" style={{ background: "#f3f4f6" }}>
           <TabsTrigger value="task2" className="rounded-xl px-6 py-2.5 text-sm font-semibold data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm" style={{ ["--tw-ring-color" as string]: "transparent" }}>Task 2 — Essay</TabsTrigger>
-          <TabsTrigger value="task1" className="rounded-xl px-6 py-2.5 text-sm font-semibold data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm">Task 1 — Academic Report</TabsTrigger>
+          <TabsTrigger value="task1" className="rounded-xl px-6 py-2.5 text-sm font-semibold data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm">
+            {moduleType === "general" && taskType === "task1" ? "Task 1 — Letter" : "Task 1 — Academic Report"}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value={taskType} className="mt-4">
@@ -509,7 +557,9 @@ export default function WritingPage() {
             <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border bg-muted/40">
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">
-                  {taskType === "task1" ? "Task 1 · Academic" : "Task 2 · Essay"}
+                  {taskType === "task1"
+                    ? (moduleType === "general" ? "Task 1 · General Training · Letter" : "Task 1 · Academic")
+                    : "Task 2 · Essay"}
                 </span>
                 <span>⏱ {taskType === "task1" ? "20 min" : "40 min"}</span>
                 <span>📝 Min {taskType === "task1" ? "150" : "250"} words</span>
@@ -567,7 +617,7 @@ export default function WritingPage() {
                     className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
                   >
                     <Shuffle className="w-3 h-3" />
-                    {taskType === "task1" ? "Practice question + chart" : "Practice question"}
+                    {taskType === "task1" && moduleType === "academic" ? "Practice question + chart" : "Practice question"}
                   </button>
                 </div>
               </div>
@@ -580,15 +630,17 @@ export default function WritingPage() {
                 readOnly={isGeneratedQuestion}
                 placeholder={
                   taskType === "task1"
-                    ? "Paste the task instructions here, e.g. 'The graph below shows... Summarise the information by selecting and reporting the main features...'"
+                    ? (moduleType === "general"
+                        ? "Paste the letter task instructions here, e.g. 'You recently stayed at a hotel... Write a letter to the hotel manager...'"
+                        : "Paste the task instructions here, e.g. 'The graph below shows... Summarise the information by selecting and reporting the main features...'")
                     : "Paste the essay question here, or click 'Practice question' for a sample..."
                 }
                 className={`resize-none min-h-[100px] text-sm ${isGeneratedQuestion ? "bg-muted/50 cursor-default select-text" : ""}`}
               />
             </div>
 
-            {/* Task 1: Chart / diagram upload */}
-            {taskType === "task1" && (
+            {/* Task 1: Chart / diagram upload — Academic only */}
+            {taskType === "task1" && moduleType === "academic" && (
               <div className="space-y-1.5">
                 <label className="text-sm font-medium flex items-center gap-1.5">
                   <BarChart3 className="w-3.5 h-3.5 text-emerald-600" />
@@ -603,13 +655,25 @@ export default function WritingPage() {
               </div>
             )}
 
-            {/* Essay / report */}
+            {/* GT Task 1: Letter format tips */}
+            {taskType === "task1" && moduleType === "general" && (
+              <div className="rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-xs text-blue-800">
+                <span className="font-semibold">Letter format guide: </span>
+                Formal: Dear Sir/Madam → Yours faithfully | Semi-formal: Dear Mr Smith → Yours sincerely | Informal: Dear John → Best wishes
+              </div>
+            )}
+
+            {/* Essay / report / letter */}
             <EssayEditor
               value={essay}
               onChange={handleEssayChange}
               minWords={minWords}
-              label={taskType === "task1" ? "Your report" : "Your essay"}
-              placeholder={`Write your ${taskType === "task1" ? "report" : "essay"} here… (timer starts automatically)`}
+              label={taskType === "task1" ? (moduleType === "general" ? "Your letter" : "Your report") : "Your essay"}
+              placeholder={
+                taskType === "task1" && moduleType === "general"
+                  ? "Write your letter here… (timer starts automatically)"
+                  : `Write your ${taskType === "task1" ? "report" : "essay"} here… (timer starts automatically)`
+              }
             />
 
             {/* Submit */}
