@@ -320,7 +320,8 @@ export default function ListeningPage() {
     const audioUrl       = ftSections[0].mat.content.audio_url;
     const totalAnswered  = Object.values(ftAnswers).filter(v => v.trim()).length;
     const totalQuestions = ftSections.reduce((s, sec) => s + getQuestions(sec.mat).length, 0);
-    const canSeek        = examMode === "practice";
+    // Full Mock Test: audio NEVER seekable — simulates real IELTS exam conditions
+    const canSeek        = false;
 
     return (
       <div className="space-y-4 pb-8">
@@ -380,6 +381,7 @@ export default function ListeningPage() {
 
         {/* ── Audio player ── */}
         <div className="rounded-2xl p-5 space-y-3" style={{ background:"#0a1520", border:"1px solid #0c2a45" }}>
+          {/* Non-seekable audio — onSeeking snaps back to prevent scrubbing */}
           <audio ref={audioRef}
             src={audioUrl}
             onTimeUpdate={() => setCurTime(audioRef.current?.currentTime ?? 0)}
@@ -387,6 +389,12 @@ export default function ListeningPage() {
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
             onEnded={() => setPlaying(false)}
+            onSeeking={() => {
+              // Block any seek attempt — snap back to current real position
+              if (audioRef.current) {
+                audioRef.current.currentTime = curTime;
+              }
+            }}
             muted={muted}
           />
 
@@ -398,18 +406,11 @@ export default function ListeningPage() {
             </button>
 
             <div className="flex-1 space-y-1.5">
-              <div className="relative h-2.5 rounded-full overflow-hidden cursor-pointer" style={{ background:"#1e293b" }}>
-                <div className="absolute inset-y-0 left-0 rounded-full"
+              {/* Progress bar — display only, not interactive */}
+              <div className="relative h-2.5 rounded-full overflow-hidden" style={{ background:"#1e293b", cursor:"default" }}>
+                <div className="absolute inset-y-0 left-0 rounded-full pointer-events-none"
                   style={{ width:`${dur > 0 ? (curTime/dur)*100 : 0}%`, background:"linear-gradient(90deg,#0369a1,#38bdf8)", transition:"width 0.3s linear" }} />
-                {canSeek && dur > 0 && (
-                  <input type="range" min={0} max={dur} step={0.5} value={curTime}
-                    onChange={e => {
-                      const v = parseFloat(e.target.value);
-                      if (audioRef.current) audioRef.current.currentTime = v;
-                      setCurTime(v);
-                    }}
-                    className="absolute inset-0 w-full opacity-0 cursor-pointer h-full" />
-                )}
+                {/* No seek input — intentionally removed for IELTS exam conditions */}
               </div>
               <div className="flex justify-between text-[11px] font-mono" style={{ color:"#334155" }}>
                 <span>{fmtTime(curTime)}</span>
@@ -424,10 +425,17 @@ export default function ListeningPage() {
             </button>
           </div>
 
-          {examMode === "exam" && !audioStarted && (
+          {/* Always show the no-seek warning in full test */}
+          {!audioStarted && (
             <p className="text-xs text-center py-2 rounded-lg"
               style={{ color:"#64748b", background:"rgba(56,189,248,0.04)", border:"1px solid rgba(56,189,248,0.1)" }}>
-              ⚠️ Exam mode — audio plays once. Read the questions, then press play.
+              🎧 Audio plays once — no rewind or fast-forward. Read the questions, then press play.
+            </p>
+          )}
+          {audioStarted && playing && (
+            <p className="text-xs text-center py-1.5 rounded-lg"
+              style={{ color:"#38bdf8", background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.15)" }}>
+              ● Live — answer questions as you listen. Switch parts freely using tabs above.
             </p>
           )}
         </div>
