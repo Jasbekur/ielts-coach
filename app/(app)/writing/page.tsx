@@ -492,6 +492,7 @@ export default function WritingPage() {
           setTimerSeconds(0);
           if (timerRef.current) clearInterval(timerRef.current);
           setTimerActive(false);
+          timerStartedRef.current = false; // fix: reset so auto-start fires again on next keystroke
           setChartFile(null);
           setChartPreview(null);
         }}

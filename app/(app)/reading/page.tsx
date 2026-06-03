@@ -458,16 +458,25 @@ export default function ReadingPage() {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // ── Always-fresh submit ref — fixes stale-closure bug in timer ────────────
+  // The timer useEffect only runs when `phase` changes, so `handleSubmit`
+  // captured inside it would always see answers={} (the value at phase-change
+  // time). Instead we keep a ref that is updated on every render, then call
+  // handleSubmitRef.current() from inside the timer callback.
+  const handleSubmitRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+  }); // intentionally no deps — re-sync every render
+
   // ── Timer ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (phase !== "reading") return;
-    // Clear any existing interval before starting a new one (guards against Strict Mode double-invoke)
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
           clearInterval(timerRef.current!);
-          handleSubmit();
+          handleSubmitRef.current(); // always calls the latest handleSubmit
           return 0;
         }
         return t - 1;
@@ -476,8 +485,7 @@ export default function ReadingPage() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
+  }, [phase]); // phase only — no stale closure risk anymore
 
   // ── Start exam ────────────────────────────────────────────────────────────
   function startExam(passageIndex: number | null) {
