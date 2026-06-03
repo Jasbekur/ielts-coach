@@ -4,7 +4,7 @@ export const revalidate = 30; // revalidate every 30 s — allows prefetch to ca
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, Mic, TrendingUp, ArrowRight, Flame, Lightbulb } from "lucide-react";
+import { BookOpen, Mic, TrendingUp, ArrowRight, Flame, Lightbulb, GraduationCap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getBandTailwind, getBandBg, Attempt } from "@/types/ielts";
 import { TargetBandSetter } from "@/components/dashboard/TargetBandSetter";
@@ -113,6 +113,16 @@ export default async function DashboardPage() {
   const avgBand         = attempts.length ? (attempts.reduce((s, a) => s + a.overall_band, 0) / attempts.length).toFixed(1) : null;
   const remaining       = 10 - todayCount;
   const dailyTip        = getDailyTip();
+
+  // ── IELTS Readiness: average of best Writing + best Speaking this week ────
+  const bestWriting  = writingAttempts.length  ? Math.max(...writingAttempts.map(a => a.overall_band))  : null;
+  const bestSpeaking = speakingAttempts.length ? Math.max(...speakingAttempts.map(a => a.overall_band)) : null;
+  const readinessBand: number | null =
+    bestWriting != null && bestSpeaking != null
+      ? roundBand((bestWriting + bestSpeaking) / 2)
+      : bestWriting  != null ? roundBand(bestWriting)
+      : bestSpeaking != null ? roundBand(bestSpeaking)
+      : null;
 
   return (
     <div className="space-y-5">
@@ -296,6 +306,70 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ── IELTS Readiness band ────────────────────────────────────────── */}
+      {readinessBand != null && (
+        <ScrollReveal>
+        <Card className="fade-up" style={{ animationDelay: "140ms" }}>
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: "linear-gradient(135deg, rgba(5,150,105,0.15), rgba(5,150,105,0.08))" }}>
+                  <GraduationCap className="w-4 h-4" style={{ color: "#059669" }} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    IELTS Readiness
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {bestWriting != null && bestSpeaking != null
+                      ? `Writing ${formatBand(bestWriting)} + Speaking ${formatBand(bestSpeaking)} avg`
+                      : bestWriting != null
+                      ? "Based on Writing — add Speaking for full score"
+                      : "Based on Speaking — add Writing for full score"}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className={`text-3xl font-mono font-bold tracking-nums ${getBandTailwind(readinessBand)}`}>
+                  {formatBand(readinessBand)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {readinessBand >= 7 ? "University ready ✓"
+                    : readinessBand >= 6 ? "Almost there"
+                    : readinessBand >= 5 ? "Keep practising"
+                    : "Needs improvement"}
+                </p>
+              </div>
+            </div>
+            {/* Sub-skill breakdown bar */}
+            {bestWriting != null && bestSpeaking != null && (
+              <div className="mt-3 pt-3 border-t border-border/60 grid grid-cols-2 gap-3">
+                {[
+                  { label: "Writing",  band: bestWriting,  icon: "✍️" },
+                  { label: "Speaking", band: bestSpeaking, icon: "🎤" },
+                ].map(({ label, band, icon }) => (
+                  <div key={label} className="flex items-center gap-2">
+                    <span className="text-sm">{icon}</span>
+                    <div className="flex-1">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-muted-foreground">{label}</span>
+                        <span className={`font-mono font-semibold ${getBandTailwind(band)}`}>{formatBand(band)}</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div className={`h-full rounded-full ${getBandBg(band)}`}
+                          style={{ width: `${Math.min(100, (band / 9) * 100)}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        </ScrollReveal>
+      )}
 
       {/* ── Progress to target ──────────────────────────────────────────── */}
       {profile?.target_band != null && bestBand != null && (() => {

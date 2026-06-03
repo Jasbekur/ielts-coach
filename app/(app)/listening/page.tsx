@@ -75,6 +75,7 @@ const SECTIONS = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+// Official Cambridge Listening band conversion table (differs from Reading)
 function scoreToBand(correct: number, outOf: number): number {
   if (outOf === 0) return 0;
   const scaled = Math.round((correct / outOf) * 40);
@@ -85,7 +86,7 @@ function scoreToBand(correct: number, outOf: number): number {
   if (scaled >= 30) return 7;
   if (scaled >= 27) return 6.5;
   if (scaled >= 23) return 6;
-  if (scaled >= 20) return 5.5;
+  if (scaled >= 18) return 5.5;  // fix: was >= 20 — official table 18–22 → 5.5
   if (scaled >= 16) return 5;
   if (scaled >= 13) return 4.5;
   return 4;

@@ -123,8 +123,9 @@ const PART3_TOPICS: TopicSet[] = [
   { topic: "Globalisation & Culture", emoji: "🌐", questions: ["What are the main benefits of globalisation for ordinary people?", "Do you think globalisation is causing local cultures and traditions to disappear?", "Should countries try to protect their local industries from foreign competition?", "How has the spread of English as a global language affected other languages?", "In your view, does globalisation lead to greater equality between countries, or greater inequality?"] },
 ];
 
-const PART_LIMITS: Record<SpeakingPart, number> = { 1: 40, 2: 120, 3: 120 };
-const PART_MIN:   Record<SpeakingPart, number> = { 1: 15, 2:  60, 3:  40 };
+// Real IELTS: Part 1 = 4–5 min, Part 2 = up to 2 min, Part 3 = 4–5 min
+const PART_LIMITS: Record<SpeakingPart, number> = { 1: 300, 2: 120, 3: 300 };
+const PART_MIN:   Record<SpeakingPart, number> = { 1:  60, 2:  60, 3:  60 };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function SpeakingSkeletonLoader() {

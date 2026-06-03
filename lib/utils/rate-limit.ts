@@ -5,7 +5,7 @@ export async function checkDailyLimit(
   supabase: SupabaseClient
 ) {
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setUTCHours(0, 0, 0, 0); // fix: UTC so limit resets at midnight UTC, not server local time
 
   const { count } = await supabase
     .from("attempts")
