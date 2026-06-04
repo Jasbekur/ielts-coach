@@ -9,7 +9,7 @@ import {
   BookOpen, Timer, ChevronLeft, ChevronRight,
   CheckCircle2, XCircle, AlertCircle, RotateCcw,
   Trophy, Zap, BookMarked, ArrowRight, X,
-  FileText,
+  FileText, Clock,
 } from "lucide-react";
 import {
   READING_TEST_SETS,
@@ -463,6 +463,23 @@ export default function ReadingPage() {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // ── Exam UI enhancements ─────────────────────────────────────────────────
+  const [flaggedQ,       setFlaggedQ]      = useState<Set<number>>(new Set());
+  const [showQNavigator, setShowQNavigator] = useState(false);
+  const [showReadSubmit, setShowReadSubmit] = useState(false);
+  const readingRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  function toggleReadingFlag(num: number) {
+    setFlaggedQ(prev => {
+      const next = new Set(prev);
+      if (next.has(num)) next.delete(num); else next.add(num);
+      return next;
+    });
+  }
+  function scrollToReadingQ(num: number) {
+    readingRefs.current[num]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   // ── Always-fresh submit ref — fixes stale-closure bug in timer ────────────
   // The timer useEffect only runs when `phase` changes, so `handleSubmit`
   // captured inside it would always see answers={} (the value at phase-change
@@ -858,94 +875,81 @@ export default function ReadingPage() {
       className="fixed inset-0 z-[9999] flex flex-col"
       style={{ background: "oklch(0.982 0.005 285)" }}
     >
-      {/* ── Top bar ─────────────────────────────────────────────────────── */}
-      <div
-        className="flex items-center justify-between px-4 py-2.5 border-b border-border shrink-0 gap-3"
-        style={{ background: "white" }}
-      >
-        {/* Left: title */}
+      {/* ── CD-IELTS exam top bar ── */}
+      <div className="flex items-center justify-between gap-3 h-12 px-4 shrink-0"
+        style={{ background:"var(--exam-bar, #1e2d5a)", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
+        <button
+          onClick={() => { if (window.confirm("Leave the test? Your answers will be lost.")) { clearInterval(timerRef.current!); setPhase("selector"); } }}
+          className="flex items-center gap-1 text-xs font-semibold text-white/70 hover:text-white transition-colors shrink-0">
+          <ChevronLeft className="w-3.5 h-3.5" /> Exit
+        </button>
         <div className="flex items-center gap-2 min-w-0">
-          <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span className="text-sm font-semibold truncate hidden sm:block">
-            {practiceOnly !== null
-              ? `Passage ${practiceOnly + 1} Practice`
-              : "IELTS Academic Reading"}
-          </span>
-          <span className="text-xs text-muted-foreground hidden md:block">
-            · {Object.keys(answers).length}/{practiceOnly !== null ? totalInPassage : TOTAL_QUESTIONS} answered
+          <span className="text-white font-black text-sm tracking-tight hidden sm:block">IELTS Sensei</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest text-white"
+            style={{ background:"rgba(255,255,255,0.15)" }}>READING</span>
+          <span className="text-white/50 text-xs hidden md:block">
+            {practiceOnly !== null ? `Passage ${practiceOnly + 1}` : "Full Test · 3 Passages"}
           </span>
         </div>
-
-        {/* Center: passage tabs (full test only) */}
-        {practiceOnly === null && (
-          <div className="flex gap-1 shrink-0">
-            {activeTestSetPassages.map((p, i) => {
-              const r = PASSAGE_RANGES[i];
-              const done = countAnswered(answers, r.start, r.end);
-              const tot = r.end - r.start + 1;
-              return (
-                <button
-                  key={i}
-                  onClick={() => setActivePassage(i)}
-                  className={cn(
-                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all",
-                    activePassage === i
-                      ? "text-white"
-                      : "text-muted-foreground hover:bg-muted"
-                  )}
-                  style={activePassage === i ? {
-                    background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))",
-                  } : {}}
-                >
-                  P{i + 1}
-                  <span className={cn(
-                    "text-[9px]",
-                    activePassage === i ? "text-violet-200" : "text-muted-foreground"
-                  )}>
-                    {done}/{tot}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Right: timer + finish */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-mono font-bold border",
-            isUrgent
-              ? "text-red-600 bg-red-50 border-red-200 animate-pulse"
-              : "text-gray-700 bg-gray-50 border-gray-200"
-          )}>
-            <Timer className="w-3.5 h-3.5 shrink-0" />
-            {formatTime(timeLeft)}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded"
+            style={{ background: timeLeft < 600 ? "rgba(248,113,113,0.25)" : "rgba(255,255,255,0.1)" }}>
+            <Clock className="w-3 h-3" style={{ color: timeLeft < 600 ? "#f87171" : "rgba(255,255,255,0.7)" }} />
+            <span className="font-mono font-bold text-xs tabular-nums"
+              style={{ color: timeLeft < 600 ? "#f87171" : "white" }}>
+              {formatTime(timeLeft)}
+            </span>
           </div>
-          <Button
-            size="sm"
-            onClick={handleSubmit}
-            className="text-xs font-semibold gap-1.5"
-            style={{
-              background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))",
-              color: "white",
-            }}
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Finish</span>
-          </Button>
-          <button
-            onClick={() => {
-              if (window.confirm("Leave test? Progress will be lost.")) {
-                clearInterval(timerRef.current!);
-                setPhase("selector");
-              }
-            }}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-          >
-            <X className="w-4 h-4" />
+          <span className="text-xs font-semibold tabular-nums hidden sm:block text-white/60">
+            {countAnswered(answers, 1, 40)}/40
+          </span>
+          <button onClick={() => setShowQNavigator(v => !v)}
+            className="text-xs font-semibold px-2 py-1 rounded text-white transition-colors"
+            style={{ background: showQNavigator ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)" }}>
+            Nav
+          </button>
+          <button onClick={() => setShowReadSubmit(true)}
+            className="text-xs font-black px-3 py-1.5 rounded text-white"
+            style={{ background:"#16a34a" }}>
+            Submit
           </button>
         </div>
       </div>
+
+      {/* Reading question navigator */}
+      {showQNavigator && (
+        <div className="fixed inset-y-0 right-0 z-30 w-52 flex flex-col shadow-2xl"
+          style={{ background:"#1e2432", borderLeft:"1px solid rgba(255,255,255,0.08)", top:"48px" }}>
+          <div className="px-4 py-3 flex items-center justify-between"
+            style={{ borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
+            <span className="text-xs font-black text-white uppercase tracking-wider">Questions</span>
+            <button onClick={() => setShowQNavigator(false)} className="text-white/50 hover:text-white text-xs">✕</button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+            {PASSAGE_RANGES.map((range, pi) => (
+              <div key={pi}>
+                <p className="text-[10px] font-black text-white/50 uppercase mb-2">Passage {pi + 1}</p>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i).map(num => {
+                    const answered = !!(answers[num] ?? "").trim();
+                    const flagged  = flaggedQ.has(num);
+                    return (
+                      <button key={num} onClick={() => { scrollToReadingQ(num); setShowQNavigator(false); }}
+                        className="h-7 w-full rounded text-xs font-bold transition-all hover:scale-105"
+                        style={{
+                          background: flagged ? "#d97706" : answered ? "#2563eb" : "rgba(255,255,255,0.12)",
+                          color: (flagged || answered) ? "white" : "rgba(255,255,255,0.5)",
+                        }}>
+                        {num}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Mobile: passage / questions toggle ───────────────────────────── */}
       <div className="flex md:hidden border-b border-border shrink-0 bg-white">
@@ -1066,6 +1070,35 @@ export default function ReadingPage() {
           Next <ChevronRight className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Reading submit confirmation */}
+      {showReadSubmit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background:"rgba(0,0,0,0.75)", backdropFilter:"blur(4px)" }}>
+          <div className="w-full max-w-sm rounded-2xl p-6 space-y-5 bg-card border">
+            <div>
+              <p className="font-black text-lg mb-1">Submit reading test?</p>
+              <p className="text-muted-foreground text-sm">
+                {40 - countAnswered(answers, 1, 40) > 0
+                  ? `${40 - countAnswered(answers, 1, 40)} questions unanswered.`
+                  : "All 40 questions answered ✓"}
+                {flaggedQ.size > 0 && ` ${flaggedQ.size} flagged.`}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => setShowReadSubmit(false)}
+                className="py-2.5 rounded-xl text-sm font-bold border border-border hover:bg-muted transition-colors">
+                Keep reviewing
+              </button>
+              <button onClick={() => { setShowReadSubmit(false); handleSubmit(); }}
+                className="py-2.5 rounded-xl text-sm font-black text-white"
+                style={{ background:"#16a34a" }}>
+                Submit test
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>,
     document.body
   );

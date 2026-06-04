@@ -33,6 +33,11 @@ export function EssayEditor({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="min-h-[280px] resize-none"
+        /* IELTS exam: disable browser writing aids */
+        spellCheck={false}
+        autoCorrect="off"
+        autoCapitalize="off"
+        autoComplete="off"
         style={{
           fontFamily: "'Lora', Georgia, serif",
           fontSize: "16px",
@@ -46,15 +51,20 @@ export function EssayEditor({
         </span>
         <span
           className={cn(
-            "font-mono font-medium",
+            "font-mono font-semibold transition-colors",
             isUnder
-              ? "text-red-500"
+              ? "text-red-600 font-bold"   /* bold red below minimum */
               : isGood
-              ? "text-emerald-500"
-              : "text-amber-500"
+              ? "text-emerald-600"          /* green at target range  */
+              : "text-amber-600"            /* amber when very long   */
           )}
         >
           {count} / {minWords}+ words
+          {isUnder && count > 0 && (
+            <span className="ml-1.5 text-red-400 font-normal">
+              ({minWords - count} more)
+            </span>
+          )}
         </span>
       </div>
     </div>

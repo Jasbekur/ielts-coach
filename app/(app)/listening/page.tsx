@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Headphones, Play, Pause, Volume2, VolumeX, Clock,
   CheckCircle2, XCircle, Users, Mic2, GraduationCap,
@@ -148,6 +148,30 @@ export default function ListeningPage() {
   const [ftTimeLeft,   setFtTimeLeft]   = useState(40 * 60);
   const [ftRunning,    setFtRunning]    = useState(false);
   const ftTimerRef                      = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Question navigator & flagging ──────────────────────────────────────────
+  const [ftFlagged,        setFtFlagged]        = useState<Set<number>>(new Set());
+  const [showSubmitModal,  setShowSubmitModal]  = useState(false);
+  const [showNavigator,    setShowNavigator]    = useState(false);
+  const questionRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  function toggleFlag(num: number) {
+    setFtFlagged(prev => {
+      const next = new Set(prev);
+      if (next.has(num)) next.delete(num); else next.add(num);
+      return next;
+    });
+  }
+  function scrollToQuestion(num: number) {
+    setFtActiveTab(
+      ftSections.findIndex(({ mat }) =>
+        getQuestions(mat).some(q => q.number === num)
+      ) || 0
+    );
+    setTimeout(() => {
+      questionRefs.current[num]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 80);
+  }
 
   // ── Fetch sections from DB ──────────────────────────────────────────────────
   useEffect(() => {
@@ -327,9 +351,62 @@ export default function ListeningPage() {
     return (
       <div className="space-y-4 pb-8">
 
-        {/* ── Sticky top bar ── */}
-        <div className="sticky top-0 z-20 flex items-center justify-between py-3 -mx-4 px-4"
-          style={{ background:"rgba(6,11,18,0.95)", backdropFilter:"blur(12px)", borderBottom:"1px solid #0c2a45" }}>
+        {/* ── Question Navigator overlay ── */}
+        {showNavigator && (
+          <div className="fixed inset-y-0 right-0 z-30 w-56 flex flex-col shadow-2xl"
+            style={{ background:"#1e2432", borderLeft:"1px solid rgba(255,255,255,0.08)", top:"48px" }}>
+            <div className="px-4 py-3 flex items-center justify-between"
+              style={{ borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
+              <span className="text-xs font-black text-white uppercase tracking-wider">Questions</span>
+              <button onClick={() => setShowNavigator(false)}
+                className="text-white/50 hover:text-white text-xs">✕</button>
+            </div>
+            {/* Legend */}
+            <div className="px-4 py-2 flex items-center gap-3 text-[10px]"
+              style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block" style={{ background:"rgba(255,255,255,0.15)" }}/><span className="text-white/50">Not answered</span></span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-blue-500"/><span className="text-white/50">Answered</span></span>
+            </div>
+            <div className="flex items-center gap-2 px-4 pt-1 pb-1 text-[10px]">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-amber-500"/><span className="text-white/50">Flagged</span></span>
+            </div>
+            {/* Number grid */}
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              {ftSections.map(({ meta, mat }) => {
+                const qs = getQuestions(mat);
+                return (
+                  <div key={meta.num} className="mb-4">
+                    <p className="text-[10px] font-black uppercase mb-2"
+                      style={{ color: meta.color }}>{meta.label}</p>
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {qs.map(q => {
+                        const answered = !!(ftAnswers[q.number] ?? "").trim();
+                        const flagged  = ftFlagged.has(q.number);
+                        return (
+                          <button key={q.number}
+                            onClick={() => { scrollToQuestion(q.number); setShowNavigator(false); }}
+                            className="h-7 w-full rounded text-xs font-bold transition-all hover:scale-105"
+                            style={{
+                              background: flagged ? "#d97706" : answered ? "#2563eb" : "rgba(255,255,255,0.12)",
+                              color: (flagged || answered) ? "white" : "rgba(255,255,255,0.6)",
+                            }}>
+                            {q.number}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── CD-IELTS exam top bar ── */}
+        <div className="sticky top-0 z-20 -mx-4 px-4 flex items-center justify-between gap-3 h-12"
+          style={{ background:"var(--exam-bar, #1e2d5a)", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
+
+          {/* Left: Exit */}
           <button
             onClick={() => {
               if (audioRef.current) audioRef.current.pause();
@@ -338,27 +415,51 @@ export default function ListeningPage() {
               setFtRunning(false);
               setFtSections([]);
             }}
-            className="flex items-center gap-1.5 text-sm font-medium transition-colors"
-            style={{ color:"#475569" }}
-            onMouseEnter={e=>(e.currentTarget.style.color="#94a3b8")}
-            onMouseLeave={e=>(e.currentTarget.style.color="#475569")}>
-            <ChevronLeft className="w-4 h-4" /> Exit
+            className="flex items-center gap-1 text-xs font-semibold text-white/70 hover:text-white transition-colors shrink-0">
+            <ChevronLeft className="w-3.5 h-3.5" /> Exit
           </button>
 
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold tabular-nums"
-              style={{ color: totalAnswered === totalQuestions ? "#34d399" : "#475569" }}>
-              {totalAnswered} / {totalQuestions} answered
+          {/* Centre: branding + test label */}
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-white font-black text-sm tracking-tight hidden sm:block">IELTS Sensei</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest text-white"
+              style={{ background:"rgba(255,255,255,0.15)" }}>LISTENING</span>
+            <span className="text-white/50 text-xs hidden md:block truncate">Full Mock Test</span>
+          </div>
+
+          {/* Right: timer + answered + navigator + submit */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Timer */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded"
+              style={{ background: ftTimeLeft < 300 ? "rgba(248,113,113,0.25)" : "rgba(255,255,255,0.1)" }}>
+              <Clock className="w-3 h-3" style={{ color: ftTimeLeft < 300 ? "#f87171" : "rgba(255,255,255,0.7)" }} />
+              <span className="font-mono font-bold text-xs tabular-nums"
+                style={{ color: ftTimeLeft < 300 ? "#f87171" : "white" }}>
+                {fmtTime(ftTimeLeft)}
+              </span>
+            </div>
+
+            {/* Answered count */}
+            <span className="text-xs font-semibold tabular-nums hidden sm:block"
+              style={{ color: totalAnswered === totalQuestions ? "#4ade80" : "rgba(255,255,255,0.6)" }}>
+              {totalAnswered}/{totalQuestions}
             </span>
-            {examMode === "exam" && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                style={{ background: ftTimeLeft < 300 ? "#2d0f0f" : "#0f172a", border:`1px solid ${ftTimeLeft < 300 ? "rgba(248,113,113,0.4)" : "#1e293b"}` }}>
-                <Clock className="w-3.5 h-3.5" style={{ color: ftTimeLeft < 300 ? "#f87171" : "#475569" }} />
-                <span className="font-mono font-bold text-sm" style={{ color: ftTimeLeft < 300 ? "#f87171" : "#94a3b8" }}>
-                  {fmtTime(ftTimeLeft)}
-                </span>
-              </div>
-            )}
+
+            {/* Navigator toggle */}
+            <button
+              onClick={() => setShowNavigator(v => !v)}
+              className="text-xs font-semibold px-2 py-1 rounded transition-colors"
+              style={{ background: showNavigator ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)", color:"white" }}>
+              Nav
+            </button>
+
+            {/* Submit */}
+            <button
+              onClick={() => setShowSubmitModal(true)}
+              className="text-xs font-black px-3 py-1.5 rounded text-white transition-all hover:opacity-90"
+              style={{ background:"#16a34a" }}>
+              Submit
+            </button>
           </div>
         </div>
 
@@ -502,6 +603,9 @@ export default function ListeningPage() {
           answers={ftAnswers}
           sectionColor={currentSec.meta.color}
           onChange={(num, val) => setFtAnswers(a => ({ ...a, [num]: val }))}
+          flagged={ftFlagged}
+          onFlag={toggleFlag}
+          questionRefs={questionRefs}
         />
 
         {/* ── Navigation + Submit ── */}
@@ -520,16 +624,45 @@ export default function ListeningPage() {
               {ftSections[ftActiveTab + 1].meta.label} <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
-            <button onClick={submitFullTest}
+            <button onClick={() => setShowSubmitModal(true)}
               className="flex-1 py-3.5 rounded-xl text-sm font-black text-white transition-all"
-              style={{ background:"linear-gradient(135deg,#059669,#10b981)", boxShadow:"0 4px 20px rgba(5,150,105,0.4)" }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform="translateY(-1px)"}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform="translateY(0)"}>
+              style={{ background:"linear-gradient(135deg,#059669,#10b981)", boxShadow:"0 4px 20px rgba(5,150,105,0.4)" }}>
               <Trophy className="w-4 h-4 inline mr-2" />
-              Submit Full Test
+              Review & Submit
             </button>
           )}
         </div>
+
+        {/* ── Submit confirmation modal ── */}
+        {showSubmitModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background:"rgba(0,0,0,0.75)", backdropFilter:"blur(4px)" }}>
+            <div className="w-full max-w-sm rounded-2xl p-6 space-y-5"
+              style={{ background:"#1e2432", border:"1px solid rgba(255,255,255,0.12)" }}>
+              <div>
+                <p className="text-white font-black text-lg mb-1">Submit your answers?</p>
+                <p className="text-white/60 text-sm">
+                  {totalAnswered < totalQuestions
+                    ? `You have ${totalQuestions - totalAnswered} unanswered question${totalQuestions - totalAnswered > 1 ? "s" : ""}.`
+                    : "All questions answered ✓"}
+                  {ftFlagged.size > 0 && ` ${ftFlagged.size} flagged for review.`}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => setShowSubmitModal(false)}
+                  className="py-2.5 rounded-xl text-sm font-bold text-white/70 hover:text-white transition-colors"
+                  style={{ background:"rgba(255,255,255,0.1)" }}>
+                  Review answers
+                </button>
+                <button onClick={() => { setShowSubmitModal(false); submitFullTest(); }}
+                  className="py-2.5 rounded-xl text-sm font-black text-white"
+                  style={{ background:"#16a34a" }}>
+                  Submit test
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1097,11 +1230,14 @@ export default function ListeningPage() {
 
 // ── Questions block ───────────────────────────────────────────────────────────
 
-function QuestionsBlock({ mat, answers, sectionColor, onChange }: {
-  mat:          LMaterial;
-  answers:      Record<number, string>;
-  sectionColor: string;
-  onChange:     (num: number, val: string) => void;
+function QuestionsBlock({ mat, answers, sectionColor, onChange, flagged, onFlag, questionRefs }: {
+  mat:           LMaterial;
+  answers:       Record<number, string>;
+  sectionColor:  string;
+  onChange:      (num: number, val: string) => void;
+  flagged?:      Set<number>;
+  onFlag?:       (num: number) => void;
+  questionRefs?: React.MutableRefObject<Record<number, HTMLDivElement | null>>;
 }) {
   const questions = getQuestions(mat);
   if (mat.content.question_groups?.length) {
@@ -1120,7 +1256,11 @@ function QuestionsBlock({ mat, answers, sectionColor, onChange }: {
             {group.questions.map(q => (
               <QuestionCard key={q.number} q={q}
                 value={answers[q.number] ?? ""}
-                onChange={v => onChange(q.number, v)} />
+                onChange={v => onChange(q.number, v)}
+                isFlagged={flagged?.has(q.number) ?? false}
+                onFlag={onFlag ? () => onFlag(q.number) : undefined}
+                questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }}
+              />
             ))}
           </div>
         ))}
@@ -1132,7 +1272,11 @@ function QuestionsBlock({ mat, answers, sectionColor, onChange }: {
       {questions.map(q => (
         <QuestionCard key={q.number} q={q}
           value={answers[q.number] ?? ""}
-          onChange={v => onChange(q.number, v)} />
+          onChange={v => onChange(q.number, v)}
+          isFlagged={flagged?.has(q.number) ?? false}
+          onFlag={onFlag ? () => onFlag(q.number) : undefined}
+          questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }}
+        />
       ))}
     </div>
   );
@@ -1140,10 +1284,13 @@ function QuestionsBlock({ mat, answers, sectionColor, onChange }: {
 
 // ── Question card ─────────────────────────────────────────────────────────────
 
-function QuestionCard({ q, value, onChange }: {
-  q:        LQuestion;
-  value:    string;
-  onChange: (v: string) => void;
+function QuestionCard({ q, value, onChange, isFlagged, onFlag, questionRef }: {
+  q:           LQuestion;
+  value:       string;
+  onChange:    (v: string) => void;
+  isFlagged?:  boolean;
+  onFlag?:     () => void;
+  questionRef?: (el: HTMLDivElement | null) => void;
 }) {
   const filled       = value.trim().length > 0;
   const isMcqSingle  = q.type === "mcq" || q.type === "mcq_single";
@@ -1158,8 +1305,20 @@ function QuestionCard({ q, value, onChange }: {
   }
 
   return (
-    <div className="rounded-xl p-4 transition-all duration-150"
+    <div ref={questionRef} className="rounded-xl p-4 transition-all duration-150 relative"
       style={{ background: filled ? "#071e36" : "#0a1520", border:`1px solid ${filled ? "rgba(56,189,248,0.25)" : "#1a2c3d"}` }}>
+      {onFlag && (
+        <button
+          onClick={onFlag}
+          className="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-full transition-all"
+          style={{
+            background: isFlagged ? "rgba(217,119,6,0.25)" : "rgba(255,255,255,0.06)",
+            color:      isFlagged ? "#fbbf24"              : "rgba(255,255,255,0.3)",
+            border:     `1px solid ${isFlagged ? "rgba(217,119,6,0.4)" : "transparent"}`,
+          }}>
+          {isFlagged ? "🚩 Flagged" : "Flag"}
+        </button>
+      )}
       <div className="flex items-start gap-3">
         <span className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-black shrink-0"
           style={{ background: filled ? "rgba(56,189,248,0.2)" : "#0f172a", color: filled ? "#38bdf8" : "#334155", border:`1px solid ${filled ? "rgba(56,189,248,0.3)" : "#1e293b"}` }}>

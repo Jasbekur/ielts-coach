@@ -188,6 +188,11 @@ function AdminContent() {
   const [loadingLogs, setLoadingLogs] = useState(true);
   const [userEmail,   setUserEmail]   = useState("");
 
+  // ── Usage stats ──────────────────────────────────────────────────────────
+  const [totalUsers,  setTotalUsers]  = useState<number | null>(null);
+  const [testsToday,  setTestsToday]  = useState<number | null>(null);
+  const [avgBand,     setAvgBand]     = useState<number | null>(null);
+
   const [editItem,       setEditItem]       = useState<Question|null>(null);
   const [editTitle,      setEditTitle]      = useState("");
   const [editDifficulty, setEditDifficulty] = useState<Difficulty>("band_6_7");
@@ -222,6 +227,21 @@ function AdminContent() {
   useEffect(() => {
     fetchQuestions(); fetchLogs();
     supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? ""));
+
+    // Fetch usage stats
+    const todayUTC = new Date(); todayUTC.setUTCHours(0,0,0,0);
+    Promise.all([
+      supabase.from("profiles").select("id", { count:"exact", head:true }),
+      supabase.from("attempts").select("id", { count:"exact", head:true }).gte("created_at", todayUTC.toISOString()),
+      supabase.from("attempts").select("overall_band"),
+    ]).then(([usersRes, todayRes, bandsRes]) => {
+      setTotalUsers(usersRes.count ?? null);
+      setTestsToday(todayRes.count ?? null);
+      if (bandsRes.data?.length) {
+        const avg = bandsRes.data.reduce((s: number, a: { overall_band: number }) => s + (a.overall_band ?? 0), 0) / bandsRes.data.length;
+        setAvgBand(Math.round(avg * 10) / 10);
+      }
+    });
   }, [fetchQuestions, fetchLogs, supabase]);
 
   const logAction = useCallback(async (action:"added"|"deleted", questionId:string, questionTitle:string) => {
@@ -283,6 +303,25 @@ function AdminContent() {
         <span className="flex items-center gap-1.5 font-semibold" style={{ color: T2 }}>
           <ShieldCheck className="w-3 h-3" style={{ color: ACL }} /> Content Manager
         </span>
+      </div>
+
+      {/* ── Usage stats grid ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label:"Total Users",   value: totalUsers  !== null ? totalUsers.toLocaleString()  : "…", icon:<Users className="w-4 h-4"/>,    color:"#38bdf8", bg:"#0c2a3d" },
+          { label:"Tests Today",   value: testsToday  !== null ? testsToday.toLocaleString()  : "…", icon:<Zap className="w-4 h-4"/>,      color:"#34d399", bg:"#0a2d22" },
+          { label:"Content Items", value: questions.length.toString(),                               icon:<BarChart3 className="w-4 h-4"/>, color:"#c084fc", bg:"#1d0d38" },
+          { label:"Avg Band",      value: avgBand     !== null ? avgBand.toFixed(1)            : "…", icon:<CheckCircle2 className="w-4 h-4"/>, color:"#fb923c", bg:"#2d1408" },
+        ].map(({ label, value, icon, color, bg }) => (
+          <div key={label} className="rounded-2xl p-4 flex flex-col gap-2"
+            style={{ background: bg, border:`1px solid ${color}25` }}>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-widest" style={{ color }}>{label}</span>
+              <span style={{ color }}>{icon}</span>
+            </div>
+            <span className="text-2xl font-black tabular-nums" style={{ color: T1 }}>{value}</span>
+          </div>
+        ))}
       </div>
 
       {/* Hero */}
