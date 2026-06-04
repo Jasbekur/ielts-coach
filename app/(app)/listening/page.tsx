@@ -345,318 +345,188 @@ export default function ListeningPage() {
     const audioUrl       = ftSections[0].mat.content.audio_url;
     const totalAnswered  = Object.values(ftAnswers).filter(v => v.trim()).length;
     const totalQuestions = ftSections.reduce((s, sec) => s + getQuestions(sec.mat).length, 0);
-    // Full Mock Test: audio NEVER seekable — simulates real IELTS exam conditions
-    const canSeek        = false;
+    const currentQs      = getQuestions(currentSec.mat);
+    const qStart         = currentQs[0]?.number ?? 1;
+    const qEnd           = currentQs[currentQs.length - 1]?.number ?? 10;
 
+    // ── OneIELTS-style full-screen exam interface ──────────────────────────────
     return (
-      <div className="space-y-4 pb-8">
+      <div className="fixed inset-0 z-50 flex flex-col bg-white" style={{ fontFamily: "var(--font-inter, sans-serif)" }}>
 
-        {/* ── Question Navigator overlay ── */}
-        {showNavigator && (
-          <div className="fixed inset-y-0 right-0 z-30 w-56 flex flex-col shadow-2xl"
-            style={{ background:"#1e2432", borderLeft:"1px solid rgba(255,255,255,0.08)", top:"48px" }}>
-            <div className="px-4 py-3 flex items-center justify-between"
-              style={{ borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
-              <span className="text-xs font-black text-white uppercase tracking-wider">Questions</span>
-              <button onClick={() => setShowNavigator(false)}
-                className="text-white/50 hover:text-white text-xs">✕</button>
-            </div>
-            {/* Legend */}
-            <div className="px-4 py-2 flex items-center gap-3 text-[10px]"
-              style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block" style={{ background:"rgba(255,255,255,0.15)" }}/><span className="text-white/50">Not answered</span></span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-blue-500"/><span className="text-white/50">Answered</span></span>
-            </div>
-            <div className="flex items-center gap-2 px-4 pt-1 pb-1 text-[10px]">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block bg-amber-500"/><span className="text-white/50">Flagged</span></span>
-            </div>
-            {/* Number grid */}
-            <div className="flex-1 overflow-y-auto px-4 py-3">
-              {ftSections.map(({ meta, mat }) => {
-                const qs = getQuestions(mat);
-                return (
-                  <div key={meta.num} className="mb-4">
-                    <p className="text-[10px] font-black uppercase mb-2"
-                      style={{ color: meta.color }}>{meta.label}</p>
-                    <div className="grid grid-cols-5 gap-1.5">
-                      {qs.map(q => {
-                        const answered = !!(ftAnswers[q.number] ?? "").trim();
-                        const flagged  = ftFlagged.has(q.number);
-                        return (
-                          <button key={q.number}
-                            onClick={() => { scrollToQuestion(q.number); setShowNavigator(false); }}
-                            className="h-7 w-full rounded text-xs font-bold transition-all hover:scale-105"
-                            style={{
-                              background: flagged ? "#d97706" : answered ? "#2563eb" : "rgba(255,255,255,0.12)",
-                              color: (flagged || answered) ? "white" : "rgba(255,255,255,0.6)",
-                            }}>
-                            {q.number}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        {/* Hidden audio */}
+        <audio ref={audioRef} src={audioUrl}
+          onTimeUpdate={() => setCurTime(audioRef.current?.currentTime ?? 0)}
+          onLoadedMetadata={() => setDur(audioRef.current?.duration ?? 0)}
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onEnded={() => setPlaying(false)}
+          onSeeking={() => { if (audioRef.current) audioRef.current.currentTime = curTime; }}
+          muted={muted}
+        />
 
-        {/* ── CD-IELTS exam top bar ── */}
-        <div className="sticky top-0 z-20 -mx-4 px-4 flex items-center justify-between gap-3 h-12"
-          style={{ background:"var(--exam-bar, #1e2d5a)", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
-
-          {/* Left: Exit */}
-          <button
-            onClick={() => {
-              if (audioRef.current) audioRef.current.pause();
-              setPlaying(false);
-              if (ftTimerRef.current) clearInterval(ftTimerRef.current);
-              setFtRunning(false);
-              setFtSections([]);
-            }}
-            className="flex items-center gap-1 text-xs font-semibold text-white/70 hover:text-white transition-colors shrink-0">
-            <ChevronLeft className="w-3.5 h-3.5" /> Exit
-          </button>
-
-          {/* Centre: branding + test label */}
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-white font-black text-sm tracking-tight hidden sm:block">IELTS Sensei</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest text-white"
-              style={{ background:"rgba(255,255,255,0.15)" }}>LISTENING</span>
-            <span className="text-white/50 text-xs hidden md:block truncate">Full Mock Test</span>
-          </div>
-
-          {/* Right: timer + answered + navigator + submit */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Timer */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded"
-              style={{ background: ftTimeLeft < 300 ? "rgba(248,113,113,0.25)" : "rgba(255,255,255,0.1)" }}>
-              <Clock className="w-3 h-3" style={{ color: ftTimeLeft < 300 ? "#f87171" : "rgba(255,255,255,0.7)" }} />
-              <span className="font-mono font-bold text-xs tabular-nums"
-                style={{ color: ftTimeLeft < 300 ? "#f87171" : "white" }}>
-                {fmtTime(ftTimeLeft)}
-              </span>
-            </div>
-
-            {/* Answered count */}
-            <span className="text-xs font-semibold tabular-nums hidden sm:block"
-              style={{ color: totalAnswered === totalQuestions ? "#4ade80" : "rgba(255,255,255,0.6)" }}>
-              {totalAnswered}/{totalQuestions}
-            </span>
-
-            {/* Navigator toggle */}
+        {/* ── TOP BAR ── */}
+        <div className="flex-shrink-0 h-14 flex items-center justify-between px-4 bg-white border-b border-gray-200 shadow-sm z-10">
+          {/* Left: logo + test info */}
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Exit */}
             <button
-              onClick={() => setShowNavigator(v => !v)}
-              className="text-xs font-semibold px-2 py-1 rounded transition-colors"
-              style={{ background: showNavigator ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)", color:"white" }}>
-              Nav
+              onClick={() => {
+                if (audioRef.current) audioRef.current.pause();
+                setPlaying(false);
+                if (ftTimerRef.current) clearInterval(ftTimerRef.current);
+                setFtRunning(false); setFtSections([]);
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors mr-1">
+              <ChevronLeft className="w-5 h-5" />
             </button>
-
-            {/* Submit */}
-            <button
-              onClick={() => setShowSubmitModal(true)}
-              className="text-xs font-black px-3 py-1.5 rounded text-white transition-all hover:opacity-90"
-              style={{ background:"#16a34a" }}>
-              Submit
-            </button>
-          </div>
-        </div>
-
-        {/* ── Test title ── */}
-        <div className="rounded-2xl p-5"
-          style={{ background:"linear-gradient(135deg,#071826 0%,#060f1a 60%,#040912 100%)", border:"1px solid #0c2a45" }}>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-xl" style={{ background:"linear-gradient(135deg,#0369a1,#0ea5e9)", boxShadow:"0 4px 12px rgba(14,165,233,0.4)" }}>
+            {/* Brand dot */}
+            <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shrink-0">
               <Headphones className="w-4 h-4 text-white" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full"
-              style={{ background:"rgba(56,189,248,0.12)", color:"#38bdf8", border:"1px solid rgba(56,189,248,0.25)" }}>
-              Full IELTS Listening Test
-            </span>
+            <div className="min-w-0">
+              <p className="font-bold text-gray-800 text-sm leading-none">Listening Test</p>
+              <p className="text-xs text-gray-400 mt-0.5 leading-none">Full Mock · 40 Questions</p>
+            </div>
           </div>
-          <p className="text-lg font-black text-white">Parts 1–4 · 40 Questions</p>
-          <p className="text-xs mt-1" style={{ color:"#475569" }}>
-            Audio plays the full test — switch freely between parts and answer as you listen.
-          </p>
-        </div>
 
-        {/* ── Audio player ── */}
-        <div className="rounded-2xl p-5 space-y-3" style={{ background:"#0a1520", border:"1px solid #0c2a45" }}>
-          {/* Non-seekable audio — onSeeking snaps back to prevent scrubbing */}
-          <audio ref={audioRef}
-            src={audioUrl}
-            onTimeUpdate={() => setCurTime(audioRef.current?.currentTime ?? 0)}
-            onLoadedMetadata={() => setDur(audioRef.current?.duration ?? 0)}
-            onPlay={() => setPlaying(true)}
-            onPause={() => setPlaying(false)}
-            onEnded={() => setPlaying(false)}
-            onSeeking={() => {
-              // Block any seek attempt — snap back to current real position
-              if (audioRef.current) {
-                audioRef.current.currentTime = curTime;
-              }
-            }}
-            muted={muted}
-          />
-
+          {/* Centre: timer + audio status */}
           <div className="flex items-center gap-4">
-
-            {/* Before audio starts: one-time START button. After: non-clickable LIVE badge */}
+            <div className={`flex items-center gap-1.5 text-sm font-medium ${ftTimeLeft < 300 ? "text-red-500" : "text-gray-600"}`}>
+              <Clock className="w-4 h-4" />
+              <span className="font-mono tabular-nums">{fmtTime(ftTimeLeft)} remaining</span>
+            </div>
             {!audioStarted ? (
               <button
                 onClick={() => { audioRef.current?.play(); setAudioStarted(true); }}
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0 transition-all active:scale-95"
-                style={{ background:"linear-gradient(135deg,#0369a1,#0ea5e9)", boxShadow:"0 4px 14px rgba(14,165,233,0.35)" }}>
-                <Play className="w-5 h-5 ml-0.5"/>
+                className="flex items-center gap-1.5 text-sm font-medium text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full transition-colors">
+                <Play className="w-3.5 h-3.5" /> Start Audio
               </button>
             ) : (
-              /* Audio is running — show LIVE dot, no stop/pause button */
-              <div className="w-12 h-12 rounded-full flex flex-col items-center justify-center shrink-0"
-                style={{ background:"#071826", border:"1px solid rgba(56,189,248,0.25)" }}>
-                <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ background:"#38bdf8" }} />
-                <span className="text-[9px] font-black mt-1" style={{ color:"#38bdf8" }}>LIVE</span>
+              <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                <Volume2 className="w-4 h-4 text-green-500 animate-pulse" />
+                <span>Audio is playing</span>
+                <button onClick={() => setMuted(m => !m)} className="ml-1 text-gray-400 hover:text-gray-600">
+                  {muted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : null}
+                </button>
               </div>
             )}
-
-            <div className="flex-1 space-y-1.5">
-              {/* Progress bar — display only, not interactive */}
-              <div className="relative h-2.5 rounded-full overflow-hidden" style={{ background:"#1e293b", cursor:"default" }}>
-                <div className="absolute inset-y-0 left-0 rounded-full pointer-events-none"
-                  style={{ width:`${dur > 0 ? (curTime/dur)*100 : 0}%`, background:"linear-gradient(90deg,#0369a1,#38bdf8)", transition:"width 0.3s linear" }} />
-              </div>
-              <div className="flex justify-between text-[11px] font-mono" style={{ color:"#334155" }}>
-                <span>{fmtTime(curTime)}</span>
-                <span>{dur ? fmtTime(dur) : "--:--"}</span>
-              </div>
-            </div>
-
-            <button onClick={() => setMuted(m => !m)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ color: muted ? "#475569" : "#38bdf8" }}>
-              {muted ? <VolumeX className="w-4 h-4"/> : <Volume2 className="w-4 h-4"/>}
-            </button>
           </div>
 
-          {!audioStarted && (
-            <p className="text-xs text-center py-2 rounded-lg"
-              style={{ color:"#64748b", background:"rgba(56,189,248,0.04)", border:"1px solid rgba(56,189,248,0.1)" }}>
-              🎧 Press Play when ready — audio plays once, cannot be paused or rewound.
-            </p>
-          )}
-          {audioStarted && (
-            <p className="text-xs text-center py-1.5 rounded-lg"
-              style={{ color:"#38bdf8", background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.15)" }}>
-              ● Answer questions as you listen — switch parts freely using the tabs above.
-            </p>
-          )}
+          {/* Right: submit */}
+          <button
+            onClick={() => setShowSubmitModal(true)}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-5 py-2 rounded transition-colors shrink-0">
+            Submit
+          </button>
         </div>
 
-        {/* ── Part tabs ── */}
-        <div className="grid grid-cols-4 gap-2">
+        {/* ── PART HEADER ── */}
+        <div className="flex-shrink-0 px-6 py-3 bg-gray-50 border-b border-gray-200">
+          <p className="font-bold text-gray-800 text-sm">Part {currentSec.meta.num}</p>
+          <p className="text-gray-600 text-sm">
+            Listen and answer questions {qStart} - {qEnd}.
+            {currentSec.mat.title && <span className="text-gray-400 ml-1">— {currentSec.mat.title}</span>}
+          </p>
+        </div>
+
+        {/* ── CONTENT ── */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-2xl mx-auto px-8 py-8">
+            <OneIELTSQuestionsBlock
+              mat={currentSec.mat}
+              answers={ftAnswers}
+              onChange={(num, val) => setFtAnswers(a => ({ ...a, [num]: val }))}
+              flagged={ftFlagged}
+              onFlag={toggleFlag}
+              questionRefs={questionRefs}
+            />
+          </div>
+        </div>
+
+        {/* ── BOTTOM NAVIGATOR (OneIELTS style) ── */}
+        <div className="flex-shrink-0 h-14 flex items-center border-t border-gray-200 bg-white px-3 gap-3 overflow-x-auto">
           {ftSections.map(({ meta, mat }, i) => {
-            const qs         = getQuestions(mat);
-            const answered   = qs.filter(q => (ftAnswers[q.number] ?? "").trim()).length;
-            const isActive   = ftActiveTab === i;
-            const isComplete = answered === qs.length;
+            const qs       = getQuestions(mat);
+            const answered = qs.filter(q => !!(ftAnswers[q.number] ?? "").trim()).length;
+            const isActive = ftActiveTab === i;
             return (
-              <button key={i} onClick={() => setFtActiveTab(i)}
-                className="flex flex-col items-center gap-1 px-2 py-3 rounded-xl transition-all duration-150"
-                style={{
-                  background: isActive ? meta.bg : "#0a1520",
-                  border:     `1px solid ${isActive ? meta.color+"70" : "#1a2c3d"}`,
-                }}>
-                <span className="text-[11px] font-black" style={{ color: isActive || isComplete ? meta.color : "#475569" }}>
-                  {meta.label}
-                </span>
-                <div className="flex items-center gap-1">
-                  <span className="text-[10px] tabular-nums" style={{ color: isComplete ? meta.color : "#334155" }}>
-                    {answered}/{qs.length}
-                  </span>
-                  {isComplete && <CheckCircle2 className="w-3 h-3" style={{ color: meta.color }} />}
-                </div>
-                <span className="text-[9px]" style={{ color:"#1e3a5f" }}>{meta.qRange}</span>
-              </button>
+              <div key={i} className="flex items-center gap-1.5 flex-shrink-0">
+                {/* Part label */}
+                <button
+                  onClick={() => setFtActiveTab(i)}
+                  className={`text-xs font-bold whitespace-nowrap ${isActive ? "text-gray-800" : "text-gray-400 hover:text-gray-600"}`}>
+                  Part {meta.num}
+                </button>
+
+                {isActive ? (
+                  /* Active part: show individual numbered squares */
+                  <div className="flex gap-1">
+                    {qs.map(q => {
+                      const isAns  = !!(ftAnswers[q.number] ?? "").trim();
+                      const isFlagged = ftFlagged.has(q.number);
+                      return (
+                        <button key={q.number}
+                          onClick={() => scrollToQuestion(q.number)}
+                          className="w-6 h-6 text-[10px] font-bold rounded flex items-center justify-center transition-all hover:scale-110"
+                          style={{
+                            background: isFlagged ? "#fef3c7" : isAns ? "#2563eb" : "#f3f4f6",
+                            color:      isFlagged ? "#d97706"  : isAns ? "white"   : "#6b7280",
+                            border:     isFlagged ? "1px solid #fbbf24" : isAns ? "none" : "1px solid #e5e7eb",
+                          }}>
+                          {q.number}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  /* Inactive parts: show "X of 10" */
+                  <span className="text-xs text-gray-400">{answered} of {qs.length}</span>
+                )}
+
+                {/* Divider */}
+                {i < ftSections.length - 1 && (
+                  <div className="w-px h-5 bg-gray-200 ml-1.5" />
+                )}
+              </div>
             );
           })}
-        </div>
 
-        {/* ── Current section header ── */}
-        <div className="rounded-xl px-4 py-3"
-          style={{ background: currentSec.meta.bg, border:`1px solid ${currentSec.meta.border}` }}>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
-              style={{ background:`${currentSec.meta.color}22`, color:currentSec.meta.color, border:`1px solid ${currentSec.meta.color}35` }}>
-              {currentSec.meta.label} · {currentSec.meta.qRange}
-            </span>
-            <span className="text-[10px] font-medium" style={{ color:"#334155" }}>{currentSec.meta.context}</span>
+          {/* Navigation arrows */}
+          <div className="flex gap-1 ml-auto flex-shrink-0">
+            <button
+              onClick={() => ftActiveTab > 0 && setFtActiveTab(t => t - 1)}
+              disabled={ftActiveTab === 0}
+              className="w-9 h-9 rounded bg-gray-100 hover:bg-gray-200 flex items-center justify-center disabled:opacity-30 transition-colors">
+              <ChevronLeft className="w-4 h-4 text-gray-600" />
+            </button>
+            <button
+              onClick={() => ftActiveTab < ftSections.length - 1 ? setFtActiveTab(t => t + 1) : setShowSubmitModal(true)}
+              className="w-9 h-9 rounded bg-gray-800 hover:bg-gray-900 flex items-center justify-center transition-colors">
+              <ChevronRight className="w-4 h-4 text-white" />
+            </button>
           </div>
-          <p className="text-sm font-bold text-white mt-1">{currentSec.mat.title}</p>
-          {currentSec.mat.content.context && (
-            <p className="text-xs mt-0.5" style={{ color:"#475569" }}>{currentSec.mat.content.context}</p>
-          )}
         </div>
 
-        {/* ── Questions ── */}
-        <QuestionsBlock
-          mat={currentSec.mat}
-          answers={ftAnswers}
-          sectionColor={currentSec.meta.color}
-          onChange={(num, val) => setFtAnswers(a => ({ ...a, [num]: val }))}
-          flagged={ftFlagged}
-          onFlag={toggleFlag}
-          questionRefs={questionRefs}
-        />
-
-        {/* ── Navigation + Submit ── */}
-        <div className="flex gap-3 pt-2">
-          {ftActiveTab > 0 && (
-            <button onClick={() => setFtActiveTab(t => t - 1)}
-              className="flex items-center gap-1.5 px-5 py-3.5 rounded-xl text-sm font-bold transition-all"
-              style={{ background:"#0f172a", border:"1px solid #1e293b", color:"#94a3b8" }}>
-              <ChevronLeft className="w-4 h-4" /> {ftSections[ftActiveTab - 1].meta.label}
-            </button>
-          )}
-          {ftActiveTab < ftSections.length - 1 ? (
-            <button onClick={() => setFtActiveTab(t => t + 1)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-3.5 rounded-xl text-sm font-black text-white transition-all"
-              style={{ background:`linear-gradient(135deg,${ftSections[ftActiveTab+1].meta.color}99,${ftSections[ftActiveTab+1].meta.color})` }}>
-              {ftSections[ftActiveTab + 1].meta.label} <ChevronRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button onClick={() => setShowSubmitModal(true)}
-              className="flex-1 py-3.5 rounded-xl text-sm font-black text-white transition-all"
-              style={{ background:"linear-gradient(135deg,#059669,#10b981)", boxShadow:"0 4px 20px rgba(5,150,105,0.4)" }}>
-              <Trophy className="w-4 h-4 inline mr-2" />
-              Review & Submit
-            </button>
-          )}
-        </div>
-
-        {/* ── Submit confirmation modal ── */}
+        {/* ── SUBMIT MODAL ── */}
         {showSubmitModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background:"rgba(0,0,0,0.75)", backdropFilter:"blur(4px)" }}>
-            <div className="w-full max-w-sm rounded-2xl p-6 space-y-5"
-              style={{ background:"#1e2432", border:"1px solid rgba(255,255,255,0.12)" }}>
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm space-y-5">
               <div>
-                <p className="text-white font-black text-lg mb-1">Submit your answers?</p>
-                <p className="text-white/60 text-sm">
+                <p className="font-bold text-gray-900 text-lg mb-1">Submit your answers?</p>
+                <p className="text-gray-500 text-sm">
                   {totalAnswered < totalQuestions
-                    ? `You have ${totalQuestions - totalAnswered} unanswered question${totalQuestions - totalAnswered > 1 ? "s" : ""}.`
-                    : "All questions answered ✓"}
+                    ? `${totalQuestions - totalAnswered} question${totalQuestions - totalAnswered > 1 ? "s" : ""} unanswered.`
+                    : "All 40 questions answered ✓"}
                   {ftFlagged.size > 0 && ` ${ftFlagged.size} flagged for review.`}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <button onClick={() => setShowSubmitModal(false)}
-                  className="py-2.5 rounded-xl text-sm font-bold text-white/70 hover:text-white transition-colors"
-                  style={{ background:"rgba(255,255,255,0.1)" }}>
-                  Review answers
+                  className="py-2.5 rounded-xl text-sm font-semibold border border-gray-200 hover:bg-gray-50 transition-colors text-gray-700">
+                  Keep reviewing
                 </button>
                 <button onClick={() => { setShowSubmitModal(false); submitFullTest(); }}
-                  className="py-2.5 rounded-xl text-sm font-black text-white"
-                  style={{ background:"#16a34a" }}>
+                  className="py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors">
                   Submit test
                 </button>
               </div>
@@ -1391,6 +1261,212 @@ function QuestionCard({ q, value, onChange, isFlagged, onFlag, questionRef }: {
             </>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── OneIELTS-style questions (light theme, inline inputs) ─────────────────────
+
+function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, questionRefs }: {
+  mat:           LMaterial;
+  answers:       Record<number, string>;
+  onChange:      (num: number, val: string) => void;
+  flagged?:      Set<number>;
+  onFlag?:       (num: number) => void;
+  questionRefs?: React.MutableRefObject<Record<number, HTMLDivElement | null>>;
+}) {
+  const groups = mat.content.question_groups ?? [];
+  const flatQs = mat.content.questions ?? [];
+
+  if (groups.length === 0) {
+    return (
+      <div className="space-y-4">
+        {flatQs.map(q => (
+          <OneIELTSInput key={q.number} q={q} value={answers[q.number] ?? ""}
+            onChange={v => onChange(q.number, v)}
+            isFlagged={flagged?.has(q.number) ?? false}
+            onFlag={onFlag ? () => onFlag(q.number) : undefined}
+            questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {groups.map((group, gi) => {
+        const isMcqGroup = group.type === "mcq_single" || group.type === "mcq_multi";
+        return (
+          <div key={gi}>
+            {/* Group instruction */}
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{group.instruction}</p>
+
+            {isMcqGroup ? (
+              /* MCQ: card-per-question layout */
+              <div className="space-y-4">
+                {group.questions.map(q => (
+                  <OneIELTSMCQ key={q.number} q={q}
+                    value={answers[q.number] ?? ""}
+                    onChange={v => onChange(q.number, v)}
+                    isMulti={group.type === "mcq_multi"}
+                    isFlagged={flagged?.has(q.number) ?? false}
+                    onFlag={onFlag ? () => onFlag(q.number) : undefined}
+                    questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
+                ))}
+              </div>
+            ) : (
+              /* Notes/Form/Short: inline layout */
+              <div className="space-y-3">
+                {group.questions.map(q => (
+                  <OneIELTSInput key={q.number} q={q}
+                    value={answers[q.number] ?? ""}
+                    onChange={v => onChange(q.number, v)}
+                    isFlagged={flagged?.has(q.number) ?? false}
+                    onFlag={onFlag ? () => onFlag(q.number) : undefined}
+                    questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Inline fill-blank input (notes / form / short / sentence)
+function OneIELTSInput({ q, value, onChange, isFlagged, onFlag, questionRef }: {
+  q:           LQuestion;
+  value:       string;
+  onChange:    (v: string) => void;
+  isFlagged?:  boolean;
+  onFlag?:     () => void;
+  questionRef?: (el: HTMLDivElement | null) => void;
+}) {
+  const isSentence = q.type === "sentence";
+  return (
+    <div ref={questionRef} className="flex items-center gap-2 flex-wrap text-sm text-gray-700 group">
+      {/* Flag button */}
+      {onFlag && (
+        <button onClick={onFlag}
+          className={`opacity-0 group-hover:opacity-100 text-[10px] px-1.5 py-0.5 rounded transition-all mr-1 ${
+            isFlagged ? "opacity-100 text-amber-600 bg-amber-50" : "text-gray-300 hover:text-amber-500"
+          }`}>
+          🚩
+        </button>
+      )}
+
+      {/* Sentence completion: prefix [input] suffix */}
+      {isSentence ? (
+        <>
+          {q.prefix && <span>{q.prefix}</span>}
+          <OneIELTSField q={q} value={value} onChange={onChange} />
+          {q.suffix && <span>{q.suffix}</span>}
+        </>
+      ) : (
+        /* Label: input */
+        <>
+          <span className="font-medium">{q.text}</span>
+          <OneIELTSField q={q} value={value} onChange={onChange} />
+        </>
+      )}
+    </div>
+  );
+}
+
+// The actual styled input box (numbered, thin border, OneIELTS style)
+function OneIELTSField({ q, value, onChange }: {
+  q: LQuestion; value: string; onChange: (v: string) => void;
+}) {
+  const filled = value.trim().length > 0;
+  return (
+    <div className="relative inline-flex items-center">
+      <input
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        spellCheck={false}
+        autoComplete="off"
+        className="text-center text-sm focus:outline-none transition-all"
+        style={{
+          minWidth:    "110px",
+          width:       value.length > 10 ? `${value.length + 4}ch` : "110px",
+          borderTop:   "none",
+          borderLeft:  "none",
+          borderRight: "none",
+          borderBottom: filled ? "2px solid #2563eb" : "2px solid #9ca3af",
+          background:  "transparent",
+          color:       "#111827",
+          padding:     "2px 4px",
+          fontWeight:  filled ? 600 : 400,
+        }}
+        onFocus={e => { e.currentTarget.style.borderBottomColor = "#2563eb"; }}
+        onBlur={e  => { e.currentTarget.style.borderBottomColor = filled ? "#2563eb" : "#9ca3af"; }}
+      />
+      {/* Question number badge — shown when empty */}
+      {!filled && (
+        <span className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-semibold pointer-events-none select-none">
+          {q.number}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// MCQ question card (OneIELTS light style)
+function OneIELTSMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, questionRef }: {
+  q:           LQuestion;
+  value:       string;
+  onChange:    (v: string) => void;
+  isMulti:     boolean;
+  isFlagged?:  boolean;
+  onFlag?:     () => void;
+  questionRef?: (el: HTMLDivElement | null) => void;
+}) {
+  const selected = isMulti
+    ? value.split(",").map(s => s.trim()).filter(Boolean)
+    : [value];
+
+  function toggle(letter: string) {
+    if (!isMulti) { onChange(value === letter ? "" : letter); return; }
+    const cur = value.split(",").map(s => s.trim()).filter(Boolean);
+    const next = cur.includes(letter) ? cur.filter(l => l !== letter) : [...cur, letter];
+    onChange(next.sort().join(","));
+  }
+
+  return (
+    <div ref={questionRef} className="space-y-2">
+      <div className="flex items-start gap-2">
+        <span className="font-bold text-gray-800 text-sm shrink-0">{q.number}.</span>
+        <p className="text-sm text-gray-800 leading-snug">{q.text}</p>
+        {onFlag && (
+          <button onClick={onFlag}
+            className={`ml-auto text-[10px] px-1.5 py-0.5 rounded shrink-0 ${isFlagged ? "text-amber-600 bg-amber-50" : "text-gray-300 hover:text-amber-500"}`}>
+            🚩
+          </button>
+        )}
+      </div>
+      <div className="space-y-1.5 pl-5">
+        {(q.options ?? []).map((opt, oi) => {
+          const letter   = ["A","B","C","D","E","F","G"][oi];
+          const isSelected = selected.includes(letter);
+          return (
+            <button key={oi} onClick={() => toggle(letter)}
+              className="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm border transition-all"
+              style={{
+                background: isSelected ? "#dbeafe" : "white",
+                borderColor: isSelected ? "#2563eb" : "#e5e7eb",
+                color:       isSelected ? "#1d4ed8" : "#374151",
+              }}>
+              <span className="w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold shrink-0"
+                style={{ borderColor: isSelected ? "#2563eb" : "#d1d5db", background: isSelected ? "#2563eb" : "white", color: isSelected ? "white" : "#6b7280" }}>
+                {letter}
+              </span>
+              {opt}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
