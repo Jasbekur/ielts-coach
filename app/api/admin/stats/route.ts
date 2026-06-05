@@ -46,11 +46,13 @@ export async function GET() {
       .from("attempts")
       .select("id", { count: "exact", head: true })
       .gte("created_at", todayUTC.toISOString()),
-    // All bands — filter out invalid (0 or null)
+    // All bands — only real IELTS scores (min achievable ≈ 2, max 9)
+    // Filters out 0 and 1 which come from failed/empty AI scoring
     admin
       .from("attempts")
       .select("overall_band")
-      .gt("overall_band", 0),
+      .gte("overall_band", 2)
+      .lte("overall_band", 9),
   ]);
 
   // Count from the actual users array — always accurate up to 1000 users
@@ -60,7 +62,7 @@ export async function GET() {
   let avgBand: number | null = null;
   const validBands = (bandsRes.data ?? [])
     .map((a: { overall_band: number }) => a.overall_band)
-    .filter((b: number) => b >= 1 && b <= 9);
+    .filter((b: number) => b >= 2 && b <= 9);
 
   if (validBands.length > 0) {
     const sum = validBands.reduce((s: number, b: number) => s + b, 0);
