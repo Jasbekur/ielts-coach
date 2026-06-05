@@ -510,3 +510,28 @@ input:focus, textarea:focus, select:focus {
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+/* ── Landing page animations ──────────────────────────────────────────────── */
+@keyframes float-up   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-10px)} }
+@keyframes float-down { 0%,100%{transform:translateY(0)}  50%{transform:translateY(10px)}  }
+@keyframes shimmer    { 0%{background-position:-200% 0}   100%{background-position:200% 0} }
+@keyframes fade-in-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(74,222,128,0.4)} 70%{box-shadow:0 0 0 14px rgba(74,222,128,0)} 100%{box-shadow:0 0 0 0 rgba(74,222,128,0)} }
+@keyframes marquee    { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+@keyframes gradient-x { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+@keyframes counter    { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+
+.float-a  { animation: float-up   6s ease-in-out infinite; }
+.float-b  { animation: float-down 5s ease-in-out infinite; }
+.float-c  { animation: float-up   7s ease-in-out infinite 1s; }
+.pulse-ring{ animation: pulse-ring 2s ease-out infinite; }
+.marquee-inner { animation: marquee 28s linear infinite; }
+.fade-in-up { animation: fade-in-up 0.7s ease both; }
+.shimmer-text {
+  background: linear-gradient(90deg,#4ade80 0%,#86efac 40%,#4ade80 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
