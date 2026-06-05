@@ -648,6 +648,14 @@ export default function ListeningPage() {
     const bc   = bandColor(overallBand);
 
     return (
+      <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+      <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+      <div style={{ marginBottom: "16px" }}>
+        <button onClick={() => { setFtPhase("active"); setFtSections([]); }}
+          style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", fontSize: "13.5px", fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+          ← Back to Listening
+        </button>
+      </div>
       <div className="space-y-6 pb-8">
 
         {/* ── Overall score ── */}
@@ -757,10 +765,12 @@ export default function ListeningPage() {
           </button>
           <button onClick={startFullTest}
             className="flex-1 py-3.5 rounded-xl text-sm font-black text-white"
-            style={{ background:"linear-gradient(135deg,#0369a1,#0ea5e9)", boxShadow:"0 4px 14px rgba(14,165,233,0.3)" }}>
+            style={{ background:"linear-gradient(135deg,#16a34a,#15803d)", boxShadow:"0 4px 14px rgba(22,163,74,0.3)" }}>
             <RotateCcw className="w-4 h-4 inline mr-1.5" /> Try Again
           </button>
         </div>
+      </div>
+      </div>
       </div>
     );
   }
@@ -774,6 +784,8 @@ export default function ListeningPage() {
     const answered  = Object.values(answers).filter(v => v.trim()).length;
 
     return (
+      <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+      <div style={{ maxWidth: "860px", margin: "0 auto" }}>
       <div className="space-y-5 pb-8">
         {/* Top bar */}
         <div className="flex items-center justify-between">
@@ -892,6 +904,8 @@ export default function ListeningPage() {
           Submit Answers
         </button>
       </div>
+      </div>
+      </div>
     );
   }
 
@@ -905,6 +919,14 @@ export default function ListeningPage() {
     const bc   = bandColor(band);
 
     return (
+      <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+      <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+      <div style={{ marginBottom: "16px" }}>
+        <button onClick={() => setPracticePhase("selector")}
+          style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", fontSize: "13.5px", fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+          ← Back to Listening
+        </button>
+      </div>
       <div className="space-y-6 pb-8">
         <div className="rounded-2xl overflow-hidden" style={{ background: section.bg, border:`1px solid ${section.border}` }}>
           <div className="px-6 pt-6 pb-4 flex flex-col sm:flex-row items-center gap-6">
@@ -1003,6 +1025,8 @@ export default function ListeningPage() {
           </button>
         </div>
       </div>
+      </div>
+      </div>
     );
   }
 
@@ -1012,7 +1036,14 @@ export default function ListeningPage() {
 
   return (
     <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
-      <div style={{ maxWidth: "860px" }}>
+      <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+
+        {/* Back to dashboard */}
+        <div style={{ marginBottom: "16px" }}>
+          <a href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", fontSize: "13.5px", fontWeight: 500, textDecoration: "none" }}>
+            ← Dashboard
+          </a>
+        </div>
 
         {/* ── Section 1: Header card ── */}
         <div style={{
