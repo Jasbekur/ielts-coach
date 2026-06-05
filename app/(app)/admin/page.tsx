@@ -228,20 +228,15 @@ function AdminContent() {
     fetchQuestions(); fetchLogs();
     supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? ""));
 
-    // Fetch usage stats
-    const todayUTC = new Date(); todayUTC.setUTCHours(0,0,0,0);
-    Promise.all([
-      supabase.from("profiles").select("id", { count:"exact", head:true }),
-      supabase.from("attempts").select("id", { count:"exact", head:true }).gte("created_at", todayUTC.toISOString()),
-      supabase.from("attempts").select("overall_band"),
-    ]).then(([usersRes, todayRes, bandsRes]) => {
-      setTotalUsers(usersRes.count ?? null);
-      setTestsToday(todayRes.count ?? null);
-      if (bandsRes.data?.length) {
-        const avg = bandsRes.data.reduce((s: number, a: { overall_band: number }) => s + (a.overall_band ?? 0), 0) / bandsRes.data.length;
-        setAvgBand(Math.round(avg * 10) / 10);
-      }
-    });
+    // Fetch usage stats via service-role API (bypasses RLS — accurate counts)
+    fetch("/api/admin/stats")
+      .then(r => r.json())
+      .then(data => {
+        if (data.totalUsers  !== undefined) setTotalUsers(data.totalUsers);
+        if (data.testsToday  !== undefined) setTestsToday(data.testsToday);
+        if (data.avgBand     !== null)      setAvgBand(data.avgBand);
+      })
+      .catch(() => { /* silent — stats are non-critical */ });
   }, [fetchQuestions, fetchLogs, supabase]);
 
   const logAction = useCallback(async (action:"added"|"deleted", questionId:string, questionTitle:string) => {
