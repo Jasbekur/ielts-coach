@@ -25,7 +25,7 @@ export function LimitBanner() {
         </div>
         <a href="mailto:kc5769392@gmail.com?subject=IELTS Sensei Pro"
           style={{
-            background: "#1d4ed8", color: "#fff", border: "none",
+            background: "#16a34a", color: "#fff", border: "none",
             borderRadius: "6px", padding: "8px 16px", fontSize: "13px",
             fontWeight: 600, cursor: "pointer", textDecoration: "none",
             whiteSpace: "nowrap",

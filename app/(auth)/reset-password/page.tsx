@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
             style={{
-              background: "#1d4ed8",
+              background: "#16a34a",
               boxShadow: "0 4px 24px rgba(220,38,38,0.4)",
             }}
           >
@@ -94,7 +94,7 @@ export default function ResetPasswordPage() {
               "Avoid using personal information",
             ].map((tip) => (
               <div key={tip} className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: "#1d4ed8" }} />
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: "#16a34a" }} />
                 <p className="text-xs" style={{ color: "oklch(0.65 0.012 278)" }}>{tip}</p>
               </div>
             ))}
@@ -110,7 +110,7 @@ export default function ResetPasswordPage() {
           <div className="flex items-center gap-3 mb-8 lg:hidden">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: "#1d4ed8" }}
+              style={{ background: "#16a34a" }}
             >
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
@@ -188,7 +188,7 @@ export default function ResetPasswordPage() {
               className="w-full h-11 font-semibold mt-2"
               disabled={loading || !passwordOk || !confirmOk}
               style={{
-                background: "#1d4ed8",
+                background: "#16a34a",
                 boxShadow: "0 4px 16px rgba(220,38,38,0.35)",
               }}
             >

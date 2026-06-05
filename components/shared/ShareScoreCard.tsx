@@ -32,8 +32,8 @@ export function ShareScoreCard({ band, mode, detail }: Props) {
   }
 
   const bandColor =
-    band >= 7.5 ? "#2563eb" :
-    band >= 6   ? "#d97706" : "#1d4ed8";
+    band >= 7.5 ? "#16a34a" :
+    band >= 6   ? "#d97706" : "#16a34a";
 
   return (
     <div style={{

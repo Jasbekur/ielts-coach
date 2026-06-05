@@ -33,7 +33,7 @@ export function ExamCountdown() {
   const urgency =
     daysLeft === null ? "blue" :
     daysLeft <= 7     ? "#dc2626" :
-    daysLeft <= 21    ? "#d97706" : "#2563eb";
+    daysLeft <= 21    ? "#d97706" : "#16a34a";
 
   if (editing) {
     return (
@@ -53,7 +53,7 @@ export function ExamCountdown() {
           min={new Date().toISOString().slice(0, 10)}
         />
         <button onClick={save}
-          style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: "5px", padding: "6px 14px", fontSize: "12.5px", fontWeight: 600, cursor: "pointer" }}>
+          style={{ background: "#16a34a", color: "#fff", border: "none", borderRadius: "5px", padding: "6px 14px", fontSize: "12.5px", fontWeight: 600, cursor: "pointer" }}>
           Save
         </button>
         <button onClick={() => setEditing(false)}

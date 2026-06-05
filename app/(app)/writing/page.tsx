@@ -136,10 +136,10 @@ const TASK2_QUESTIONS = [
 ];
 
 const ESSAY_TYPE_LABELS: Record<string, { label: string; color: string; tip: string }> = {
-  opinion:                    { label: "Opinion Essay",              color: "bg-blue-100 text-blue-700", tip: "Give a CLEAR opinion. Support with 2 reasons + examples." },
-  discuss_both_views:         { label: "Discuss Both Views",         color: "bg-blue-100 text-blue-700",    tip: "Discuss BOTH sides fairly. State your opinion in the introduction AND conclusion." },
+  opinion:                    { label: "Opinion Essay",              color: "bg-green-100 text-green-700", tip: "Give a CLEAR opinion. Support with 2 reasons + examples." },
+  discuss_both_views:         { label: "Discuss Both Views",         color: "bg-green-100 text-green-700",    tip: "Discuss BOTH sides fairly. State your opinion in the introduction AND conclusion." },
   problem_solution:           { label: "Problem & Solution",         color: "bg-amber-100 text-amber-700",  tip: "Name specific problems, then give realistic solutions. Avoid vague answers." },
-  advantages_disadvantages:   { label: "Advantages & Disadvantages", color: "bg-blue-100 text-blue-700", tip: "Compare advantages and disadvantages. Give your opinion at the end." },
+  advantages_disadvantages:   { label: "Advantages & Disadvantages", color: "bg-green-100 text-green-700", tip: "Compare advantages and disadvantages. Give your opinion at the end." },
   direct_question:            { label: "Direct Question",            color: "bg-pink-100 text-pink-700",    tip: "Answer ALL parts of the question directly. Don't just give one side." },
 };
 
@@ -159,8 +159,8 @@ function WritingSkeletonLoader() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 py-2">
-        <div className="w-8 h-8 rounded-full bg-blue-100 animate-pulse flex items-center justify-center">
-          <span className="text-blue-600 text-sm">🎓</span>
+        <div className="w-8 h-8 rounded-full bg-green-100 animate-pulse flex items-center justify-center">
+          <span className="text-green-600 text-sm">🎓</span>
         </div>
         <p className="text-sm text-muted-foreground animate-pulse font-medium">
           IELTS Sensei is analysing your essay…
@@ -187,7 +187,7 @@ function TimerDisplay({ seconds, limit }: { seconds: number; limit: number }) {
     <div className={`flex items-center gap-2 text-sm font-mono font-bold px-3 py-1.5 rounded-lg border ${
       isOver    ? "text-red-500 border-red-200 bg-red-50" :
       isWarning ? "text-amber-500 border-amber-200 bg-amber-50" :
-                  "text-blue-600 border-blue-200 bg-blue-50"
+                  "text-green-600 border-green-200 bg-green-50"
     }`}>
       <Timer className="w-3.5 h-3.5" />
       {isOver ? "TIME UP" : `${mins}:${secs.toString().padStart(2, "0")}`}
@@ -251,8 +251,8 @@ function ChartUpload({
       onClick={() => inputRef.current?.click()}
       className={`relative flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed cursor-pointer transition-all ${
         dragging
-          ? "border-blue-400 bg-blue-50 dark:bg-blue-950"
-          : "border-border hover:border-blue-300 hover:bg-muted/30"
+          ? "border-green-400 bg-green-50 dark:bg-blue-950"
+          : "border-border hover:border-green-300 hover:bg-muted/30"
       }`}
     >
       <input
@@ -262,8 +262,8 @@ function ChartUpload({
         className="hidden"
         onChange={handleFileInput}
       />
-      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-        <BarChart3 className="w-5 h-5 text-blue-600" />
+      <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-blue-900 flex items-center justify-center">
+        <BarChart3 className="w-5 h-5 text-green-600" />
       </div>
       <div className="text-center">
         <p className="text-sm font-medium">Upload your chart or diagram</p>
@@ -504,13 +504,13 @@ export default function WritingPage() {
     {/* ── Header card ── */}
     <div style={{
       background: "#ffffff", borderRadius: "8px",
-      border: "1px solid #e2e8f0", borderLeft: "4px solid #1d4ed8",
+      border: "1px solid #e2e8f0", borderLeft: "4px solid #16a34a",
       padding: "20px 24px", marginBottom: "20px",
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
       display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px",
     }}>
       <div>
-        <p style={{ fontSize: "11px", fontWeight: 600, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+        <p style={{ fontSize: "11px", fontWeight: 600, color: "#16a34a", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
           IELTS Academic
         </p>
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>
@@ -522,7 +522,7 @@ export default function WritingPage() {
       </div>
       <button
         onClick={() => setShowBandGuide(!showBandGuide)}
-        style={{ fontSize: "12px", color: "#1d4ed8", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, flexShrink: 0, marginTop: "2px" }}
+        style={{ fontSize: "12px", color: "#16a34a", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, flexShrink: 0, marginTop: "2px" }}
       >
         Band guide {showBandGuide ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
       </button>
@@ -596,8 +596,8 @@ export default function WritingPage() {
         }}
       >
         <TabsList className="flex border-b border-gray-200 bg-transparent h-auto p-0 rounded-none gap-0">
-          <TabsTrigger value="task2" className="px-5 py-2.5 text-sm rounded-none border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 font-medium bg-transparent">Task 2 — Essay</TabsTrigger>
-          <TabsTrigger value="task1" className="px-5 py-2.5 text-sm rounded-none border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 font-medium bg-transparent">
+          <TabsTrigger value="task2" className="px-5 py-2.5 text-sm rounded-none border-b-2 data-[state=active]:border-green-600 data-[state=active]:text-green-600 data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 font-medium bg-transparent">Task 2 — Essay</TabsTrigger>
+          <TabsTrigger value="task1" className="px-5 py-2.5 text-sm rounded-none border-b-2 data-[state=active]:border-green-600 data-[state=active]:text-green-600 data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 font-medium bg-transparent">
             {moduleType === "general" && taskType === "task1" ? "Task 1 — Letter" : "Task 1 — Academic Report"}
           </TabsTrigger>
         </TabsList>
@@ -616,10 +616,10 @@ export default function WritingPage() {
                 <span>⏱ {taskType === "task1" ? "20 min" : "40 min"}</span>
                 <span>📝 Min {taskType === "task1" ? "150" : "250"} words</span>
                 {taskType === "task1" && (
-                  <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">Scored on Task Achievement, CC, LR, GRA</span>
+                  <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">Scored on Task Achievement, CC, LR, GRA</span>
                 )}
                 {taskType === "task2" && (
-                  <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">Scored on Task Response, CC, LR, GRA</span>
+                  <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">Scored on Task Response, CC, LR, GRA</span>
                 )}
                 <span className="hidden lg:inline text-xs font-semibold" style={{ color: "#d97706" }}>
                   ⚠ Spelling and grammar count — write carefully
@@ -632,7 +632,7 @@ export default function WritingPage() {
                   variant={timerActive ? "outline" : "default"}
                   size="sm"
                   onClick={toggleTimer}
-                  className={`gap-1.5 h-7 text-xs ${!timerActive ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}`}
+                  className={`gap-1.5 h-7 text-xs ${!timerActive ? "bg-green-600 hover:bg-green-700 text-white" : ""}`}
                 >
                   <Timer className="w-3 h-3" />
                   {timerActive ? "Pause" : timerSeconds > 0 ? "Resume" : "Start Timer"}
@@ -669,7 +669,7 @@ export default function WritingPage() {
                   <button
                     type="button"
                     onClick={pickRandomQuestion}
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 transition-colors"
+                    className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 transition-colors"
                   >
                     <Shuffle className="w-3 h-3" />
                     {taskType === "task1" && moduleType === "academic" ? "Practice question + chart" : "Practice question"}
@@ -698,7 +698,7 @@ export default function WritingPage() {
             {taskType === "task1" && moduleType === "academic" && (
               <div className="space-y-1.5">
                 <label className="text-sm font-medium flex items-center gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
+                  <BarChart3 className="w-3.5 h-3.5 text-green-600" />
                   Chart or diagram
                   <span className="text-xs text-muted-foreground font-normal">(optional but recommended)</span>
                 </label>
@@ -712,7 +712,7 @@ export default function WritingPage() {
 
             {/* GT Task 1: Letter format tips */}
             {taskType === "task1" && moduleType === "general" && (
-              <div className="rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-xs text-blue-800">
+              <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-xs text-blue-800">
                 <span className="font-semibold">Letter format guide: </span>
                 Formal: Dear Sir/Madam → Yours faithfully | Semi-formal: Dear Mr Smith → Yours sincerely | Informal: Dear John → Best wishes
               </div>
@@ -738,8 +738,8 @@ export default function WritingPage() {
                 disabled={loading}
                 className="flex-1 sm:flex-none sm:min-w-[200px] gap-2 text-white text-base font-bold py-5"
                 style={{
-                  background: "#1d4ed8",
-                  boxShadow: "0 4px 0 #1d4ed8, 0 6px 20px rgba(37,99,235,0.35)",
+                  background: "#16a34a",
+                  boxShadow: "0 4px 0 #16a34a, 0 6px 20px rgba(22,163,74,0.35)",
                   transition: "transform 0.1s, box-shadow 0.1s",
                 }}
               >

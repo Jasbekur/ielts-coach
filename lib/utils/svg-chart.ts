@@ -7,7 +7,7 @@ const IW = W - PL - PR;   // 656 inner width
 const IH = H - PT - PB;   // 314 inner height
 
 export const CHART_COLORS = [
-  "#7c3aed", "#2563eb", "#16a34a", "#ea580c",
+  "#7c3aed", "#16a34a", "#16a34a", "#ea580c",
   "#db2777", "#0891b2", "#ca8a04", "#4f46e5",
 ];
 

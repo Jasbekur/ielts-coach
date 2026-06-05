@@ -14,7 +14,7 @@ import { WritingResult, SpeakingResult, getBandTailwind } from "@/types/ielts";
 
 const ESSAY_TYPE_LABELS: Record<string, { label: string; color: string }> = {
   opinion:                    { label: "Opinion Essay",               color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" },
-  discuss_both_views:         { label: "Discuss Both Views",          color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" },
+  discuss_both_views:         { label: "Discuss Both Views",          color: "bg-green-100 text-green-700 dark:bg-blue-900 dark:text-blue-300" },
   problem_solution:           { label: "Problem & Solution",          color: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300" },
   advantages_disadvantages:   { label: "Advantages & Disadvantages",  color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" },
   direct_question:            { label: "Direct Question",             color: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300" },
@@ -391,9 +391,9 @@ export default async function AttemptDetailPage({
 
             {/* Vocabulary suggestions */}
             {speakingResult.vocabulary_suggestions && speakingResult.vocabulary_suggestions.length > 0 && (
-              <Card className="border-blue-200 dark:border-blue-800">
+              <Card className="border-green-200 dark:border-blue-800">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-green-600 dark:text-blue-400">
                     💬 Vocabulary Upgrades
                   </CardTitle>
                 </CardHeader>
@@ -404,7 +404,7 @@ export default async function AttemptDetailPage({
                         <div className="flex items-center gap-2 flex-wrap mb-0.5">
                           <span className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">{v.basic_word}</span>
                           <ArrowRight className="w-3 h-3 text-muted-foreground shrink-0" />
-                          <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded text-xs font-mono font-semibold">{v.better_word}</span>
+                          <span className="bg-green-100 dark:bg-blue-900 text-green-700 dark:text-blue-300 px-1.5 py-0.5 rounded text-xs font-mono font-semibold">{v.better_word}</span>
                         </div>
                         <p className="text-xs text-muted-foreground italic">&quot;{v.example}&quot;</p>
                       </div>

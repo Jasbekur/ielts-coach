@@ -9,12 +9,12 @@
   --surface:      #ffffff;
   --surface-2:    #f0f2f5;
   --border-light: #eaecf0;
-  --blue:         #1d4ed8;
-  --blue-mid:     #2563eb;
-  --blue-light:   #dbeafe;
+  --blue:         #16a34a;
+  --blue-mid:     #16a34a;
+  --blue-light:   #dcfce7;
   --green:        #16a34a;
   --green-light:  #dcfce7;
-  --red:          #1d4ed8;
+  --red:          #16a34a;
   --amber:        #d97706;
   --text-1:       #111827;
   --text-2:       #374151;
@@ -501,9 +501,9 @@
 }
 
 /* Focus rings — red */
-*:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 2px; }
+*:focus-visible { outline: 2px solid #16a34a; outline-offset: 2px; }
 input:focus, textarea:focus, select:focus {
-  border-color: #1d4ed8 !important;
+  border-color: #16a34a !important;
   box-shadow: 0 0 0 3px rgba(220,38,38,0.1) !important;
   outline: none;
 }

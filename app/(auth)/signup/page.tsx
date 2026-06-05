@@ -24,7 +24,7 @@ function GoogleIcon() {
   );
 }
 
-const PRIMARY    = "#1d4ed8";
+const PRIMARY    = "#16a34a";
 const PRIMARY_LT = "#ef4444";
 const PRIMARY_DIM = "rgba(220,38,38,0.15)";
 
@@ -168,8 +168,8 @@ export default function SignupPage() {
                 className="w-full h-11 gap-2 font-semibold text-white"
                 disabled={loading || otp.length !== 6}
                 style={{
-                  background: "#1d4ed8",
-                  boxShadow: `0 4px 0 #1e40af, 0 6px 16px rgba(220,38,38,0.35)`,
+                  background: "#16a34a",
+                  boxShadow: `0 4px 0 #15803d, 0 6px 16px rgba(220,38,38,0.35)`,
                 }}
               >
                 {loading
@@ -243,7 +243,7 @@ export default function SignupPage() {
           <h2 className="text-3xl font-bold leading-snug text-white">
             Start your IELTS<br />
             <span style={{
-              background: `linear-gradient(135deg, #93c5fd, ${PRIMARY_LT})`,
+              background: `linear-gradient(135deg, #bbf7d0, ${PRIMARY_LT})`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -371,8 +371,8 @@ export default function SignupPage() {
               className="w-full h-11 gap-2 font-semibold mt-2 text-white"
               disabled={loading}
               style={{
-                background: "#1d4ed8",
-                boxShadow: `0 4px 0 #1e40af, 0 6px 16px rgba(220,38,38,0.35)`,
+                background: "#16a34a",
+                boxShadow: `0 4px 0 #15803d, 0 6px 16px rgba(220,38,38,0.35)`,
               }}
             >
               {loading ? (

@@ -55,7 +55,7 @@ export function EssayEditor({
             isUnder
               ? "text-red-600 font-bold"   /* bold red below minimum */
               : isGood
-              ? "text-blue-600"              /* blue at target range  */
+              ? "text-green-600"              /* blue at target range  */
               : "text-amber-600"            /* amber when very long   */
           )}
         >

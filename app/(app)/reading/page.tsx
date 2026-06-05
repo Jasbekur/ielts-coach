@@ -87,7 +87,7 @@ function QuestionItem({
 
   const resultIcon = showResult ? (
     correct ? (
-      <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+      <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
     ) : (
       <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
     )
@@ -95,7 +95,7 @@ function QuestionItem({
 
   const itemBg = showResult
     ? correct
-      ? "bg-red-50 border-red-200"
+      ? "bg-green-50 border-green-200"
       : "bg-red-50 border-red-200"
     : "bg-white border-border";
 
@@ -110,7 +110,7 @@ function QuestionItem({
         <div className="flex gap-2">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800 leading-snug">
-            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-green-700 font-bold mr-1.5">{question.number}.</span>
             {question.type === "tfng" ? (
               <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mr-1">T/F/NG</span>
             ) : (
@@ -130,10 +130,10 @@ function QuestionItem({
                 value === opt
                   ? showResult
                     ? correct
-                      ? "bg-red-500 text-white border-red-500"
+                      ? "bg-green-600 text-white border-green-600"
                       : "bg-red-500 text-white border-red-500"
-                    : "bg-red-700 text-white border-red-600"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-red-300 hover:bg-red-50"
+                    : "bg-green-700 text-white border-green-600"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-green-300 hover:bg-green-50"
               )}
             >
               {opt}
@@ -141,7 +141,7 @@ function QuestionItem({
           ))}
         </div>
         {showResult && !correct && (
-          <p className="text-xs text-red-700 font-medium">
+          <p className="text-xs text-green-700 font-medium">
             ✓ Correct: <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -156,7 +156,7 @@ function QuestionItem({
         <div className="flex gap-2">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800 leading-snug">
-            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-green-700 font-bold mr-1.5">{question.number}.</span>
             {question.text}
           </p>
         </div>
@@ -171,12 +171,12 @@ function QuestionItem({
                 value === opt.letter
                   ? showResult
                     ? correct
-                      ? "bg-red-500 text-white border-red-500"
+                      ? "bg-green-600 text-white border-green-600"
                       : "bg-red-400 text-white border-red-400"
-                    : "bg-red-700 text-white border-red-600"
+                    : "bg-green-700 text-white border-green-600"
                   : showResult && opt.letter === question.answer
-                    ? "bg-red-100 border-red-300 text-red-800"
-                    : "bg-white border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700"
+                    ? "bg-green-100 border-green-300 text-green-800"
+                    : "bg-white border-gray-200 hover:border-green-300 hover:bg-green-50 text-gray-700"
               )}
             >
               <span className="font-bold shrink-0">{opt.letter}.</span>
@@ -211,7 +211,7 @@ function QuestionItem({
         <div className="flex gap-2 items-start">
           {resultIcon}
           <p className="text-sm font-medium text-gray-700">
-            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-green-700 font-bold mr-1.5">{question.number}.</span>
             {prefix}{" "}
             <span className="inline-block border-b-2 border-dashed border-red-400 min-w-[80px] mx-1" />
             {suffix && <span> {suffix}</span>}
@@ -225,17 +225,17 @@ function QuestionItem({
             onChange={e => onChange(e.target.value)}
             placeholder={maxW}
             className={cn(
-              "flex-1 text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-400 transition-all",
+              "flex-1 text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-400 transition-all",
               showResult
                 ? correct
-                  ? "border-red-400 bg-red-50 text-red-800"
-                  : "border-red-400 bg-red-50 text-red-800"
+                  ? "border-green-400 bg-green-50 text-green-800"
+                  : "border-green-400 bg-green-50 text-green-800"
                 : "border-gray-300 bg-white"
             )}
           />
         </div>
         {showResult && !correct && (
-          <p className="text-xs text-red-700 font-medium">
+          <p className="text-xs text-green-700 font-medium">
             ✓ Correct: <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -251,7 +251,7 @@ function QuestionItem({
         <div className="flex gap-2 items-center">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800">
-            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-green-700 font-bold mr-1.5">{question.number}.</span>
             Paragraph <span className="font-bold">{question.paragraph}</span>
           </p>
         </div>
@@ -260,10 +260,10 @@ function QuestionItem({
           value={value}
           onChange={e => onChange(e.target.value)}
           className={cn(
-            "w-full text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-400 bg-white transition-all",
+            "w-full text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-400 bg-white transition-all",
             showResult
               ? correct
-                ? "border-red-400 bg-red-50 text-red-800"
+                ? "border-green-400 bg-green-50 text-green-800"
                 : "border-red-400 bg-red-50"
               : "border-gray-300"
           )}
@@ -279,7 +279,7 @@ function QuestionItem({
           })}
         </select>
         {showResult && !correct && (
-          <p className="text-xs text-red-700 font-medium">
+          <p className="text-xs text-green-700 font-medium">
             ✓ Correct: <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -294,7 +294,7 @@ function QuestionItem({
         <div className="flex gap-2">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800 leading-snug">
-            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-green-700 font-bold mr-1.5">{question.number}.</span>
             {question.text}
           </p>
         </div>
@@ -309,9 +309,9 @@ function QuestionItem({
                 value === para
                   ? showResult
                     ? correct
-                      ? "bg-red-500 text-white border-red-500"
+                      ? "bg-green-600 text-white border-green-600"
                       : "bg-red-500 text-white border-red-500"
-                    : "bg-red-700 text-white border-red-600"
+                    : "bg-green-700 text-white border-green-600"
                   : showResult && para === question.answer
                     ? "bg-red-100 border-red-400 text-red-700"
                     : "bg-white border-gray-200 hover:border-red-300 text-gray-600"
@@ -322,7 +322,7 @@ function QuestionItem({
           ))}
         </div>
         {showResult && !correct && (
-          <p className="text-xs text-red-700 font-medium">
+          <p className="text-xs text-green-700 font-medium">
             ✓ Correct: paragraph <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -410,8 +410,8 @@ function QuestionsPanel({
                           showResult
                             ? correct
                               ? "bg-red-100 text-red-800"
-                              : "bg-red-100 text-red-700"
-                            : "bg-red-100 text-red-700"
+                              : "bg-green-100 text-green-700"
+                            : "bg-green-100 text-green-700"
                         )}
                       >
                         {num}
@@ -596,8 +596,8 @@ export default function ReadingPage() {
         </div>
 
         {/* Header card */}
-        <div style={{ background: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", borderLeft: "4px solid #1d4ed8", padding: "20px 24px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-          <p style={{ fontSize: "11px", fontWeight: 600, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>IELTS Academic</p>
+        <div style={{ background: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", borderLeft: "4px solid #16a34a", padding: "20px 24px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+          <p style={{ fontSize: "11px", fontWeight: 600, color: "#16a34a", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>IELTS Academic</p>
           <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>Reading</h1>
           <p style={{ fontSize: "13px", color: "#475569" }}>3 passages · 40 questions · 60 minutes · Timed exam</p>
         </div>
@@ -605,7 +605,7 @@ export default function ReadingPage() {
         <div className="space-y-6">
         {/* Test set picker */}
         <div>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
+          <p style={{ fontSize: "11px", fontWeight: 700, color: "#16a34a", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
             Select Test Set
           </p>
           <div className="flex gap-2">
@@ -616,9 +616,9 @@ export default function ReadingPage() {
                 style={{
                   padding: "6px 16px", borderRadius: "20px", fontSize: "13px",
                   fontWeight: testSetIdx === idx ? 600 : 400, cursor: "pointer",
-                  background: testSetIdx === idx ? "#1d4ed8" : "#ffffff",
+                  background: testSetIdx === idx ? "#16a34a" : "#ffffff",
                   color: testSetIdx === idx ? "#ffffff" : "#64748b",
-                  border: testSetIdx === idx ? "1px solid #1d4ed8" : "1px solid #e2e8f0",
+                  border: testSetIdx === idx ? "1px solid #16a34a" : "1px solid #e2e8f0",
                   transition: "all 0.15s",
                 }}
               >
@@ -631,15 +631,15 @@ export default function ReadingPage() {
         {/* Full test card */}
         <div
           className="rounded-2xl p-8 relative overflow-hidden cursor-pointer group transition-all hover:scale-[1.01]"
-          style={{ background: "linear-gradient(135deg, #0b1c30, #122338)", boxShadow: "0 8px 32px rgba(37,99,235,0.2)" }}
+          style={{ background: "linear-gradient(135deg, #0b1c30, #122338)", boxShadow: "0 8px 32px rgba(22,163,74,0.2)" }}
           onClick={() => startExam(null)}
         >
           <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(circle, rgba(37,99,235,0.2), transparent 70%)" }} />
+            style={{ background: "radial-gradient(circle, rgba(22,163,74,0.2), transparent 70%)" }} />
           <div className="relative z-10">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <Badge className="mb-3 text-[10px] font-bold tracking-widest" style={{ background: "rgba(37,99,235,0.2)", color: "#93c5fd", border: "1px solid rgba(37,99,235,0.4)" }}>
+                <Badge className="mb-3 text-[10px] font-bold tracking-widest" style={{ background: "rgba(22,163,74,0.2)", color: "#bbf7d0", border: "1px solid rgba(22,163,74,0.4)" }}>
                   FULL ACADEMIC TEST
                 </Badge>
                 <h2 className="text-2xl font-display" style={{ color: "white" }}>3 Passages · 40 Questions</h2>
@@ -647,7 +647,7 @@ export default function ReadingPage() {
                   Complete a full timed exam under real conditions to get your instant AI-calculated band score.
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(37,99,235,0.2)" }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(22,163,74,0.2)" }}>
                 <Trophy className="w-6 h-6 text-blue-400" />
               </div>
             </div>
@@ -658,7 +658,7 @@ export default function ReadingPage() {
                 </div>
               ))}
             </div>
-            <button style={{ background: "#1d4ed8", color: "#ffffff", border: "none", borderRadius: "6px", padding: "10px 20px", fontSize: "13.5px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            <button style={{ background: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", padding: "10px 20px", fontSize: "13.5px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
               Start Full Test <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -675,12 +675,12 @@ export default function ReadingPage() {
               return (
                 <div
                   key={p.id}
-                  className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4 hover:border-blue-300 hover:bg-blue-50/30 cursor-pointer transition-all group"
+                  className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4 hover:border-green-300 hover:bg-green-50/30 cursor-pointer transition-all group"
                   onClick={() => startExam(i)}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm"
-                      style={{ background: "rgba(37,99,235,0.1)", color: "#1d4ed8" }}>
+                      style={{ background: "rgba(22,163,74,0.1)", color: "#16a34a" }}>
                       {p.id}
                     </div>
                     <div>
@@ -690,7 +690,7 @@ export default function ReadingPage() {
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-blue-600 transition-colors shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-green-600 transition-colors shrink-0" />
                 </div>
               );
             })}
@@ -733,7 +733,7 @@ export default function ReadingPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 mb-4">
             <BookOpen className="w-3.5 h-3.5" />
             {isPractice
               ? `Passage ${practiceOnly + 1} Practice Result`
@@ -742,7 +742,7 @@ export default function ReadingPage() {
           {isPractice ? (
             /* Practice: show raw score without band */
             <>
-              <div className="text-6xl font-black font-mono tracking-tight text-red-600">
+              <div className="text-6xl font-black font-mono tracking-tight text-green-700">
                 {results.correct}<span className="text-3xl text-muted-foreground font-bold">/{results.total}</span>
               </div>
               <p className="text-lg font-semibold mt-1 text-gray-700">
@@ -932,7 +932,7 @@ export default function ReadingPage() {
                       <button key={num} onClick={() => { scrollToReadingQ(num); setShowQNavigator(false); }}
                         className="h-7 w-full rounded text-xs font-bold transition-all hover:scale-105"
                         style={{
-                          background: flagged ? "#d97706" : answered ? "#1d4ed8" : "rgba(255,255,255,0.12)",
+                          background: flagged ? "#d97706" : answered ? "#16a34a" : "rgba(255,255,255,0.12)",
                           color: (flagged || answered) ? "white" : "rgba(255,255,255,0.5)",
                         }}>
                         {num}
@@ -970,7 +970,7 @@ export default function ReadingPage() {
         >
           <FileText className="w-3.5 h-3.5 inline mr-1" />Questions
           {answered > 0 && (
-            <span className="ml-1 text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">
+            <span className="ml-1 text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-bold">
               {answered}/{totalInPassage}
             </span>
           )}

@@ -59,17 +59,17 @@ export function PracticeToday({ attempts }: Props) {
   return (
     <div style={{
       background: "#ffffff", border: "1px solid #e2e8f0",
-      borderLeft: "4px solid #1d4ed8", borderRadius: "10px",
+      borderLeft: "4px solid #16a34a", borderRadius: "10px",
       padding: "18px 20px", marginBottom: "0",
     }}>
-      <p style={{ fontSize: "11px", fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
+      <p style={{ fontSize: "11px", fontWeight: 700, color: "#16a34a", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
         PRACTICE TODAY
       </p>
 
       {/* Primary recommendation */}
       <Link href={primary.href} style={{ textDecoration: "none" }}>
         <div style={{
-          background: "#eff6ff", border: "1px solid #dbeafe", borderRadius: "8px",
+          background: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "8px",
           padding: "14px 16px", marginBottom: "10px", cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px",
         }}>
@@ -88,7 +88,7 @@ export function PracticeToday({ attempts }: Props) {
               <p style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px" }}>{daysAgo(primary.mode)}</p>
             </div>
           </div>
-          <span style={{ fontSize: "18px", color: "#1d4ed8", fontWeight: 700, flexShrink: 0 }}>→</span>
+          <span style={{ fontSize: "18px", color: "#16a34a", fontWeight: 700, flexShrink: 0 }}>→</span>
         </div>
       </Link>
 

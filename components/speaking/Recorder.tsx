@@ -168,8 +168,8 @@ export function Recorder({
         <div className="flex flex-col items-center gap-3 py-6">
           <div style={{
             width: "80px", height: "80px", borderRadius: "50%",
-            background: "#1d4ed8", display: "flex", alignItems: "center",
-            justifyContent: "center", boxShadow: "0 0 0 12px rgba(29,78,216,0.15)",
+            background: "#16a34a", display: "flex", alignItems: "center",
+            justifyContent: "center", boxShadow: "0 0 0 12px rgba(22,163,74,0.15)",
             transition: "all 0.3s",
           }}>
             <span style={{ fontSize: "36px", fontWeight: 800, color: "#fff", lineHeight: 1 }}>

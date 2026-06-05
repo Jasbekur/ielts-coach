@@ -292,7 +292,7 @@ export const TASK1_PRACTICE: Task1Item[] = [
       labels: ["Louvre","Nat'l China","Nat. History\nLondon","Vatican","Smithsonian","British\nMuseum","Tate Modern","Nat. Palace\nTaipei","Hermitage","Uffizi"],
       data: [9.6, 8.0, 5.7, 5.1, 4.9, 4.7, 4.1, 3.9, 3.7, 2.3],
       yMax: 11, yUnit: "M",
-      color: "#2563eb",
+      color: "#16a34a",
     }),
   },
 
@@ -504,13 +504,13 @@ export const TASK1_PRACTICE: Task1Item[] = [
       title: "Water Usage: San Diego (USA) vs Sydney (Australia)",
       pies: [
         { label: "San Diego", slices: [
-          { name: "Residential", value: 39, color: "#2563eb" },
+          { name: "Residential", value: 39, color: "#16a34a" },
           { name: "Industry",    value: 27, color: "#16a34a" },
           { name: "Agriculture", value: 28, color: "#ca8a04" },
           { name: "Other",       value: 6,  color: "#dc2626" },
         ]},
         { label: "Sydney", slices: [
-          { name: "Residential", value: 65, color: "#2563eb" },
+          { name: "Residential", value: 65, color: "#16a34a" },
           { name: "Industry",    value: 10, color: "#16a34a" },
           { name: "Agriculture", value: 20, color: "#ca8a04" },
           { name: "Other",       value: 5,  color: "#dc2626" },
@@ -529,14 +529,14 @@ export const TASK1_PRACTICE: Task1Item[] = [
         { label: "1990", slices: [
           { name: "Coal",       value: 37, color: "#374151" },
           { name: "Natural gas",value: 17, color: "#f97316" },
-          { name: "Hydro",      value: 19, color: "#2563eb" },
+          { name: "Hydro",      value: 19, color: "#16a34a" },
           { name: "Nuclear",    value: 17, color: "#7c3aed" },
           { name: "Oil",        value: 10, color: "#ca8a04" },
         ]},
         { label: "2020", slices: [
           { name: "Coal",       value: 35, color: "#374151" },
           { name: "Natural gas",value: 23, color: "#f97316" },
-          { name: "Hydro",      value: 16, color: "#2563eb" },
+          { name: "Hydro",      value: 16, color: "#16a34a" },
           { name: "Nuclear",    value: 10, color: "#7c3aed" },
           { name: "Renewables", value: 12, color: "#16a34a" },
           { name: "Oil",        value: 4,  color: "#ca8a04" },
@@ -554,7 +554,7 @@ export const TASK1_PRACTICE: Task1Item[] = [
         label: "",
         slices: [
           { name: "Housing",     value: 29, color: "#7c3aed" },
-          { name: "Transport",   value: 15, color: "#2563eb" },
+          { name: "Transport",   value: 15, color: "#16a34a" },
           { name: "Food",        value: 16, color: "#16a34a" },
           { name: "Recreation",  value: 11, color: "#f97316" },
           { name: "Clothing",    value: 7,  color: "#db2777" },
@@ -574,14 +574,14 @@ export const TASK1_PRACTICE: Task1Item[] = [
       pies: [
         { label: "2000", slices: [
           { name: "Packaging",    value: 42, color: "#7c3aed" },
-          { name: "Textiles",     value: 14, color: "#2563eb" },
+          { name: "Textiles",     value: 14, color: "#16a34a" },
           { name: "Construction", value: 20, color: "#16a34a" },
           { name: "Electronics",  value: 6,  color: "#f97316" },
           { name: "Other",        value: 18, color: "#ca8a04" },
         ]},
         { label: "2020", slices: [
           { name: "Packaging",    value: 47, color: "#7c3aed" },
-          { name: "Textiles",     value: 16, color: "#2563eb" },
+          { name: "Textiles",     value: 16, color: "#16a34a" },
           { name: "Construction", value: 16, color: "#16a34a" },
           { name: "Electronics",  value: 9,  color: "#f97316" },
           { name: "Other",        value: 12, color: "#ca8a04" },
@@ -600,7 +600,7 @@ export const TASK1_PRACTICE: Task1Item[] = [
         { label: "1990", slices: [
           { name: "Sleep",       value: 8,   color: "#374151" },
           { name: "Work",        value: 8,   color: "#7c3aed" },
-          { name: "TV/Media",    value: 3,   color: "#2563eb" },
+          { name: "TV/Media",    value: 3,   color: "#16a34a" },
           { name: "Socialising", value: 2,   color: "#16a34a" },
           { name: "Exercise",    value: 1,   color: "#ea580c" },
           { name: "Other",       value: 2,   color: "#ca8a04" },
@@ -608,7 +608,7 @@ export const TASK1_PRACTICE: Task1Item[] = [
         { label: "2022", slices: [
           { name: "Sleep",       value: 7,   color: "#374151" },
           { name: "Work",        value: 8,   color: "#7c3aed" },
-          { name: "TV/Media",    value: 4,   color: "#2563eb" },
+          { name: "TV/Media",    value: 4,   color: "#16a34a" },
           { name: "Socialising", value: 1.5, color: "#16a34a" },
           { name: "Exercise",    value: 1,   color: "#ea580c" },
           { name: "Other",       value: 2.5, color: "#ca8a04" },
@@ -648,7 +648,7 @@ export const TASK1_PRACTICE: Task1Item[] = [
         label: "",
         slices: [
           { name: "Better pay",      value: 34, color: "#7c3aed" },
-          { name: "Career growth",   value: 22, color: "#2563eb" },
+          { name: "Career growth",   value: 22, color: "#16a34a" },
           { name: "Work-life balance",value: 18,color: "#16a34a" },
           { name: "Poor management", value: 12, color: "#ea580c" },
           { name: "Location",        value: 8,  color: "#db2777" },
@@ -672,7 +672,7 @@ export const TASK1_PRACTICE: Task1Item[] = [
           { name: "Other",       value: 6,  color: "#9ca3af" },
         ]},
         { label: "Sweden", slices: [
-          { name: "District heating", value: 51, color: "#2563eb" },
+          { name: "District heating", value: 51, color: "#16a34a" },
           { name: "Heat pumps",       value: 23, color: "#16a34a" },
           { name: "Electricity",      value: 13, color: "#7c3aed" },
           { name: "Biomass",          value: 9,  color: "#ca8a04" },
@@ -813,7 +813,7 @@ export const TASK1_PRACTICE: Task1Item[] = [
     svg: processDiagram({
       title: "The Process of Recycling Paper",
       steps: ["Collection & sorting", "Pulping with water & chemicals", "Cleaning & screening", "De-inking", "Bleaching", "Sheet formation", "Drying & cutting", "New paper products"],
-      color: "#2563eb",
+      color: "#16a34a",
       layout: "snake",
     }),
   },

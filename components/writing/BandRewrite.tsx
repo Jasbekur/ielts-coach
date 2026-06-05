@@ -76,10 +76,10 @@ export function BandRewrite({ result }: BandRewriteProps) {
   const selectedTab = BAND_TABS.find(t => t.key === selectedBand)!;
 
   return (
-    <Card style={{ border: "2px solid #1d4ed8", background: "#eff6ff" }}>
+    <Card style={{ border: "2px solid #16a34a", background: "#f0fdf4" }}>
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#1d4ed8" }}>
+          <CardTitle className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#16a34a" }}>
             <Sparkles className="w-4 h-4" />
             ✦ Model Answer — See how a Band 7/8 student writes this
           </CardTitle>

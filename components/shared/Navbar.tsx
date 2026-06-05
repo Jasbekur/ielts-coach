@@ -27,7 +27,7 @@ const navItems = [
   { href: "/history",    label: "History",    icon: History,         description: "All attempts" },
 ];
 
-const PRIMARY = "#1d4ed8";
+const PRIMARY = "#16a34a";
 const EXAM_PATHS = ["/listening", "/reading", "/writing", "/speaking"];
 
 // ── Sensei logo mark ─────────────────────────────────────────────────────────
@@ -147,11 +147,11 @@ export function Sidebar() {
                   )}
                   style={
                     active
-                      ? { background: "#1d4ed8", boxShadow: "0 4px 14px rgba(220,38,38,0.35)" }
+                      ? { background: "#16a34a", boxShadow: "0 4px 14px rgba(22,163,74,0.35)" }
                       : { color: "rgba(255,255,255,0.6)" }
                   }
                   onMouseEnter={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(220,38,38,0.12)";
+                    if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(22,163,74,0.12)";
                   }}
                   onMouseLeave={e => {
                     if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
@@ -179,7 +179,7 @@ export function Sidebar() {
           {/* Avatar */}
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-white text-sm font-bold"
-            style={{ background: `linear-gradient(135deg, ${PRIMARY}, #1e40af)` }}
+            style={{ background: `linear-gradient(135deg, ${PRIMARY}, #15803d)` }}
           >
             {initials}
           </div>
@@ -188,7 +188,7 @@ export function Sidebar() {
               {userEmail ?? "Loading…"}
             </p>
             <p className="text-[10px] font-semibold"
-              style={{ color: isAdmin ? "#1d4ed8" : isEditor ? "#fbbf24" : "rgba(255,255,255,0.35)" }}>
+              style={{ color: isAdmin ? "#16a34a" : isEditor ? "#fbbf24" : "rgba(255,255,255,0.35)" }}>
               {isAdmin ? "Admin" : isEditor ? "Editor" : "Student"}
             </p>
           </div>
@@ -250,7 +250,7 @@ export function MobileNav() {
         {mobileItems.map(({ href, label, icon: Icon }) => {
           const active     = pathname === href || pathname.startsWith(href + "/");
           const isAdminTab = href === "/admin";
-          const activeColor = isAdminTab ? "#1d4ed8" : PRIMARY;
+          const activeColor = isAdminTab ? "#16a34a" : PRIMARY;
           return (
             <Link
               key={href}
