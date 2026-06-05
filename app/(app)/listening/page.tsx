@@ -10,6 +10,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { useLocalDraft } from "@/hooks/useLocalDraft";
 import { ShareScoreCard } from "@/components/shared/ShareScoreCard";
+import { useTestMode } from "@/contexts/TestModeContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -116,6 +117,7 @@ function bandColor(band: number) {
 
 export default function ListeningPage() {
   const supabase = createClient();
+  const { setTestActive } = useTestMode();
 
   // ── Shared ─────────────────────────────────────────────────────────────────
   const [pageMode,  setPageMode]  = useState<PageMode>("practice");
@@ -227,6 +229,7 @@ export default function ListeningPage() {
     if (ptTimerRef.current) clearInterval(ptTimerRef.current);
     if (audioRef.current)   { audioRef.current.pause(); setPlaying(false); }
     setPracticePhase("results");
+    setTestActive(false);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user && section) {
@@ -278,6 +281,7 @@ export default function ListeningPage() {
     setFtRunning(false);
     answerDraft.clear(); // wipe persisted answers after submit
     setFtPhase("results");
+    setTestActive(false);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -325,6 +329,7 @@ export default function ListeningPage() {
     setShowTranscript(false);
     if (examMode === "exam") setPtTimeLeft(10 * 60);
     setPracticePhase("listening");
+    setTestActive(true);
   }
 
   // ── Full-test: start ────────────────────────────────────────────────────────
@@ -341,6 +346,7 @@ export default function ListeningPage() {
     setPlaying(false); setCurTime(0); setDur(0);
     setFtTimeLeft(40 * 60); setFtRunning(true);
     setFtPhase("active");
+    setTestActive(true);
   }
 
   // ── Auto-play audio when full test goes active ──────────────────────────────
@@ -791,7 +797,7 @@ export default function ListeningPage() {
       <div className="space-y-5 pb-8">
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <button onClick={() => { setPracticePhase("selector"); if (ptTimerRef.current) clearInterval(ptTimerRef.current); if (audioRef.current) audioRef.current.pause(); }}
+          <button onClick={() => { setPracticePhase("selector"); setTestActive(false); if (ptTimerRef.current) clearInterval(ptTimerRef.current); if (audioRef.current) audioRef.current.pause(); }}
             className="flex items-center gap-1.5 text-sm font-medium transition-colors"
             style={{ color:"#475569" }}
             onMouseEnter={e=>(e.currentTarget.style.color="#94a3b8")}

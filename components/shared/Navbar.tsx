@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useTestMode } from "@/contexts/TestModeContext";
 
 const navItems = [
   { href: "/dashboard",  label: "Dashboard",  icon: LayoutDashboard, description: "Overview & stats" },
@@ -50,6 +51,9 @@ export function Sidebar() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const { isAdmin, isEditor } = useUserRole();
+  const { isTestActive } = useTestMode();
+
+  if (isTestActive) return null;
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -231,6 +235,9 @@ export function Sidebar() {
 export function MobileNav() {
   const pathname  = usePathname();
   const { isAdmin, isEditor } = useUserRole();
+  const { isTestActive } = useTestMode();
+
+  if (isTestActive) return null;
 
   const adminItem = (isAdmin || isEditor)
     ? [{ href: "/admin", label: "Admin", icon: ShieldCheck }]

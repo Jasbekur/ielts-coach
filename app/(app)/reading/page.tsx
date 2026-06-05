@@ -24,6 +24,7 @@ import {
 } from "@/lib/data/reading-passages";
 import { getBandTailwind } from "@/types/ielts";
 import { cn } from "@/lib/utils";
+import { useTestMode } from "@/contexts/TestModeContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Phase = "selector" | "reading" | "results";
@@ -447,6 +448,7 @@ function QuestionsPanel({
 // MAIN PAGE
 // ════════════════════════════════════════════════════════════════════════════════
 export default function ReadingPage() {
+  const { setTestActive } = useTestMode();
   const [phase, setPhase] = useState<Phase>("selector");
   const [testSetIdx, setTestSetIdx] = useState(0);
   const [activePassage, setActivePassage] = useState(0);
@@ -518,6 +520,7 @@ export default function ReadingPage() {
       passageIndex !== null ? 20 * 60 : EXAM_DURATION_SECONDS;
     setTimeLeft(duration);
     setPhase("reading");
+    setTestActive(true);
   }
 
   // ── Answer handler ────────────────────────────────────────────────────────
@@ -557,6 +560,7 @@ export default function ReadingPage() {
 
     setResults({ correct, total, byPassage, band: rawScoreToBand(scaledCorrect) });
     setPhase("results");
+    setTestActive(false);
   }
 
   // ── Passage tabs ──────────────────────────────────────────────────────────
@@ -573,6 +577,7 @@ export default function ReadingPage() {
         if (window.confirm("Leave the test? Your answers will be lost.")) {
           clearInterval(timerRef.current!);
           setPhase("selector");
+          setTestActive(false);
         }
       }
     }
@@ -726,7 +731,7 @@ export default function ReadingPage() {
       <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
       <div style={{ maxWidth: "860px", margin: "0 auto" }}>
       <div style={{ marginBottom: "16px" }}>
-        <button onClick={() => setPhase("selector")} style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "transparent", border: "none", color: "#64748b", fontSize: "13.5px", fontWeight: 500, cursor: "pointer", padding: "4px 0" }}>
+        <button onClick={() => { setPhase("selector"); setTestActive(false); }} style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "transparent", border: "none", color: "#64748b", fontSize: "13.5px", fontWeight: 500, cursor: "pointer", padding: "4px 0" }}>
           ← Back to Reading
         </button>
       </div>
@@ -826,6 +831,7 @@ export default function ReadingPage() {
           <Button
             onClick={() => {
               setPhase("selector");
+              setTestActive(false);
               setResults(null);
               setAnswers({});
             }}
@@ -874,7 +880,7 @@ export default function ReadingPage() {
       <div className="flex items-center justify-between gap-3 h-12 px-4 shrink-0"
         style={{ background:"var(--exam-bar, #1e2d5a)", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
         <button
-          onClick={() => { if (window.confirm("Leave the test? Your answers will be lost.")) { clearInterval(timerRef.current!); setPhase("selector"); } }}
+          onClick={() => { if (window.confirm("Leave the test? Your answers will be lost.")) { clearInterval(timerRef.current!); setPhase("selector"); setTestActive(false); } }}
           className="flex items-center gap-1 text-xs font-semibold text-white/70 hover:text-white transition-colors shrink-0">
           <ChevronLeft className="w-3.5 h-3.5" /> Exit
         </button>
