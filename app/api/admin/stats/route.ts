@@ -37,8 +37,10 @@ export async function GET() {
   todayUTC.setUTCHours(0, 0, 0, 0);
 
   const [usersRes, todayRes, bandsRes] = await Promise.all([
-    // Total users — from auth.users via admin API (most accurate)
-    admin.auth.admin.listUsers({ page: 1, perPage: 1 }),
+    // Total users — fetch up to 1000 users and count.
+    // Service-role bypasses RLS so we get ALL accounts, not just the admin's.
+    // For scale > 1000 users, switch to a DB function. For now this is fine.
+    admin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
     // Tests today — all attempts today across all users
     admin
       .from("attempts")
@@ -51,9 +53,8 @@ export async function GET() {
       .gt("overall_band", 0),
   ]);
 
-  // `total` exists on the paginated response when users exist; fall back to array length
-  const usersData = usersRes.data;
-  const totalUsers = (usersData && "total" in usersData ? (usersData as { total: number }).total : usersData?.users?.length) ?? 0;
+  // Count from the actual users array — always accurate up to 1000 users
+  const totalUsers = usersRes.data?.users?.length ?? 0;
   const testsToday = todayRes.count ?? 0;
 
   let avgBand: number | null = null;
