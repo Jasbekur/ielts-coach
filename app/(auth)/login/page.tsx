@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const PRIMARY    = "#dc2626";
+const PRIMARY    = "#1d4ed8";
 const PRIMARY_LT = "#ef4444";
 const PRIMARY_DIM = "rgba(220,38,38,0.15)";
 
@@ -98,7 +98,7 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold leading-snug mb-3 text-white">
             Your path to<br />
             <span style={{
-              background: `linear-gradient(135deg, #fca5a5, ${PRIMARY_LT})`,
+              background: `linear-gradient(135deg, #93c5fd, ${PRIMARY_LT})`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -260,8 +260,8 @@ export default function LoginPage() {
               className="w-full h-11 gap-2 text-sm font-semibold mt-2 text-white"
               disabled={loading}
               style={{
-                background: "#dc2626",
-                boxShadow: `0 4px 0 #b91c1c, 0 6px 16px rgba(220,38,38,0.35)`,
+                background: "#1d4ed8",
+                boxShadow: `0 4px 0 #1e40af, 0 6px 16px rgba(220,38,38,0.35)`,
               }}
             >
               {loading ? (

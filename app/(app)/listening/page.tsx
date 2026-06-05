@@ -418,7 +418,7 @@ export default function ListeningPage() {
               </p>
               <button
                 onClick={async () => { await audioRef.current?.play(); setAudioBlocked(false); setAudioStarted(true); }}
-                style={{ background:"#dc2626", color:"#fff", border:"none", borderRadius:"6px", padding:"12px 28px", fontSize:"14px", fontWeight:600, cursor:"pointer" }}>
+                style={{ background:"#1d4ed8", color:"#fff", border:"none", borderRadius:"6px", padding:"12px 28px", fontSize:"14px", fontWeight:600, cursor:"pointer" }}>
                 Begin Listening Test →
               </button>
             </div>
@@ -487,10 +487,13 @@ export default function ListeningPage() {
         <div className="flex-shrink-0 px-4 py-2 bg-white border-b border-gray-100 flex items-center gap-3">
           <span className="text-xs font-mono text-gray-400 tabular-nums shrink-0">{fmtTime(curTime)}</span>
           <div style={{ flex:1, height:"4px", background:"#e5e7eb", borderRadius:"2px", overflow:"hidden" }}>
-            <div style={{ height:"100%", background: playing ? "#dc2626" : "#94a3b8", width:`${audioProgress}%`, borderRadius:"2px", transition:"width 0.5s linear" }} />
+            <div style={{ height:"100%", background: playing ? "#1d4ed8" : "#94a3b8", width:`${audioProgress}%`, borderRadius:"2px", transition:"width 0.5s linear" }} />
           </div>
           <span className="text-xs font-mono text-gray-400 tabular-nums shrink-0">{dur ? fmtTime(dur) : "--:--"}</span>
           <span className="text-[10px] text-gray-400 italic hidden sm:inline">🎧 plays once</span>
+          <span className="text-[10px] font-semibold hidden md:inline" style={{ color: "#d97706" }}>
+            ⚠ Spelling counts — wrong spelling = wrong answer
+          </span>
         </div>
 
         {/* ── CONTENT (Fix 3, 4, 5, 6) ── */}
@@ -567,7 +570,7 @@ export default function ListeningPage() {
                           onClick={() => scrollToQuestion(q.number)}
                           className="w-6 h-6 text-[10px] font-bold rounded flex items-center justify-center transition-all hover:scale-110"
                           style={{
-                            background: isFlagged ? "#fef3c7" : isAns ? "#dc2626" : "#f3f4f6",
+                            background: isFlagged ? "#fef3c7" : isAns ? "#1d4ed8" : "#f3f4f6",
                             color:      isFlagged ? "#d97706"  : isAns ? "white"   : "#6b7280",
                             border:     isFlagged ? "1px solid #fbbf24" : isAns ? "none" : "1px solid #e5e7eb",
                           }}>
@@ -1014,13 +1017,13 @@ export default function ListeningPage() {
         {/* ── Section 1: Header card ── */}
         <div style={{
           background: "#ffffff", borderRadius: "8px",
-          border: "1px solid #e2e8f0", borderLeft: "4px solid #dc2626",
+          border: "1px solid #e2e8f0", borderLeft: "4px solid #1d4ed8",
           padding: "24px 28px", marginBottom: "16px",
           boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
         }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
             <div>
-              <p style={{ fontSize: "11px", fontWeight: 600, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+              <p style={{ fontSize: "11px", fontWeight: 600, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
                 IELTS Academic
               </p>
               <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "6px" }}>
@@ -1058,9 +1061,9 @@ export default function ListeningPage() {
         <div style={{ display: "flex", gap: "10px", marginBottom: "16px", flexWrap: "wrap" }}>
           <button onClick={() => setPageMode("practice")} style={{
             padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-            border: pageMode === "practice" ? "2px solid #dc2626" : "1px solid #e2e8f0",
+            border: pageMode === "practice" ? "2px solid #1d4ed8" : "1px solid #e2e8f0",
             background: pageMode === "practice" ? "#eff6ff" : "#ffffff",
-            color: pageMode === "practice" ? "#dc2626" : "#64748b",
+            color: pageMode === "practice" ? "#1d4ed8" : "#64748b",
             fontSize: "13.5px", fontWeight: 600,
             display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
           }}>
@@ -1071,9 +1074,9 @@ export default function ListeningPage() {
           </button>
           <button onClick={() => setPageMode("fulltest")} style={{
             padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-            border: pageMode === "fulltest" ? "2px solid #dc2626" : "1px solid #e2e8f0",
+            border: pageMode === "fulltest" ? "2px solid #1d4ed8" : "1px solid #e2e8f0",
             background: pageMode === "fulltest" ? "#eff6ff" : "#ffffff",
-            color: pageMode === "fulltest" ? "#dc2626" : "#64748b",
+            color: pageMode === "fulltest" ? "#1d4ed8" : "#64748b",
             fontSize: "13.5px", fontWeight: 600,
             display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
           }}>
@@ -1090,7 +1093,7 @@ export default function ListeningPage() {
           borderRadius: "6px", padding: "12px 16px", marginBottom: "24px",
           display: "flex", alignItems: "flex-start", gap: "10px",
         }}>
-          <span style={{ color: "#dc2626", fontSize: "15px", flexShrink: 0, lineHeight: "1.5" }}>ℹ</span>
+          <span style={{ color: "#1d4ed8", fontSize: "15px", flexShrink: 0, lineHeight: "1.5" }}>ℹ</span>
           <p style={{ fontSize: "13px", color: "#1e40af", lineHeight: "1.6", margin: 0 }}>
             In the real exam each recording plays <strong>once only</strong>.
             Read all questions <strong>before</strong> the audio starts.
@@ -1118,7 +1121,7 @@ export default function ListeningPage() {
                   }}
                   onMouseEnter={e => {
                     if (hasContent) {
-                      (e.currentTarget as HTMLElement).style.borderColor = "#dc2626";
+                      (e.currentTarget as HTMLElement).style.borderColor = "#1d4ed8";
                       (e.currentTarget as HTMLElement).style.background = "#f8fafc";
                     }
                   }}
@@ -1128,7 +1131,7 @@ export default function ListeningPage() {
                   }}
                 >
                   {/* Part label */}
-                  <div style={{ fontSize: "11px", fontWeight: 700, color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
                     {sec.label}
                   </div>
                   {/* Description */}
@@ -1148,7 +1151,7 @@ export default function ListeningPage() {
                   </div>
                   {/* Start CTA */}
                   {hasContent && (
-                    <div style={{ marginTop: "12px", fontSize: "12px", fontWeight: 600, color: "#dc2626" }}>
+                    <div style={{ marginTop: "12px", fontSize: "12px", fontWeight: 600, color: "#1d4ed8" }}>
                       Start {examMode === "exam" ? "exam" : "practice"} →
                     </div>
                   )}
@@ -1170,7 +1173,7 @@ export default function ListeningPage() {
                     background: "#ffffff", border: "1px solid #e2e8f0",
                     borderRadius: "8px", padding: "16px 14px", textAlign: "center",
                   }}>
-                    <div style={{ fontSize: "11px", fontWeight: 700, color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
                       {sec.label}
                     </div>
                     <div style={{ fontSize: "12px", color: "#475569", lineHeight: "1.4", marginBottom: "10px", minHeight: "32px" }}>
@@ -1179,8 +1182,8 @@ export default function ListeningPage() {
                     <span style={{
                       display: "inline-block", fontSize: "11px", fontWeight: 600,
                       padding: "2px 8px", borderRadius: "4px",
-                      background: hasContent ? "#f1f5f9" : "#fef2f2",
-                      color: hasContent ? "#475569" : "#dc2626",
+                      background: hasContent ? "#f1f5f9" : "#eff6ff",
+                      color: hasContent ? "#475569" : "#1d4ed8",
                     }}>
                       {hasContent ? sec.qRange : "No content"}
                     </span>
@@ -1216,8 +1219,8 @@ export default function ListeningPage() {
               </div>
 
               {!hasAllSections ? (
-                <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "6px", padding: "12px 16px", display: "inline-block" }}>
-                  <p style={{ fontSize: "13px", color: "#dc2626", margin: 0 }}>
+                <div style={{ background: "#eff6ff", border: "1px solid #fecaca", borderRadius: "6px", padding: "12px 16px", display: "inline-block" }}>
+                  <p style={{ fontSize: "13px", color: "#1d4ed8", margin: 0 }}>
                     ⚠️ Some parts have no content yet. Add audio + questions in the Content Manager.
                   </p>
                 </div>
@@ -1225,13 +1228,13 @@ export default function ListeningPage() {
                 <button
                   onClick={startFullTest}
                   style={{
-                    background: "#dc2626", color: "#ffffff", border: "none",
+                    background: "#1d4ed8", color: "#ffffff", border: "none",
                     borderRadius: "6px", padding: "13px 36px",
                     fontSize: "14px", fontWeight: 600, cursor: "pointer",
                     transition: "background 0.15s",
                   }}
                   onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "#1d4ed8"}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "#dc2626"}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "#1d4ed8"}
                 >
                   Start Full Mock Test →
                 </button>
@@ -1577,7 +1580,7 @@ function CambridgeInput({ value, onChange }: { value: string; onChange: (v: stri
       autoComplete="off"
       style={{
         border:       "none",
-        borderBottom: focused ? "2px solid #dc2626" : "1.5px solid #374151",
+        borderBottom: focused ? "2px solid #1d4ed8" : "1.5px solid #374151",
         background:   "transparent",
         width:        "140px",
         flexShrink:   0,
@@ -1636,15 +1639,15 @@ function CambridgeMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, question
                 display:"flex", alignItems:"center", gap:"8px",
                 width:"100%", textAlign:"left", padding:"5px 10px", margin:"3px 0",
                 borderRadius:"4px",
-                border:`1px solid ${isSelected ? "#dc2626" : "#e5e7eb"}`,
+                border:`1px solid ${isSelected ? "#1d4ed8" : "#e5e7eb"}`,
                 background: isSelected ? "#dbeafe" : "white",
                 color:      isSelected ? "#1d4ed8" : "#374151",
                 fontFamily:"'Times New Roman', Georgia, serif", fontSize:"14px", cursor:"pointer",
               }}>
               <span style={{
                 width:"20px", height:"20px", borderRadius:"50%", flexShrink:0,
-                border:`1px solid ${isSelected ? "#dc2626" : "#d1d5db"}`,
-                background: isSelected ? "#dc2626" : "white",
+                border:`1px solid ${isSelected ? "#1d4ed8" : "#d1d5db"}`,
+                background: isSelected ? "#1d4ed8" : "white",
                 color:      isSelected ? "white" : "#6b7280",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 fontSize:"11px", fontWeight:700,

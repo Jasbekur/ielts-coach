@@ -82,7 +82,7 @@ function Spinner() {
     >
       <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3"
         className="text-muted-foreground/20" />
-      <path d="M36 20a16 16 0 0 0-16-16" stroke="#dc2626" strokeWidth="3"
+      <path d="M36 20a16 16 0 0 0-16-16" stroke="#1d4ed8" strokeWidth="3"
         strokeLinecap="round" />
     </svg>
   );

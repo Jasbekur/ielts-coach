@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { formatBand, roundBand } from "@/lib/utils/band-score";
 import { ShareScoreCard } from "@/components/shared/ShareScoreCard";
+import { LimitBanner } from "@/components/shared/LimitBanner";
 
 // ─── Cue Card Bank (50 real IELTS Part 2 cards) ───────────────────────────────
 interface CueCardData {
@@ -405,6 +406,15 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
           </div>
         </CardContent>
       </Card>
+      {/* Pronunciation disclaimer — honest with student */}
+      <div style={{
+        background: "#fffbeb", border: "1px solid #fde68a", borderLeft: "3px solid #d97706",
+        borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#92400e",
+        lineHeight: "1.5",
+      }}>
+        <strong>Note on pronunciation scoring:</strong> AI scoring is approximate. If you have a non-native accent (Uzbek, Russian, Arabic, Hindi etc.), your real examiner score may differ by ±0.5 bands. Focus on <em>clarity and intelligibility</em> — not eliminating your accent.
+      </div>
+
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Criterion Scores</CardTitle>
@@ -682,7 +692,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
       ))}
 
       <ShareScoreCard band={overallBand} mode="Speaking" detail="Full Mock Test" />
-      <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#dc2626" }}>
+      <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#1d4ed8" }}>
         <ClipboardList className="w-5 h-5" /> Take Another Mock Test
       </Button>
     </div>
@@ -1010,14 +1020,16 @@ export default function SpeakingPage() {
       </a>
     </div>
 
+    <LimitBanner />
+
     {/* ── Header card ── */}
     <div style={{
       background: "#ffffff", borderRadius: "8px",
-      border: "1px solid #e2e8f0", borderLeft: "4px solid #dc2626",
+      border: "1px solid #e2e8f0", borderLeft: "4px solid #1d4ed8",
       padding: "20px 24px", marginBottom: "20px",
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
     }}>
-      <p style={{ fontSize: "11px", fontWeight: 600, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+      <p style={{ fontSize: "11px", fontWeight: 600, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
         IELTS Academic
       </p>
       <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>
@@ -1035,9 +1047,9 @@ export default function SpeakingPage() {
         <button
           onClick={() => setMode("practice")}
           style={{ padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-            border: mode === "practice" ? "2px solid #dc2626" : "1px solid #e2e8f0",
+            border: mode === "practice" ? "2px solid #1d4ed8" : "1px solid #e2e8f0",
             background: mode === "practice" ? "#eff6ff" : "#ffffff",
-            color: mode === "practice" ? "#dc2626" : "#64748b",
+            color: mode === "practice" ? "#1d4ed8" : "#64748b",
             fontSize: "13.5px", fontWeight: 600,
             display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
           }}
@@ -1048,9 +1060,9 @@ export default function SpeakingPage() {
         <button
           onClick={() => { setMode("mock"); if (mockPhase === "intro") setMockPhase("intro"); }}
           style={{ padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-            border: mode === "mock" ? "2px solid #dc2626" : "1px solid #e2e8f0",
+            border: mode === "mock" ? "2px solid #1d4ed8" : "1px solid #e2e8f0",
             background: mode === "mock" ? "#eff6ff" : "#ffffff",
-            color: mode === "mock" ? "#dc2626" : "#64748b",
+            color: mode === "mock" ? "#1d4ed8" : "#64748b",
             fontSize: "13.5px", fontWeight: 600,
             display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
           }}

@@ -13,6 +13,7 @@ import { CountUp } from "@/components/shared/CountUp";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { BandRing } from "@/components/shared/BandRing";
 import { ExamCountdown } from "@/components/dashboard/ExamCountdown";
+import { PracticeToday } from "@/components/dashboard/PracticeToday";
 
 // ─── Daily IELTS Tips ─────────────────────────────────────────────────────
 const IELTS_TIPS = [
@@ -51,14 +52,14 @@ function BandSparkline({ attempts }: { attempts: Attempt[] }) {
     <div className="flex items-center gap-3">
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0">
         <polyline points={points.join(" ")} fill="none"
-          stroke={improving ? "#dc2626" : "#f59e0b"} strokeWidth="2"
+          stroke={improving ? "#1d4ed8" : "#f59e0b"} strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round" />
         {last7.map((a, i) => {
           const x = (i / (last7.length - 1)) * w;
           const y = h - ((a.overall_band - min) / (max - min)) * h;
           return <circle key={i} cx={x} cy={y} r="3"
-            fill={i === last7.length - 1 ? "#dc2626" : "#e5e7eb"}
-            stroke={i === last7.length - 1 ? "#dc2626" : "#9ca3af"} strokeWidth="1.5" />;
+            fill={i === last7.length - 1 ? "#1d4ed8" : "#e5e7eb"}
+            stroke={i === last7.length - 1 ? "#1d4ed8" : "#9ca3af"} strokeWidth="1.5" />;
         })}
       </svg>
       <div className="text-xs text-muted-foreground">
@@ -134,7 +135,7 @@ export default async function DashboardPage() {
       <div className="fade-up rounded-2xl px-5 py-5 relative overflow-hidden"
         style={{
           animationDelay: "0ms",  // keep at 0 — hero is instant
-          background: "linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%)",
+          background: "linear-gradient(135deg, #eff6ff 0%, #fff5f5 100%)",
           border: "1px solid rgba(220,38,38,0.12)",
         }}>
 
@@ -172,8 +173,8 @@ export default async function DashboardPage() {
             <Link href="/writing"
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
               style={{
-                background: "#dc2626",
-                boxShadow: "0 4px 0 #b91c1c, 0 6px 16px #dc262640",
+                background: "#1d4ed8",
+                boxShadow: "0 4px 0 #1e40af, 0 6px 16px #1d4ed840",
               }}>
               <BookOpen className="w-3.5 h-3.5" /> Write now
             </Link>
@@ -185,11 +186,14 @@ export default async function DashboardPage() {
                 border: "1px solid #d1d5db",
                 boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
               }}>
-              <Mic className="w-3.5 h-3.5" style={{ color: "#dc2626" }} /> Speak now
+              <Mic className="w-3.5 h-3.5" style={{ color: "#1d4ed8" }} /> Speak now
             </Link>
           </div>
         </div>
       </div>
+
+      {/* ── Practice Today — tells student exactly what to do ── */}
+      <PracticeToday attempts={attempts} />
 
       {/* ── Exam date countdown ── */}
       <ExamCountdown />
@@ -197,7 +201,7 @@ export default async function DashboardPage() {
       {/* ── Onboarding card — shown only on first visit (zero attempts ever) ── */}
       {!allData?.length && (
         <div className="fade-up rounded-2xl border-2 border-dashed px-5 py-5 space-y-4"
-          style={{ borderColor: "#fca5a5", animationDelay: "20ms" }}>
+          style={{ borderColor: "#93c5fd", animationDelay: "20ms" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: "rgba(220,38,38,0.12)" }}>
@@ -222,7 +226,7 @@ export default async function DashboardPage() {
                 </div>
                 <p className="text-sm font-semibold">{title}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
-                <span className="text-xs font-semibold flex items-center gap-1 mt-auto" style={{ color: "#dc2626" }}>
+                <span className="text-xs font-semibold flex items-center gap-1 mt-auto" style={{ color: "#1d4ed8" }}>
                   {cta} <ArrowRight className="w-3 h-3" />
                 </span>
               </Link>
@@ -257,7 +261,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Today</p>
               <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "rgba(5,150,105,0.12)" }}>
-                <TrendingUp className="w-3 h-3" style={{ color: "#dc2626" }} />
+                <TrendingUp className="w-3 h-3" style={{ color: "#1d4ed8" }} />
               </div>
             </div>
             <p className="text-3xl font-display leading-none tracking-nums">
@@ -322,7 +326,7 @@ export default async function DashboardPage() {
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.12), rgba(220,38,38,0.06))" }}>
-                  <GraduationCap className="w-4 h-4" style={{ color: "#dc2626" }} />
+                  <GraduationCap className="w-4 h-4" style={{ color: "#1d4ed8" }} />
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -590,7 +594,7 @@ export default async function DashboardPage() {
           <div className="flex gap-2 justify-center">
             <Link href="/writing"
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.02]"
-              style={{ background: "#dc2626", boxShadow: "0 4px 12px rgba(220,38,38,0.3)" }}>
+              style={{ background: "#1d4ed8", boxShadow: "0 4px 12px rgba(220,38,38,0.3)" }}>
               <BookOpen className="w-3.5 h-3.5" /> Try Writing
             </Link>
             <Link href="/speaking"

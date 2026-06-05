@@ -55,7 +55,7 @@ function getDefaultBand(score: number): BandKey {
 }
 
 export function BandRewrite({ result }: BandRewriteProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true); // open by default — most valuable feature
   const [copied, setCopied] = useState(false);
 
   // Support both new model_answers and legacy band_8_rewrite
@@ -76,12 +76,12 @@ export function BandRewrite({ result }: BandRewriteProps) {
   const selectedTab = BAND_TABS.find(t => t.key === selectedBand)!;
 
   return (
-    <Card className="border-red-200 dark:border-red-800">
+    <Card style={{ border: "2px solid #1d4ed8", background: "#eff6ff" }}>
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-sm font-medium text-green-600 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
-            Model Answer
+          <CardTitle className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#1d4ed8" }}>
+            <Sparkles className="w-4 h-4" />
+            ✦ Model Answer — See how a Band 7/8 student writes this
           </CardTitle>
           <div className="flex items-center gap-1">
             {expanded && (

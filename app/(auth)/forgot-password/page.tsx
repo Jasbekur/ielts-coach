@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
             style={{
-              background: "#dc2626",
+              background: "#1d4ed8",
               boxShadow: "0 4px 24px rgba(220,38,38,0.4)",
             }}
           >
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
             className="rounded-xl p-4 text-left"
             style={{ background: "oklch(0.22 0.028 278)" }}
           >
-            <p className="text-xs font-semibold mb-1" style={{ color: "#dc2626" }}>
+            <p className="text-xs font-semibold mb-1" style={{ color: "#1d4ed8" }}>
               💡 Quick tip
             </p>
             <p className="text-xs leading-relaxed" style={{ color: "oklch(0.65 0.012 278)" }}>
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
           <div className="flex items-center gap-3 mb-8 lg:hidden">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: "#dc2626" }}
+              style={{ background: "#1d4ed8" }}
             >
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
                 style={{ background: "rgba(220,38,38,0.1)" }}
               >
-                <CheckCircle2 className="w-8 h-8" style={{ color: "#dc2626" }} />
+                <CheckCircle2 className="w-8 h-8" style={{ color: "#1d4ed8" }} />
               </div>
               <div>
                 <h1 className="text-2xl font-bold mb-2">Check your email</h1>
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
                 <Link
                   href="/login"
                   className="flex items-center justify-center gap-1.5 text-sm font-medium hover:underline transition-colors"
-                  style={{ color: "#dc2626" }}
+                  style={{ color: "#1d4ed8" }}
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to sign in
                 </Link>
@@ -150,7 +150,7 @@ export default function ForgotPasswordPage() {
                   className="w-full h-11 gap-2 font-semibold"
                   disabled={loading}
                   style={{
-                    background: "linear-gradient(135deg, #dc2626, oklch(0.52 0.22 300))",
+                    background: "linear-gradient(135deg, #1d4ed8, oklch(0.52 0.22 300))",
                     boxShadow: "0 4px 16px rgba(220,38,38,0.35)",
                   }}
                 >
@@ -164,7 +164,7 @@ export default function ForgotPasswordPage() {
                 <Link
                   href="/login"
                   className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline transition-colors"
-                  style={{ color: "#dc2626" }}
+                  style={{ color: "#1d4ed8" }}
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to sign in
                 </Link>

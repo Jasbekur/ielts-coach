@@ -27,7 +27,7 @@ const navItems = [
   { href: "/history",    label: "History",    icon: History,         description: "All attempts" },
 ];
 
-const PRIMARY = "#dc2626";
+const PRIMARY = "#1d4ed8";
 const EXAM_PATHS = ["/listening", "/reading", "/writing", "/speaking"];
 
 // ── Sensei logo mark ─────────────────────────────────────────────────────────
@@ -147,7 +147,7 @@ export function Sidebar() {
                   )}
                   style={
                     active
-                      ? { background: "#dc2626", boxShadow: "0 4px 14px rgba(220,38,38,0.35)" }
+                      ? { background: "#1d4ed8", boxShadow: "0 4px 14px rgba(220,38,38,0.35)" }
                       : { color: "rgba(255,255,255,0.6)" }
                   }
                   onMouseEnter={e => {
@@ -179,7 +179,7 @@ export function Sidebar() {
           {/* Avatar */}
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-white text-sm font-bold"
-            style={{ background: `linear-gradient(135deg, ${PRIMARY}, #b91c1c)` }}
+            style={{ background: `linear-gradient(135deg, ${PRIMARY}, #1e40af)` }}
           >
             {initials}
           </div>
@@ -188,7 +188,7 @@ export function Sidebar() {
               {userEmail ?? "Loading…"}
             </p>
             <p className="text-[10px] font-semibold"
-              style={{ color: isAdmin ? "#dc2626" : isEditor ? "#fbbf24" : "rgba(255,255,255,0.35)" }}>
+              style={{ color: isAdmin ? "#1d4ed8" : isEditor ? "#fbbf24" : "rgba(255,255,255,0.35)" }}>
               {isAdmin ? "Admin" : isEditor ? "Editor" : "Student"}
             </p>
           </div>
@@ -250,7 +250,7 @@ export function MobileNav() {
         {mobileItems.map(({ href, label, icon: Icon }) => {
           const active     = pathname === href || pathname.startsWith(href + "/");
           const isAdminTab = href === "/admin";
-          const activeColor = isAdminTab ? "#dc2626" : PRIMARY;
+          const activeColor = isAdminTab ? "#1d4ed8" : PRIMARY;
           return (
             <Link
               key={href}

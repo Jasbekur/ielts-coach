@@ -17,7 +17,7 @@ interface RecorderProps {
   autoStart?: boolean;
 }
 
-type RecordState = "idle" | "recording" | "done";
+type RecordState = "idle" | "countdown" | "recording" | "done";
 
 export function Recorder({
   limitSeconds,
@@ -30,6 +30,7 @@ export function Recorder({
   const [state, setState] = useState<RecordState>("idle");
   const [elapsed, setElapsed] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(3);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -45,7 +46,7 @@ export function Recorder({
   // Auto-start recording when the parent signals it's time
   useEffect(() => {
     if (autoStart && stateRef.current === "idle" && !disabled) {
-      startRecording();
+      beginCountdown();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart]);
@@ -79,11 +80,38 @@ export function Recorder({
     }
   }, [elapsed, limitSeconds]);
 
-  async function startRecording() {
+  async function beginCountdown() {
+    // Request mic permission first so countdown isn't interrupted
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       chunksRef.current = [];
+      setState("countdown");
+      setCountdown(3);
+
+      let count = 3;
+      const cdTimer = setInterval(() => {
+        count -= 1;
+        setCountdown(count);
+        if (count <= 0) {
+          clearInterval(cdTimer);
+          startRecordingFromStream(stream);
+        }
+      }, 1000);
+    } catch (err) {
+      const isDenied = err instanceof DOMException &&
+        (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
+      toast.error(
+        isDenied
+          ? "Microphone access denied. Please allow microphone in your browser settings and try again."
+          : "Could not start recording. Check your microphone is connected and try again.",
+        { duration: 6000 }
+      );
+    }
+  }
+
+  async function startRecordingFromStream(stream: MediaStream) {
+    try {
 
       const mimeType = getSupportedMimeType();
       const mediaRecorder = new MediaRecorder(stream, {
@@ -135,10 +163,30 @@ export function Recorder({
     <div className="space-y-4">
       {label && <p className="text-sm text-muted-foreground">{label}</p>}
 
+      {/* 3-2-1 Countdown overlay */}
+      {state === "countdown" && (
+        <div className="flex flex-col items-center gap-3 py-6">
+          <div style={{
+            width: "80px", height: "80px", borderRadius: "50%",
+            background: "#1d4ed8", display: "flex", alignItems: "center",
+            justifyContent: "center", boxShadow: "0 0 0 12px rgba(29,78,216,0.15)",
+            transition: "all 0.3s",
+          }}>
+            <span style={{ fontSize: "36px", fontWeight: 800, color: "#fff", lineHeight: 1 }}>
+              {countdown}
+            </span>
+          </div>
+          <p className="text-sm font-semibold text-gray-600">
+            Get ready… recording starts in {countdown}s
+          </p>
+        </div>
+      )}
+
       {/* Big record button — minimum 80px touch target */}
+      {state !== "countdown" && (
       <div className="flex flex-col items-center gap-4">
         <button
-          onClick={state === "idle" ? startRecording : stopRecording}
+          onClick={state === "idle" ? beginCountdown : stopRecording}
           disabled={
             disabled ||
             state === "done" ||
@@ -163,12 +211,13 @@ export function Recorder({
         </button>
 
         <div className="text-center text-xs text-muted-foreground">
-          {state === "idle" && "Tap to start recording"}
+          {state === "idle" && "Tap to start — 3-second countdown then recording begins"}
           {state === "recording" && !canStop && `Speak for at least ${minSeconds}s...`}
           {state === "recording" && canStop && "Tap to stop"}
           {state === "done" && "✓ Recording complete"}
         </div>
       </div>
+      )}
 
       {/* Live timer */}
       {state === "recording" && (

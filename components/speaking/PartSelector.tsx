@@ -15,7 +15,7 @@ const PARTS: { value: SpeakingPart; label: string; sublabel: string; desc: strin
   { value: 3, icon: Users,         label: "Part 3",    sublabel: "Discussion",  desc: "In-depth discussion on abstract themes linked to the topic in Part 2. 2–3 min each." },
 ];
 
-const PRIMARY = "#dc2626";
+const PRIMARY = "#1d4ed8";
 
 export function PartSelector({ selected, onChange }: PartSelectorProps) {
   return (

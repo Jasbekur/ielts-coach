@@ -596,8 +596,8 @@ export default function ReadingPage() {
         </div>
 
         {/* Header card */}
-        <div style={{ background: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", borderLeft: "4px solid #dc2626", padding: "20px 24px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-          <p style={{ fontSize: "11px", fontWeight: 600, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>IELTS Academic</p>
+        <div style={{ background: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", borderLeft: "4px solid #1d4ed8", padding: "20px 24px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+          <p style={{ fontSize: "11px", fontWeight: 600, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>IELTS Academic</p>
           <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>Reading</h1>
           <p style={{ fontSize: "13px", color: "#475569" }}>3 passages · 40 questions · 60 minutes · Timed exam</p>
         </div>
@@ -605,7 +605,7 @@ export default function ReadingPage() {
         <div className="space-y-6">
         {/* Test set picker */}
         <div>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
+          <p style={{ fontSize: "11px", fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
             Select Test Set
           </p>
           <div className="flex gap-2">
@@ -616,9 +616,9 @@ export default function ReadingPage() {
                 style={{
                   padding: "6px 16px", borderRadius: "20px", fontSize: "13px",
                   fontWeight: testSetIdx === idx ? 600 : 400, cursor: "pointer",
-                  background: testSetIdx === idx ? "#dc2626" : "#ffffff",
+                  background: testSetIdx === idx ? "#1d4ed8" : "#ffffff",
                   color: testSetIdx === idx ? "#ffffff" : "#64748b",
-                  border: testSetIdx === idx ? "1px solid #dc2626" : "1px solid #e2e8f0",
+                  border: testSetIdx === idx ? "1px solid #1d4ed8" : "1px solid #e2e8f0",
                   transition: "all 0.15s",
                 }}
               >
@@ -658,7 +658,7 @@ export default function ReadingPage() {
                 </div>
               ))}
             </div>
-            <button style={{ background: "#dc2626", color: "#ffffff", border: "none", borderRadius: "6px", padding: "10px 20px", fontSize: "13.5px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            <button style={{ background: "#1d4ed8", color: "#ffffff", border: "none", borderRadius: "6px", padding: "10px 20px", fontSize: "13.5px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
               Start Full Test <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -680,7 +680,7 @@ export default function ReadingPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm"
-                      style={{ background: "rgba(37,99,235,0.1)", color: "#dc2626" }}>
+                      style={{ background: "rgba(37,99,235,0.1)", color: "#1d4ed8" }}>
                       {p.id}
                     </div>
                     <div>
@@ -932,7 +932,7 @@ export default function ReadingPage() {
                       <button key={num} onClick={() => { scrollToReadingQ(num); setShowQNavigator(false); }}
                         className="h-7 w-full rounded text-xs font-bold transition-all hover:scale-105"
                         style={{
-                          background: flagged ? "#d97706" : answered ? "#dc2626" : "rgba(255,255,255,0.12)",
+                          background: flagged ? "#d97706" : answered ? "#1d4ed8" : "rgba(255,255,255,0.12)",
                           color: (flagged || answered) ? "white" : "rgba(255,255,255,0.5)",
                         }}>
                         {num}

@@ -17,6 +17,7 @@ import { wordCount } from "@/lib/utils/word-count";
 import { TASK1_PRACTICE } from "@/lib/data/task1-practice";
 import { useLocalDraft } from "@/hooks/useLocalDraft";
 import { ShareScoreCard } from "@/components/shared/ShareScoreCard";
+import { LimitBanner } from "@/components/shared/LimitBanner";
 
 // ─── GT Task 1 Letter Questions ───────────────────────────────────────────
 const GT_TASK1_QUESTIONS = [
@@ -498,16 +499,18 @@ export default function WritingPage() {
       </a>
     </div>
 
+    <LimitBanner />
+
     {/* ── Header card ── */}
     <div style={{
       background: "#ffffff", borderRadius: "8px",
-      border: "1px solid #e2e8f0", borderLeft: "4px solid #dc2626",
+      border: "1px solid #e2e8f0", borderLeft: "4px solid #1d4ed8",
       padding: "20px 24px", marginBottom: "20px",
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
       display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px",
     }}>
       <div>
-        <p style={{ fontSize: "11px", fontWeight: 600, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+        <p style={{ fontSize: "11px", fontWeight: 600, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
           IELTS Academic
         </p>
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>
@@ -519,7 +522,7 @@ export default function WritingPage() {
       </div>
       <button
         onClick={() => setShowBandGuide(!showBandGuide)}
-        style={{ fontSize: "12px", color: "#dc2626", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, flexShrink: 0, marginTop: "2px" }}
+        style={{ fontSize: "12px", color: "#1d4ed8", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, flexShrink: 0, marginTop: "2px" }}
       >
         Band guide {showBandGuide ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
       </button>
@@ -618,6 +621,9 @@ export default function WritingPage() {
                 {taskType === "task2" && (
                   <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">Scored on Task Response, CC, LR, GRA</span>
                 )}
+                <span className="hidden lg:inline text-xs font-semibold" style={{ color: "#d97706" }}>
+                  ⚠ Spelling and grammar count — write carefully
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 {timerActive && <TimerDisplay seconds={timerSeconds} limit={timeLimit} />}
@@ -732,7 +738,7 @@ export default function WritingPage() {
                 disabled={loading}
                 className="flex-1 sm:flex-none sm:min-w-[200px] gap-2 text-white text-base font-bold py-5"
                 style={{
-                  background: "#dc2626",
+                  background: "#1d4ed8",
                   boxShadow: "0 4px 0 #1d4ed8, 0 6px 20px rgba(37,99,235,0.35)",
                   transition: "transform 0.1s, box-shadow 0.1s",
                 }}
