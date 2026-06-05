@@ -929,196 +929,243 @@ export default function ListeningPage() {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // SELECTOR (default view for both modes)
+  // SELECTOR — Cambridge / British Council institutional style
   // ─────────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-8 pb-8">
+    <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+      <div style={{ maxWidth: "860px" }}>
 
-      {/* ── Hero ── */}
-      <div className="relative overflow-hidden rounded-2xl p-7"
-        style={{ background:"linear-gradient(135deg,#071826 0%,#060f1a 60%,#040912 100%)", border:"1px solid #0c2a45" }}>
-        <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full"
-          style={{ background:"radial-gradient(circle,rgba(56,189,248,0.22) 0%,transparent 70%)" }} />
-
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="p-2.5 rounded-xl" style={{ background:"linear-gradient(135deg,#0369a1,#0ea5e9)", boxShadow:"0 4px 16px rgba(14,165,233,0.5)" }}>
-                <Headphones className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.22em] px-2.5 py-1 rounded-full"
-                style={{ background:"rgba(56,189,248,0.15)", color:"#38bdf8", border:"1px solid rgba(56,189,248,0.3)" }}>
-                IELTS Listening
-              </span>
-            </div>
-            <h1 className="text-3xl font-black tracking-tight leading-none mb-1.5 text-white">Listening Practice</h1>
-            <p className="text-sm" style={{ color:"#64748b" }}>
-              4 parts · 40 questions · 30 minutes audio · choose practice or full mock test
-            </p>
-          </div>
-
-          {/* Exam mode toggle */}
-          <div className="shrink-0 space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color:"#475569" }}>Mode</p>
-            <div className="flex gap-2">
-              {(["practice","exam"] as ExamMode[]).map(m => (
-                <button key={m} onClick={() => setExamMode(m)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
-                  style={{
-                    background: examMode === m ? (m==="exam" ? "rgba(248,113,113,0.15)" : "rgba(56,189,248,0.15)") : "#0f172a",
-                    border:     `1px solid ${examMode === m ? (m==="exam" ? "rgba(248,113,113,0.4)" : "rgba(56,189,248,0.4)") : "#1e293b"}`,
-                    color:      examMode === m ? (m==="exam" ? "#f87171" : "#38bdf8") : "#475569",
-                  }}>
-                  {m === "practice" ? "🎧 Practice" : "⏱ Exam"}
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px]" style={{ color:"#334155" }}>
-              {examMode === "exam" ? "Audio plays once · no rewind · timer active" : "Full controls · replay anytime · no timer"}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mode tabs ── */}
-      <div className="flex gap-1.5 p-1.5 rounded-2xl w-fit" style={{ background:"#0f172a" }}>
-        <button onClick={() => setPageMode("practice")}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
-          style={pageMode === "practice"
-            ? { background:"#071826", color:"#38bdf8", boxShadow:"0 1px 4px rgba(0,0,0,0.4)", border:"1px solid rgba(56,189,248,0.25)" }
-            : { color:"#475569" }}>
-          <Zap className="w-3.5 h-3.5" /> Practice
-        </button>
-        <button onClick={() => setPageMode("fulltest")}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
-          style={pageMode === "fulltest"
-            ? { background:"#071826", color:"#38bdf8", boxShadow:"0 1px 4px rgba(0,0,0,0.4)", border:"1px solid rgba(56,189,248,0.25)" }
-            : { color:"#475569" }}>
-          <ClipboardList className="w-3.5 h-3.5" /> Full Mock Test
-          <span className="text-[10px] font-normal hidden sm:inline" style={{ color:"#334155" }}>~40 min</span>
-        </button>
-      </div>
-
-      {/* ── Tip ── */}
-      <div className="rounded-xl px-4 py-3 flex items-start gap-3"
-        style={{ background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.15)" }}>
-        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" style={{ color:"#38bdf8" }} />
-        <p className="text-xs leading-relaxed" style={{ color:"#94a3b8" }}>
-          <span style={{ fontWeight:700, color:"#f1f5f9" }}>IELTS tip:</span> In the real exam each recording plays <span style={{ fontWeight:600, color:"#f1f5f9" }}>once only</span>.
-          Read all questions <span style={{ fontWeight:600, color:"#f1f5f9" }}>before</span> the audio starts.
-          Use <span style={{ fontWeight:600, color:"#38bdf8" }}>Full Mock Test</span> to simulate real exam conditions with all 4 parts as one continuous session.
-        </p>
-      </div>
-
-      {/* ── PRACTICE: individual section cards ── */}
-      {pageMode === "practice" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {SECTIONS.map(sec => {
-            const Icon       = sec.icon;
-            const count      = available[sec.type]?.length ?? 0;
-            const hasContent = count > 0;
-            return (
-              <button key={sec.num} onClick={() => hasContent && startSection(sec)}
-                disabled={!hasContent}
-                className="text-left p-6 rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: sec.bg, border:`1px solid ${hasContent ? sec.border : "#1a2332"}` }}
-                onMouseEnter={e => { if (hasContent) (e.currentTarget as HTMLElement).style.borderColor = sec.color+"60"; }}
-                onMouseLeave={e => { if (hasContent) (e.currentTarget as HTMLElement).style.borderColor = sec.border; }}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl" style={{ background:`${sec.color}18`, border:`1px solid ${sec.color}30` }}>
-                      <Icon className="w-5 h-5" style={{ color: sec.color }} />
-                    </div>
-                    <div>
-                      <p className="font-black text-white text-sm">{sec.label}</p>
-                      <p className="text-[10px] font-bold mt-0.5" style={{ color: sec.color }}>{sec.qRange}</p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-                    style={hasContent
-                      ? { background:`${sec.color}18`, color: sec.color, border:`1px solid ${sec.color}30` }
-                      : { background:"#0f172a", color:"#334155", border:"1px solid #1e293b" }}>
-                    {hasContent ? `${count} set${count > 1 ? "s" : ""}` : "No content"}
-                  </span>
-                </div>
-                <p className="text-sm font-bold mb-1 text-white">{sec.context}</p>
-                <p className="text-xs leading-relaxed" style={{ color:"#475569" }}>{sec.description}</p>
-                {hasContent && (
-                  <div className="mt-4 flex items-center gap-1.5 text-xs font-bold" style={{ color: sec.color }}>
-                    <Play className="w-3.5 h-3.5" /> Start {examMode === "exam" ? "exam" : "practice"}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── FULL MOCK TEST: launcher ── */}
-      {pageMode === "fulltest" && (
-        <div className="rounded-2xl overflow-hidden"
-          style={{ background:"linear-gradient(135deg,#071826,#060f1a)", border:"1px solid #0c2a45" }}>
-
-          {/* Parts overview */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[#0c2a45]"
-            style={{ borderBottom:"1px solid #0c2a45" }}>
-            {SECTIONS.map(sec => {
-              const Icon       = sec.icon;
-              const hasContent = (available[sec.type]?.length ?? 0) > 0;
-              return (
-                <div key={sec.num} className="flex flex-col items-center gap-2 px-4 py-5"
-                  style={{ borderColor:"#0c2a45" }}>
-                  <div className="p-2.5 rounded-xl" style={{ background:`${sec.color}18`, border:`1px solid ${sec.color}30` }}>
-                    <Icon className="w-4 h-4" style={{ color: sec.color }} />
-                  </div>
-                  <p className="text-xs font-black text-white">{sec.label}</p>
-                  <p className="text-[10px] text-center leading-tight" style={{ color:"#475569" }}>{sec.context}</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                    style={hasContent
-                      ? { background:`${sec.color}15`, color: sec.color }
-                      : { background:"#0f172a", color:"#334155" }}>
-                    {hasContent ? sec.qRange : "No content"}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Launch */}
-          <div className="px-8 py-8 text-center space-y-4">
+        {/* ── Section 1: Header card ── */}
+        <div style={{
+          background: "#ffffff", borderRadius: "8px",
+          border: "1px solid #e2e8f0", borderLeft: "4px solid #2563eb",
+          padding: "24px 28px", marginBottom: "16px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+        }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
             <div>
-              <p className="text-xl font-black text-white mb-1">Full IELTS Listening Mock Test</p>
-              <p className="text-sm" style={{ color:"#475569" }}>
-                All 4 parts in one continuous session · navigate freely between parts · single audio playback
+              <p style={{ fontSize: "11px", fontWeight: 600, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+                IELTS Academic
+              </p>
+              <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "6px" }}>
+                Listening
+              </h1>
+              <p style={{ fontSize: "13.5px", color: "#475569", lineHeight: "1.5" }}>
+                4 parts · 40 questions · 30 minutes · Parts play continuously
               </p>
             </div>
 
-            <div className="flex justify-center gap-6 text-xs" style={{ color:"#334155" }}>
-              <span>🎧 40 questions</span>
-              <span>⏱ {examMode === "exam" ? "40 min timer" : "No timer"}</span>
-              <span>📋 Instant band score</span>
-            </div>
-
-            {!hasAllSections ? (
-              <div className="rounded-xl px-4 py-3" style={{ background:"rgba(248,113,113,0.08)", border:"1px solid rgba(248,113,113,0.2)" }}>
-                <p className="text-xs font-semibold" style={{ color:"#f87171" }}>
-                  ⚠️ Some parts have no content yet. Ask an admin to add audio + questions in the Content Manager.
-                </p>
+            {/* Practice / Exam Mode toggle */}
+            <div style={{ flexShrink: 0 }}>
+              <div style={{ display: "flex", background: "#f1f5f9", borderRadius: "6px", padding: "3px" }}>
+                {(["practice", "exam"] as ExamMode[]).map(m => (
+                  <button key={m} onClick={() => setExamMode(m)} style={{
+                    padding: "6px 16px", borderRadius: "5px",
+                    background: examMode === m ? "#ffffff" : "transparent",
+                    color: examMode === m ? "#0f172a" : "#64748b",
+                    fontSize: "13px", fontWeight: 500, border: "none", cursor: "pointer",
+                    boxShadow: examMode === m ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+                    transition: "all 0.15s",
+                  }}>
+                    {m === "practice" ? "Practice" : "Exam Mode"}
+                  </button>
+                ))}
               </div>
-            ) : (
-              <button onClick={startFullTest}
-                className="w-full sm:w-auto px-10 py-4 rounded-2xl text-base font-black text-white transition-all duration-150"
-                style={{ background:"linear-gradient(135deg,#0369a1,#0ea5e9)", boxShadow:"0 6px 24px rgba(14,165,233,0.45)" }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform="translateY(-2px)"}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform="translateY(0)"}>
-                <Headphones className="w-5 h-5 inline mr-2" />
-                Start Full Test
-              </button>
-            )}
+              <p style={{ fontSize: "11px", color: "#94a3b8", marginTop: "6px", textAlign: "right" }}>
+                {examMode === "exam" ? "Audio plays once · no rewind · timed" : "Full controls · replay anytime"}
+              </p>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* ── Section 2: Mode selector ── */}
+        <div style={{ display: "flex", gap: "10px", marginBottom: "16px", flexWrap: "wrap" }}>
+          <button onClick={() => setPageMode("practice")} style={{
+            padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
+            border: pageMode === "practice" ? "2px solid #2563eb" : "1px solid #e2e8f0",
+            background: pageMode === "practice" ? "#eff6ff" : "#ffffff",
+            color: pageMode === "practice" ? "#2563eb" : "#64748b",
+            fontSize: "13.5px", fontWeight: 600,
+            display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
+          }}>
+            ▷ Practice
+            <span style={{ fontSize: "11px", fontWeight: 400, color: "#94a3b8" }}>
+              Choose parts · replay anytime
+            </span>
+          </button>
+          <button onClick={() => setPageMode("fulltest")} style={{
+            padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
+            border: pageMode === "fulltest" ? "2px solid #2563eb" : "1px solid #e2e8f0",
+            background: pageMode === "fulltest" ? "#eff6ff" : "#ffffff",
+            color: pageMode === "fulltest" ? "#2563eb" : "#64748b",
+            fontSize: "13.5px", fontWeight: 600,
+            display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
+          }}>
+            📋 Full Mock Test
+            <span style={{ fontSize: "11px", fontWeight: 400, color: "#94a3b8" }}>
+              ~40 min · timed
+            </span>
+          </button>
+        </div>
+
+        {/* ── Section 3: Info notice ── */}
+        <div style={{
+          background: "#eff6ff", border: "1px solid #bfdbfe",
+          borderRadius: "6px", padding: "12px 16px", marginBottom: "24px",
+          display: "flex", alignItems: "flex-start", gap: "10px",
+        }}>
+          <span style={{ color: "#2563eb", fontSize: "15px", flexShrink: 0, lineHeight: "1.5" }}>ℹ</span>
+          <p style={{ fontSize: "13px", color: "#1e40af", lineHeight: "1.6", margin: 0 }}>
+            In the real exam each recording plays <strong>once only</strong>.
+            Read all questions <strong>before</strong> the audio starts.
+            Use <strong>Full Mock Test</strong> to simulate real exam conditions with all 4 parts as one continuous session.
+          </p>
+        </div>
+
+        {/* ── Section 4: Part cards (Practice) ── */}
+        {pageMode === "practice" && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "24px" }}
+            className="sm:grid-cols-4 grid-cols-2">
+            {SECTIONS.map(sec => {
+              const count      = available[sec.type]?.length ?? 0;
+              const hasContent = count > 0;
+              return (
+                <button
+                  key={sec.num}
+                  onClick={() => hasContent && startSection(sec)}
+                  disabled={!hasContent}
+                  style={{
+                    background: "#ffffff", borderRadius: "8px", textAlign: "left",
+                    border: "1px solid #e2e8f0", padding: "18px 16px",
+                    cursor: hasContent ? "pointer" : "not-allowed",
+                    opacity: hasContent ? 1 : 0.5, transition: "all 0.15s",
+                  }}
+                  onMouseEnter={e => {
+                    if (hasContent) {
+                      (e.currentTarget as HTMLElement).style.borderColor = "#2563eb";
+                      (e.currentTarget as HTMLElement).style.background = "#f8fafc";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "#e2e8f0";
+                    (e.currentTarget as HTMLElement).style.background = "#ffffff";
+                  }}
+                >
+                  {/* Part label */}
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+                    {sec.label}
+                  </div>
+                  {/* Description */}
+                  <div style={{ fontSize: "12.5px", color: "#475569", lineHeight: "1.4", marginBottom: "12px", minHeight: "36px" }}>
+                    {sec.description}
+                  </div>
+                  {/* Q range badge + content count */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
+                    <span style={{ display: "inline-block", background: "#f1f5f9", color: "#475569", fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "4px" }}>
+                      {sec.qRange}
+                    </span>
+                    {hasContent && (
+                      <span style={{ fontSize: "11px", color: "#94a3b8" }}>
+                        {count} set{count > 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </div>
+                  {/* Start CTA */}
+                  {hasContent && (
+                    <div style={{ marginTop: "12px", fontSize: "12px", fontWeight: 600, color: "#2563eb" }}>
+                      Start {examMode === "exam" ? "exam" : "practice"} →
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Section 5: Full Mock Test CTA ── */}
+        {pageMode === "fulltest" && (
+          <div>
+            {/* Parts overview row */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "16px" }}>
+              {SECTIONS.map(sec => {
+                const hasContent = (available[sec.type]?.length ?? 0) > 0;
+                return (
+                  <div key={sec.num} style={{
+                    background: "#ffffff", border: "1px solid #e2e8f0",
+                    borderRadius: "8px", padding: "16px 14px", textAlign: "center",
+                  }}>
+                    <div style={{ fontSize: "11px", fontWeight: 700, color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+                      {sec.label}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#475569", lineHeight: "1.4", marginBottom: "10px", minHeight: "32px" }}>
+                      {sec.context}
+                    </div>
+                    <span style={{
+                      display: "inline-block", fontSize: "11px", fontWeight: 600,
+                      padding: "2px 8px", borderRadius: "4px",
+                      background: hasContent ? "#f1f5f9" : "#fef2f2",
+                      color: hasContent ? "#475569" : "#dc2626",
+                    }}>
+                      {hasContent ? sec.qRange : "No content"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* CTA card */}
+            <div style={{
+              background: "#ffffff", border: "1px solid #e2e8f0",
+              borderRadius: "8px", padding: "32px 28px", textAlign: "center",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+            }}>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#0f172a", marginBottom: "8px" }}>
+                Full IELTS Listening Mock Test
+              </h2>
+              <p style={{ fontSize: "13.5px", color: "#64748b", marginBottom: "20px", lineHeight: "1.5" }}>
+                All 4 parts in one continuous session · Navigate freely between parts · Single audio playback
+              </p>
+
+              {/* Stats row */}
+              <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginBottom: "24px", flexWrap: "wrap" }}>
+                {[
+                  { icon: "🎧", text: "40 questions" },
+                  { icon: "⏱", text: examMode === "exam" ? "40 min timer" : "No timer" },
+                  { icon: "📊", text: "Instant band score" },
+                ].map((s, i) => (
+                  <div key={i} style={{ fontSize: "13px", color: "#64748b", display: "flex", alignItems: "center", gap: "5px" }}>
+                    <span>{s.icon}</span><span>{s.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              {!hasAllSections ? (
+                <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "6px", padding: "12px 16px", display: "inline-block" }}>
+                  <p style={{ fontSize: "13px", color: "#dc2626", margin: 0 }}>
+                    ⚠️ Some parts have no content yet. Add audio + questions in the Content Manager.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={startFullTest}
+                  style={{
+                    background: "#2563eb", color: "#ffffff", border: "none",
+                    borderRadius: "6px", padding: "13px 36px",
+                    fontSize: "14px", fontWeight: 600, cursor: "pointer",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "#1d4ed8"}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "#2563eb"}
+                >
+                  Start Full Mock Test →
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
