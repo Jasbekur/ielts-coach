@@ -429,16 +429,18 @@ export default function ListeningPage() {
         <div className="flex-shrink-0 h-14 flex items-center justify-between px-4 bg-white border-b border-gray-200 shadow-sm z-10">
           {/* Left: logo + test info */}
           <div className="flex items-center gap-3 min-w-0">
-            {/* Exit */}
+            {/* Exit → back to Listening selector */}
             <button
               onClick={() => {
-                if (audioRef.current) audioRef.current.pause();
-                setPlaying(false);
-                if (ftTimerRef.current) clearInterval(ftTimerRef.current);
-                setFtRunning(false); setFtSections([]);
+                if (window.confirm("Exit the test? Your answers will be lost.")) {
+                  if (audioRef.current) audioRef.current.pause();
+                  setPlaying(false);
+                  if (ftTimerRef.current) clearInterval(ftTimerRef.current);
+                  setFtRunning(false); setFtSections([]);
+                }
               }}
-              className="text-gray-400 hover:text-gray-600 transition-colors mr-1">
-              <ChevronLeft className="w-5 h-5" />
+              className="flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-gray-800 transition-colors mr-2 border border-gray-200 rounded px-2 py-1">
+              <ChevronLeft className="w-3.5 h-3.5" /> Exit
             </button>
             {/* Brand dot */}
             <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shrink-0">

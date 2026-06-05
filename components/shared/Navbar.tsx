@@ -28,7 +28,6 @@ const navItems = [
 ];
 
 const PRIMARY = "#16a34a";
-const EXAM_PATHS = ["/listening", "/reading", "/writing", "/speaking"];
 
 // ── Sensei logo mark ─────────────────────────────────────────────────────────
 function SenseiLogo({ size = 40 }: { size?: number }) {
@@ -47,7 +46,6 @@ function SenseiLogo({ size = 40 }: { size?: number }) {
 export function Sidebar() {
   const pathname = usePathname();
   const router   = useRouter();
-  if (EXAM_PATHS.some(p => pathname.startsWith(p))) return null;
   const supabase = useMemo(() => createClient(), []);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -232,7 +230,6 @@ export function Sidebar() {
 
 export function MobileNav() {
   const pathname  = usePathname();
-  if (EXAM_PATHS.some(p => pathname.startsWith(p))) return null;
   const { isAdmin, isEditor } = useUserRole();
 
   const adminItem = (isAdmin || isEditor)
