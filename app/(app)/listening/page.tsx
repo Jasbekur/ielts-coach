@@ -126,8 +126,10 @@ export default function ListeningPage() {
   const [playing,      setPlaying]  = useState(false);
   const [curTime,      setCurTime]  = useState(0);
   const [dur,          setDur]      = useState(0);
-  const [muted,        setMuted]    = useState(false);
+  const [muted,        setMuted]       = useState(false);
   const [audioStarted, setAudioStarted] = useState(false);
+  const [audioBlocked, setAudioBlocked] = useState(false); // autoplay blocked overlay
+  const [audioProgress, setAudioProgress] = useState(0);   // 0-100 for progress bar
 
   // ── Practice mode ──────────────────────────────────────────────────────────
   const [practicePhase,    setPracticePhase]    = useState<"selector"|"listening"|"results">("selector");
@@ -316,10 +318,29 @@ export default function ListeningPage() {
     if (!secs.length) return;
     setFtSections(secs);
     setFtAnswers({}); setFtActiveTab(0); setFtResult(null);
-    setAudioStarted(false); setPlaying(false); setCurTime(0); setDur(0);
+    setAudioStarted(false); setAudioBlocked(false); setAudioProgress(0);
+    setPlaying(false); setCurTime(0); setDur(0);
     setFtTimeLeft(40 * 60); setFtRunning(true);
     setFtPhase("active");
   }
+
+  // ── Auto-play audio when full test goes active ──────────────────────────────
+  useEffect(() => {
+    if (pageMode !== "fulltest" || ftPhase !== "active" || !ftSections.length) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+    const timer = setTimeout(async () => {
+      try {
+        await audio.play();
+        setAudioStarted(true);
+        setAudioBlocked(false);
+      } catch {
+        setAudioBlocked(true); // browser blocked autoplay → show overlay
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageMode, ftPhase, ftSections.length]);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // LOADING
@@ -353,16 +374,37 @@ export default function ListeningPage() {
     return (
       <div className="fixed inset-0 z-50 flex flex-col bg-white" style={{ fontFamily: "var(--font-inter, sans-serif)" }}>
 
-        {/* Hidden audio */}
-        <audio ref={audioRef} src={audioUrl}
-          onTimeUpdate={() => setCurTime(audioRef.current?.currentTime ?? 0)}
+        {/* Hidden audio — no controls, no seeking */}
+        <audio ref={audioRef} src={audioUrl} preload="auto"
+          onTimeUpdate={() => {
+            const a = audioRef.current;
+            if (!a) return;
+            setCurTime(a.currentTime);
+            if (a.duration) setAudioProgress((a.currentTime / a.duration) * 100);
+          }}
           onLoadedMetadata={() => setDur(audioRef.current?.duration ?? 0)}
-          onPlay={() => setPlaying(true)}
+          onPlay={() => { setPlaying(true); setAudioStarted(true); }}
           onPause={() => setPlaying(false)}
-          onEnded={() => setPlaying(false)}
-          onSeeking={() => { if (audioRef.current) audioRef.current.currentTime = curTime; }}
+          onEnded={() => { setPlaying(false); }}
           muted={muted}
         />
+
+        {/* Autoplay-blocked overlay */}
+        {audioBlocked && (
+          <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:999 }}>
+            <div style={{ background:"#ffffff", borderRadius:"12px", padding:"32px 40px", textAlign:"center", maxWidth:"400px" }}>
+              <p style={{ fontSize:"16px", fontWeight:700, marginBottom:"8px", color:"#0f172a" }}>Ready to start?</p>
+              <p style={{ fontSize:"13px", color:"#64748b", marginBottom:"20px", lineHeight:"1.5" }}>
+                The audio will play once and cannot be paused or rewound. Make sure your volume is turned up.
+              </p>
+              <button
+                onClick={async () => { await audioRef.current?.play(); setAudioBlocked(false); setAudioStarted(true); }}
+                style={{ background:"#2563eb", color:"#fff", border:"none", borderRadius:"6px", padding:"12px 28px", fontSize:"14px", fontWeight:600, cursor:"pointer" }}>
+                Begin Listening Test →
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── TOP BAR ── */}
         <div className="flex-shrink-0 h-14 flex items-center justify-between px-4 bg-white border-b border-gray-200 shadow-sm z-10">
@@ -395,21 +437,23 @@ export default function ListeningPage() {
               <Clock className="w-4 h-4" />
               <span className="font-mono tabular-nums">{fmtTime(ftTimeLeft)} remaining</span>
             </div>
-            {!audioStarted ? (
-              <button
-                onClick={() => { audioRef.current?.play(); setAudioStarted(true); }}
-                className="flex items-center gap-1.5 text-sm font-medium text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full transition-colors">
-                <Play className="w-3.5 h-3.5" /> Start Audio
+            {/* Audio status — NO manual play button */}
+            <div className="flex items-center gap-2">
+              {playing ? (
+                <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <Volume2 className="w-4 h-4 text-blue-500 animate-pulse" />
+                  <span className="text-xs font-medium text-gray-600">Audio playing</span>
+                </div>
+              ) : audioStarted ? (
+                <span className="text-xs text-gray-400">Audio complete</span>
+              ) : (
+                <span className="text-xs text-gray-400 italic">Loading audio…</span>
+              )}
+              {/* Volume only */}
+              <button onClick={() => setMuted(m => !m)} className="text-gray-400 hover:text-gray-600 ml-1">
+                {muted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4" />}
               </button>
-            ) : (
-              <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                <Volume2 className="w-4 h-4 text-green-500 animate-pulse" />
-                <span>Audio is playing</span>
-                <button onClick={() => setMuted(m => !m)} className="ml-1 text-gray-400 hover:text-gray-600">
-                  {muted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : null}
-                </button>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Right: submit */}
@@ -418,6 +462,16 @@ export default function ListeningPage() {
             className="bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-5 py-2 rounded transition-colors shrink-0">
             Submit
           </button>
+        </div>
+
+        {/* ── READ-ONLY audio progress bar ── */}
+        <div className="flex-shrink-0 px-4 py-2 bg-white border-b border-gray-100 flex items-center gap-3">
+          <span className="text-xs font-mono text-gray-400 tabular-nums shrink-0">{fmtTime(curTime)}</span>
+          <div style={{ flex:1, height:"4px", background:"#e5e7eb", borderRadius:"2px", overflow:"hidden" }}>
+            <div style={{ height:"100%", background: playing ? "#2563eb" : "#94a3b8", width:`${audioProgress}%`, borderRadius:"2px", transition:"width 0.5s linear" }} />
+          </div>
+          <span className="text-xs font-mono text-gray-400 tabular-nums shrink-0">{dur ? fmtTime(dur) : "--:--"}</span>
+          <span className="text-[10px] text-gray-400 italic hidden sm:inline">🎧 plays once</span>
         </div>
 
         {/* ── CONTENT (Fix 3, 4, 5, 6) ── */}

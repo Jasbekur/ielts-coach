@@ -585,21 +585,27 @@ export default function ReadingPage() {
   // ══════════════════════════════════════════════════════════════════════════
   if (phase === "selector") {
     return (
-      <div className="space-y-7">
-        {/* Header */}
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <BookOpen className="w-5 h-5 text-emerald-600" />
-            <h1 className="text-3xl font-display tracking-tight">Reading</h1>
-          </div>
-          <p className="text-base text-muted-foreground">
-            IELTS Academic · 3 passages · 40 questions · 60 minutes
-          </p>
+      <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+      <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+
+        {/* Back button */}
+        <div style={{ marginBottom: "16px" }}>
+          <a href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "transparent", border: "none", color: "#64748b", fontSize: "13.5px", fontWeight: 500, cursor: "pointer", padding: "4px 0", textDecoration: "none" }}>
+            ← Dashboard
+          </a>
         </div>
 
+        {/* Header card */}
+        <div style={{ background: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", borderLeft: "4px solid #2563eb", padding: "20px 24px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+          <p style={{ fontSize: "11px", fontWeight: 600, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>IELTS Academic</p>
+          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>Reading</h1>
+          <p style={{ fontSize: "13px", color: "#475569" }}>3 passages · 40 questions · 60 minutes · Timed exam</p>
+        </div>
+
+        <div className="space-y-6">
         {/* Test set picker */}
         <div>
-          <p className="text-sm font-bold mb-3 uppercase tracking-widest text-[11px]" style={{ color: "#059669" }}>
+          <p style={{ fontSize: "11px", fontWeight: 700, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
             Select Test Set
           </p>
           <div className="flex gap-2">
@@ -607,15 +613,14 @@ export default function ReadingPage() {
               <button
                 key={idx}
                 onClick={() => setTestSetIdx(idx)}
-                className={cn(
-                  "px-4 py-2 rounded-xl text-sm font-semibold border transition-all",
-                  testSetIdx === idx
-                    ? "text-white border-emerald-600"
-                    : "text-gray-600 border-gray-200 bg-card hover:border-emerald-300 hover:bg-emerald-50/30"
-                )}
-                style={testSetIdx === idx ? {
-                  background: "linear-gradient(135deg, #059669, #047857)",
-                } : {}}
+                style={{
+                  padding: "6px 16px", borderRadius: "20px", fontSize: "13px",
+                  fontWeight: testSetIdx === idx ? 600 : 400, cursor: "pointer",
+                  background: testSetIdx === idx ? "#2563eb" : "#ffffff",
+                  color: testSetIdx === idx ? "#ffffff" : "#64748b",
+                  border: testSetIdx === idx ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                  transition: "all 0.15s",
+                }}
               >
                 {label}
               </button>
@@ -626,63 +631,42 @@ export default function ReadingPage() {
         {/* Full test card */}
         <div
           className="rounded-2xl p-8 relative overflow-hidden cursor-pointer group transition-all hover:scale-[1.01]"
-          style={{
-            background: "linear-gradient(135deg, #0b1c30, #122338)",
-            boxShadow: "0 8px 32px rgba(5,150,105,0.2)",
-          }}
+          style={{ background: "linear-gradient(135deg, #0b1c30, #122338)", boxShadow: "0 8px 32px rgba(37,99,235,0.2)" }}
           onClick={() => startExam(null)}
         >
-          <div
-            className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(circle, rgba(5,150,105,0.2), transparent 70%)" }}
-          />
+          <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(37,99,235,0.2), transparent 70%)" }} />
           <div className="relative z-10">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <Badge className="mb-3 text-[10px] font-bold tracking-widest" style={{ background: "rgba(16,185,129,0.15)", color: "#4ade80", border: "1px solid rgba(16,185,129,0.3)" }}>
+                <Badge className="mb-3 text-[10px] font-bold tracking-widest" style={{ background: "rgba(37,99,235,0.2)", color: "#93c5fd", border: "1px solid rgba(37,99,235,0.4)" }}>
                   FULL ACADEMIC TEST
                 </Badge>
-                <h2 className="text-2xl font-display" style={{ color: "white" }}>
-                  3 Passages · 40 Questions
-                </h2>
+                <h2 className="text-2xl font-display" style={{ color: "white" }}>3 Passages · 40 Questions</h2>
                 <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.6)" }}>
                   Complete a full timed exam under real conditions to get your instant AI-calculated band score.
                 </p>
               </div>
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: "rgba(16,185,129,0.15)" }}
-              >
-                <Trophy className="w-6 h-6 text-emerald-400" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(37,99,235,0.2)" }}>
+                <Trophy className="w-6 h-6 text-blue-400" />
               </div>
             </div>
             <div className="flex flex-wrap gap-4 mb-6">
-              {[
-                { icon: Timer, label: "60 min" },
-                { icon: FileText, label: "40 questions" },
-                { icon: Zap, label: "Instant band score" },
-              ].map(({ icon: Icon, label }) => (
+              {[{ icon: Timer, label: "60 min" }, { icon: FileText, label: "40 questions" }, { icon: Zap, label: "Instant band score" }].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-1.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
-                  <Icon className="w-3.5 h-3.5" />
-                  {label}
+                  <Icon className="w-3.5 h-3.5" />{label}
                 </div>
               ))}
             </div>
-            <Button
-              className="gap-2 font-bold text-white text-sm"
-              style={{
-                background: "#10b981",
-                boxShadow: "0 4px 0 #059669, 0 6px 16px rgba(5,150,105,0.4)",
-              }}
-            >
+            <button style={{ background: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", padding: "10px 20px", fontSize: "13.5px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
               Start Full Test <ArrowRight className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
         </div>
 
         {/* Passage practice cards */}
         <div>
-          <p className="text-sm font-bold mb-3 uppercase tracking-widest text-[11px]" style={{ color: "#059669" }}>
+          <p style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>
             Practice Individual Passages
           </p>
           <div className="space-y-3">
@@ -691,12 +675,12 @@ export default function ReadingPage() {
               return (
                 <div
                   key={p.id}
-                  className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4 hover:border-emerald-300 hover:bg-emerald-50/30 cursor-pointer transition-all group"
+                  className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4 hover:border-blue-300 hover:bg-blue-50/30 cursor-pointer transition-all group"
                   onClick={() => startExam(i)}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm"
-                      style={{ background: "rgba(5,150,105,0.1)", color: "#059669" }}>
+                      style={{ background: "rgba(37,99,235,0.1)", color: "#2563eb" }}>
                       {p.id}
                     </div>
                     <div>
@@ -706,7 +690,7 @@ export default function ReadingPage() {
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-emerald-600 transition-colors shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-blue-600 transition-colors shrink-0" />
                 </div>
               );
             })}
@@ -723,6 +707,8 @@ export default function ReadingPage() {
             <li>Never leave a question blank — guess if unsure (no penalty)</li>
           </ul>
         </div>
+        </div>
+      </div>
       </div>
     );
   }
@@ -737,10 +723,17 @@ export default function ReadingPage() {
     const isPractice = practiceOnly !== null;
 
     return (
+      <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+      <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+      <div style={{ marginBottom: "16px" }}>
+        <button onClick={() => setPhase("selector")} style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "transparent", border: "none", color: "#64748b", fontSize: "13.5px", fontWeight: 500, cursor: "pointer", padding: "4px 0" }}>
+          ← Back to Reading
+        </button>
+      </div>
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-4">
             <BookOpen className="w-3.5 h-3.5" />
             {isPractice
               ? `Passage ${practiceOnly + 1} Practice Result`
@@ -852,6 +845,8 @@ export default function ReadingPage() {
             <RotateCcw className="w-4 h-4" /> Try Again
           </Button>
         </div>
+      </div>
+      </div>
       </div>
     );
   }

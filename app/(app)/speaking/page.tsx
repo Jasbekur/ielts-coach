@@ -1001,7 +1001,14 @@ export default function SpeakingPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
-    <div style={{ maxWidth: "860px" }}>
+    <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+
+    {/* Back button */}
+    <div style={{ marginBottom: "16px" }}>
+      <a href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", fontSize: "13.5px", fontWeight: 500, textDecoration: "none" }}>
+        ← Dashboard
+      </a>
+    </div>
 
     {/* ── Header card ── */}
     <div style={{
