@@ -1266,7 +1266,7 @@ function QuestionCard({ q, value, onChange, isFlagged, onFlag, questionRef }: {
   );
 }
 
-// ── OneIELTS-style questions (light theme, inline inputs) ─────────────────────
+// ── Cambridge IELTS paper-style questions block ───────────────────────────────
 
 function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, questionRefs }: {
   mat:           LMaterial;
@@ -1279,11 +1279,26 @@ function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, quest
   const groups = mat.content.question_groups ?? [];
   const flatQs = mat.content.questions ?? [];
 
+  const paperStyle: React.CSSProperties = {
+    border:      "1px solid #374151",
+    borderRadius:"4px",
+    padding:     "24px 32px",
+    background:  "white",
+    fontFamily:  "'Times New Roman', Georgia, serif",
+    fontSize:    "14px",
+    lineHeight:  "2.0",
+    color:       "#111827",
+  };
+
   if (groups.length === 0) {
     return (
-      <div className="space-y-4">
+      <div style={paperStyle}>
+        {mat.title && (
+          <p style={{ fontWeight: 700, textAlign: "center", marginBottom: "16px" }}>{mat.title}</p>
+        )}
         {flatQs.map(q => (
-          <OneIELTSInput key={q.number} q={q} value={answers[q.number] ?? ""}
+          <CambridgeQuestionLine key={q.number} q={q}
+            value={answers[q.number] ?? ""}
             onChange={v => onChange(q.number, v)}
             isFlagged={flagged?.has(q.number) ?? false}
             onFlag={onFlag ? () => onFlag(q.number) : undefined}
@@ -1294,19 +1309,25 @@ function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, quest
   }
 
   return (
-    <div className="space-y-8">
+    <div style={paperStyle}>
+      {/* Section title centred */}
+      {mat.title && (
+        <p style={{ fontWeight: 700, textAlign: "center", marginBottom: "16px" }}>{mat.title}</p>
+      )}
+
       {groups.map((group, gi) => {
         const isMcqGroup = group.type === "mcq_single" || group.type === "mcq_multi";
         return (
-          <div key={gi}>
-            {/* Group instruction */}
-            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{group.instruction}</p>
+          <div key={gi} style={{ marginBottom: "16px" }}>
+            {/* Subsection instruction — italic, smaller */}
+            <p style={{ fontStyle: "italic", fontSize: "13px", color: "#374151", marginBottom: "4px", lineHeight: "1.5" }}>
+              {group.instruction}
+            </p>
 
             {isMcqGroup ? (
-              /* MCQ: card-per-question layout */
-              <div className="space-y-4">
+              <div>
                 {group.questions.map(q => (
-                  <OneIELTSMCQ key={q.number} q={q}
+                  <CambridgeMCQ key={q.number} q={q}
                     value={answers[q.number] ?? ""}
                     onChange={v => onChange(q.number, v)}
                     isMulti={group.type === "mcq_multi"}
@@ -1316,10 +1337,9 @@ function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, quest
                 ))}
               </div>
             ) : (
-              /* Notes/Form/Short: inline layout */
-              <div className="space-y-3">
+              <div>
                 {group.questions.map(q => (
-                  <OneIELTSInput key={q.number} q={q}
+                  <CambridgeQuestionLine key={q.number} q={q}
                     value={answers[q.number] ?? ""}
                     onChange={v => onChange(q.number, v)}
                     isFlagged={flagged?.has(q.number) ?? false}
@@ -1335,8 +1355,8 @@ function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, quest
   );
 }
 
-// Inline fill-blank input (notes / form / short / sentence)
-function OneIELTSInput({ q, value, onChange, isFlagged, onFlag, questionRef }: {
+// Single fill-blank question line (Cambridge paper format)
+function CambridgeQuestionLine({ q, value, onChange, isFlagged, onFlag, questionRef }: {
   q:           LQuestion;
   value:       string;
   onChange:    (v: string) => void;
@@ -1345,77 +1365,78 @@ function OneIELTSInput({ q, value, onChange, isFlagged, onFlag, questionRef }: {
   questionRef?: (el: HTMLDivElement | null) => void;
 }) {
   const isSentence = q.type === "sentence";
+
   return (
-    <div ref={questionRef} className="flex items-center gap-2 flex-wrap text-sm text-gray-700 group">
+    <div ref={questionRef}
+      style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0 6px", marginBottom: "0" }}
+      className="group">
       {/* Flag button */}
       {onFlag && (
         <button onClick={onFlag}
-          className={`opacity-0 group-hover:opacity-100 text-[10px] px-1.5 py-0.5 rounded transition-all mr-1 ${
-            isFlagged ? "opacity-100 text-amber-600 bg-amber-50" : "text-gray-300 hover:text-amber-500"
-          }`}>
+          style={{
+            fontSize:   "10px",
+            marginRight:"2px",
+            opacity:    isFlagged ? 1 : 0,
+            color:      isFlagged ? "#d97706" : "#9ca3af",
+            background: "none",
+            border:     "none",
+            cursor:     "pointer",
+            padding:    "0",
+            lineHeight: "1",
+          }}
+          className="group-hover:opacity-100 transition-opacity">
           🚩
         </button>
       )}
 
-      {/* Sentence completion: prefix [input] suffix */}
       {isSentence ? (
         <>
           {q.prefix && <span>{q.prefix}</span>}
-          <OneIELTSField q={q} value={value} onChange={onChange} />
+          <strong style={{ fontWeight: 700 }}>{q.number}</strong>
+          <CambridgeInput value={value} onChange={onChange} />
           {q.suffix && <span>{q.suffix}</span>}
         </>
       ) : (
-        /* Label: input */
         <>
-          <span className="font-medium">{q.text}</span>
-          <OneIELTSField q={q} value={value} onChange={onChange} />
+          <span>{q.text}</span>
+          <strong style={{ fontWeight: 700 }}>{q.number}</strong>
+          <CambridgeInput value={value} onChange={onChange} />
         </>
       )}
     </div>
   );
 }
 
-// The actual styled input box (numbered, thin border, OneIELTS style)
-function OneIELTSField({ q, value, onChange }: {
-  q: LQuestion; value: string; onChange: (v: string) => void;
-}) {
-  const filled = value.trim().length > 0;
+// Underline-only input (replaces Cambridge dotted line)
+function CambridgeInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [focused, setFocused] = React.useState(false);
   return (
-    <div className="relative inline-flex items-center">
-      <input
-        type="text"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        spellCheck={false}
-        autoComplete="off"
-        className="text-center text-sm focus:outline-none transition-all"
-        style={{
-          minWidth:    "110px",
-          width:       value.length > 10 ? `${value.length + 4}ch` : "110px",
-          borderTop:   "none",
-          borderLeft:  "none",
-          borderRight: "none",
-          borderBottom: filled ? "2px solid #2563eb" : "2px solid #9ca3af",
-          background:  "transparent",
-          color:       "#111827",
-          padding:     "2px 4px",
-          fontWeight:  filled ? 600 : 400,
-        }}
-        onFocus={e => { e.currentTarget.style.borderBottomColor = "#2563eb"; }}
-        onBlur={e  => { e.currentTarget.style.borderBottomColor = filled ? "#2563eb" : "#9ca3af"; }}
-      />
-      {/* Question number badge — shown when empty */}
-      {!filled && (
-        <span className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-semibold pointer-events-none select-none">
-          {q.number}
-        </span>
-      )}
-    </div>
+    <input
+      type="text"
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      spellCheck={false}
+      autoComplete="off"
+      style={{
+        border:       "none",
+        borderBottom: focused ? "2px solid #2563eb" : "1.5px solid #374151",
+        background:   "transparent",
+        minWidth:     "140px",
+        padding:      "0 4px 2px",
+        fontSize:     "14px",
+        fontFamily:   "'Times New Roman', Georgia, serif",
+        outline:      "none",
+        color:        "#111827",
+        fontWeight:   value.trim() ? 600 : 400,
+      }}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+    />
   );
 }
 
-// MCQ question card (OneIELTS light style)
-function OneIELTSMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, questionRef }: {
+// MCQ question (Cambridge light style)
+function CambridgeMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, questionRef }: {
   q:           LQuestion;
   value:       string;
   onChange:    (v: string) => void;
@@ -1430,37 +1451,54 @@ function OneIELTSMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, questionR
 
   function toggle(letter: string) {
     if (!isMulti) { onChange(value === letter ? "" : letter); return; }
-    const cur = value.split(",").map(s => s.trim()).filter(Boolean);
+    const cur  = value.split(",").map(s => s.trim()).filter(Boolean);
     const next = cur.includes(letter) ? cur.filter(l => l !== letter) : [...cur, letter];
     onChange(next.sort().join(","));
   }
 
   return (
-    <div ref={questionRef} className="space-y-2">
-      <div className="flex items-start gap-2">
-        <span className="font-bold text-gray-800 text-sm shrink-0">{q.number}.</span>
-        <p className="text-sm text-gray-800 leading-snug">{q.text}</p>
+    <div ref={questionRef} style={{ marginBottom: "12px" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "6px" }}>
         {onFlag && (
           <button onClick={onFlag}
-            className={`ml-auto text-[10px] px-1.5 py-0.5 rounded shrink-0 ${isFlagged ? "text-amber-600 bg-amber-50" : "text-gray-300 hover:text-amber-500"}`}>
+            style={{ fontSize: "10px", color: isFlagged ? "#d97706" : "#9ca3af", background: "none", border: "none", cursor: "pointer", paddingTop: "2px" }}>
             🚩
           </button>
         )}
+        <p style={{ margin: 0 }}>
+          <strong style={{ fontWeight: 700 }}>{q.number}.</strong> {q.text}
+        </p>
       </div>
-      <div className="space-y-1.5 pl-5">
+      <div style={{ paddingLeft: "20px", marginTop: "4px" }}>
         {(q.options ?? []).map((opt, oi) => {
-          const letter   = ["A","B","C","D","E","F","G"][oi];
+          const letter     = ["A","B","C","D","E","F","G"][oi];
           const isSelected = selected.includes(letter);
           return (
             <button key={oi} onClick={() => toggle(letter)}
-              className="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm border transition-all"
               style={{
+                display:    "flex",
+                alignItems: "center",
+                gap:        "8px",
+                width:      "100%",
+                textAlign:  "left",
+                padding:    "4px 8px",
+                margin:     "2px 0",
+                borderRadius:"4px",
+                border:     `1px solid ${isSelected ? "#2563eb" : "#e5e7eb"}`,
                 background: isSelected ? "#dbeafe" : "white",
-                borderColor: isSelected ? "#2563eb" : "#e5e7eb",
-                color:       isSelected ? "#1d4ed8" : "#374151",
+                color:      isSelected ? "#1d4ed8" : "#374151",
+                fontFamily: "'Times New Roman', Georgia, serif",
+                fontSize:   "14px",
+                cursor:     "pointer",
               }}>
-              <span className="w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold shrink-0"
-                style={{ borderColor: isSelected ? "#2563eb" : "#d1d5db", background: isSelected ? "#2563eb" : "white", color: isSelected ? "white" : "#6b7280" }}>
+              <span style={{
+                width:"20px", height:"20px", borderRadius:"50%",
+                border:    `1px solid ${isSelected ? "#2563eb" : "#d1d5db"}`,
+                background: isSelected ? "#2563eb" : "white",
+                color:      isSelected ? "white" : "#6b7280",
+                display:   "flex", alignItems:"center", justifyContent:"center",
+                fontSize:  "11px", fontWeight:700, flexShrink:0,
+              }}>
                 {letter}
               </span>
               {opt}
@@ -1471,3 +1509,8 @@ function OneIELTSMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, questionR
     </div>
   );
 }
+
+// Keep old names as aliases so nothing else breaks
+const OneIELTSInput  = CambridgeQuestionLine;
+const OneIELTSField  = CambridgeInput;
+const OneIELTSMCQ    = CambridgeMCQ;
