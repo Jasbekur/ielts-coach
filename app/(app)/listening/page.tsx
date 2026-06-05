@@ -420,18 +420,43 @@ export default function ListeningPage() {
           </button>
         </div>
 
-        {/* ── PART HEADER ── */}
-        <div className="flex-shrink-0 px-6 py-3 bg-gray-50 border-b border-gray-200">
-          <p className="font-bold text-gray-800 text-sm">Part {currentSec.meta.num}</p>
-          <p className="text-gray-600 text-sm">
-            Listen and answer questions {qStart} - {qEnd}.
-            {currentSec.mat.title && <span className="text-gray-400 ml-1">— {currentSec.mat.title}</span>}
-          </p>
-        </div>
+        {/* ── CONTENT (Fix 3, 4, 5, 6) ── */}
+        <div className="flex-1 overflow-y-auto" style={{ background: "#f9fafb" }}>
+          <div style={{ maxWidth: "760px", margin: "0 auto", padding: "32px 24px 80px" }}>
 
-        {/* ── CONTENT ── */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-2xl mx-auto px-8 py-8">
+            {/* Fix 3 — Cambridge part header above the box */}
+            <div style={{ marginBottom: "24px", fontFamily: "'Times New Roman', Georgia, serif" }}>
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "4px" }}>
+                <span style={{ fontWeight: 700, fontSize: "15px", letterSpacing: "3px", color: "#111827" }}>
+                  PART {currentSec.meta.num}
+                </span>
+                <span style={{ fontStyle: "italic", fontWeight: 700, fontSize: "14px", color: "#111827" }}>
+                  Questions {qStart}–{qEnd}
+                </span>
+              </div>
+              <p style={{ fontStyle: "italic", fontSize: "14px", color: "#374151", marginBottom: "2px" }}>
+                Questions {qStart}–{qEnd}
+              </p>
+              {(() => {
+                const firstGroup = currentSec.mat.content.question_groups?.[0];
+                const instr = firstGroup?.instruction ?? "";
+                const isNotes = instr.toLowerCase().includes("complete") || instr.toLowerCase().includes("note") || instr.toLowerCase().includes("form");
+                return (
+                  <>
+                    <p style={{ fontStyle: "italic", fontSize: "14px", color: "#374151", marginBottom: "2px" }}>
+                      {isNotes ? "Complete the notes below." : instr ? instr.split(".")[0] + "." : "Answer the questions below."}
+                    </p>
+                    <p style={{ fontSize: "14px", color: "#374151", marginBottom: "0" }}>
+                      Write{" "}
+                      <strong style={{ fontStyle: "normal" }}>NO MORE THAN TWO WORDS AND/OR A NUMBER</strong>
+                      {" "}for each answer.
+                    </p>
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Fix 4 — Bordered Cambridge box */}
             <OneIELTSQuestionsBlock
               mat={currentSec.mat}
               answers={ftAnswers}
@@ -1268,6 +1293,17 @@ function QuestionCard({ q, value, onChange, isFlagged, onFlag, questionRef }: {
 
 // ── Cambridge IELTS paper-style questions block ───────────────────────────────
 
+const PAPER: React.CSSProperties = {
+  border:      "1px solid #374151",
+  borderRadius:"3px",
+  padding:     "28px 36px",
+  background:  "#ffffff",
+  fontFamily:  "'Times New Roman', Georgia, serif",
+  fontSize:    "14px",
+  lineHeight:  "2.4",
+  color:       "#111827",
+};
+
 function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, questionRefs }: {
   mat:           LMaterial;
   answers:       Record<number, string>;
@@ -1279,83 +1315,58 @@ function OneIELTSQuestionsBlock({ mat, answers, onChange, flagged, onFlag, quest
   const groups = mat.content.question_groups ?? [];
   const flatQs = mat.content.questions ?? [];
 
-  const paperStyle: React.CSSProperties = {
-    border:      "1px solid #374151",
-    borderRadius:"4px",
-    padding:     "24px 32px",
-    background:  "white",
-    fontFamily:  "'Times New Roman', Georgia, serif",
-    fontSize:    "14px",
-    lineHeight:  "2.0",
-    color:       "#111827",
-  };
+  const renderQ = (q: LQuestion) => (
+    <CambridgeQuestionLine key={q.number} q={q}
+      value={answers[q.number] ?? ""}
+      onChange={v => onChange(q.number, v)}
+      isFlagged={flagged?.has(q.number) ?? false}
+      onFlag={onFlag ? () => onFlag(q.number) : undefined}
+      questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
+  );
 
-  if (groups.length === 0) {
-    return (
-      <div style={paperStyle}>
-        {mat.title && (
-          <p style={{ fontWeight: 700, textAlign: "center", marginBottom: "16px" }}>{mat.title}</p>
-        )}
-        {flatQs.map(q => (
-          <CambridgeQuestionLine key={q.number} q={q}
-            value={answers[q.number] ?? ""}
-            onChange={v => onChange(q.number, v)}
-            isFlagged={flagged?.has(q.number) ?? false}
-            onFlag={onFlag ? () => onFlag(q.number) : undefined}
-            questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
-        ))}
-      </div>
-    );
-  }
+  const renderMCQ = (q: LQuestion, isMulti: boolean) => (
+    <CambridgeMCQ key={q.number} q={q}
+      value={answers[q.number] ?? ""}
+      onChange={v => onChange(q.number, v)}
+      isMulti={isMulti}
+      isFlagged={flagged?.has(q.number) ?? false}
+      onFlag={onFlag ? () => onFlag(q.number) : undefined}
+      questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
+  );
 
   return (
-    <div style={paperStyle}>
-      {/* Section title centred */}
+    <div style={PAPER}>
+      {/* Fix 4 — section title centered bold inside box */}
       {mat.title && (
-        <p style={{ fontWeight: 700, textAlign: "center", marginBottom: "16px" }}>{mat.title}</p>
+        <p style={{ fontWeight: 700, textAlign: "center", fontSize: "15px", marginBottom: "18px", lineHeight: "1.4" }}>
+          {mat.title}
+        </p>
       )}
 
-      {groups.map((group, gi) => {
-        const isMcqGroup = group.type === "mcq_single" || group.type === "mcq_multi";
-        return (
-          <div key={gi} style={{ marginBottom: "16px" }}>
-            {/* Subsection instruction — italic, smaller */}
-            <p style={{ fontStyle: "italic", fontSize: "13px", color: "#374151", marginBottom: "4px", lineHeight: "1.5" }}>
-              {group.instruction}
-            </p>
-
-            {isMcqGroup ? (
-              <div>
-                {group.questions.map(q => (
-                  <CambridgeMCQ key={q.number} q={q}
-                    value={answers[q.number] ?? ""}
-                    onChange={v => onChange(q.number, v)}
-                    isMulti={group.type === "mcq_multi"}
-                    isFlagged={flagged?.has(q.number) ?? false}
-                    onFlag={onFlag ? () => onFlag(q.number) : undefined}
-                    questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
-                ))}
+      {groups.length === 0
+        ? flatQs.map(renderQ)
+        : groups.map((group, gi) => {
+            const isMcq = group.type === "mcq_single" || group.type === "mcq_multi";
+            return (
+              <div key={gi} style={{ marginBottom: "20px" }}>
+                {/* Fix 4 — subsection heading bold left if group has a label */}
+                {(group as LGroup & { title?: string }).title && (
+                  <p style={{ fontWeight: 700, fontSize: "14px", marginBottom: "10px", lineHeight: "1.4" }}>
+                    {(group as LGroup & { title?: string }).title}
+                  </p>
+                )}
+                {isMcq
+                  ? group.questions.map(q => renderMCQ(q, group.type === "mcq_multi"))
+                  : group.questions.map(renderQ)}
               </div>
-            ) : (
-              <div>
-                {group.questions.map(q => (
-                  <CambridgeQuestionLine key={q.number} q={q}
-                    value={answers[q.number] ?? ""}
-                    onChange={v => onChange(q.number, v)}
-                    isFlagged={flagged?.has(q.number) ?? false}
-                    onFlag={onFlag ? () => onFlag(q.number) : undefined}
-                    questionRef={el => { if (questionRefs) questionRefs.current[q.number] = el; }} />
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
+            );
+          })
+      }
     </div>
   );
 }
 
-// Single fill-blank question line (Cambridge paper format)
+// Fix 2 + 5 — Cambridge fill-blank line with smart layout detection
 function CambridgeQuestionLine({ q, value, onChange, isFlagged, onFlag, questionRef }: {
   q:           LQuestion;
   value:       string;
@@ -1364,50 +1375,75 @@ function CambridgeQuestionLine({ q, value, onChange, isFlagged, onFlag, question
   onFlag?:     () => void;
   questionRef?: (el: HTMLDivElement | null) => void;
 }) {
-  const isSentence = q.type === "sentence";
+  const isSentence  = q.type === "sentence";
+  const colonIdx    = q.text.indexOf(":");
+  // Fix 5 — detect "Label: content" two-column pattern
+  const isTwoCol    = !isSentence && colonIdx > 0 && colonIdx < 30;
+  // Fix 2 — detect inline blank marker
+  const hasBlank    = /_{2,}/.test(q.text);
 
-  return (
-    <div ref={questionRef}
-      style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0 6px", marginBottom: "0" }}
-      className="group">
-      {/* Flag button */}
-      {onFlag && (
-        <button onClick={onFlag}
-          style={{
-            fontSize:   "10px",
-            marginRight:"2px",
-            opacity:    isFlagged ? 1 : 0,
-            color:      isFlagged ? "#d97706" : "#9ca3af",
-            background: "none",
-            border:     "none",
-            cursor:     "pointer",
-            padding:    "0",
-            lineHeight: "1",
-          }}
-          className="group-hover:opacity-100 transition-opacity">
-          🚩
-        </button>
-      )}
+  const flagBtn = onFlag ? (
+    <button onClick={onFlag} className="group-hover:opacity-100 transition-opacity"
+      style={{ fontSize:"10px", opacity: isFlagged ? 1 : 0, color: isFlagged ? "#d97706" : "#9ca3af",
+               background:"none", border:"none", cursor:"pointer", padding:"0 4px 0 0", lineHeight:"1", flexShrink:0 }}>
+      🚩
+    </button>
+  ) : null;
 
-      {isSentence ? (
-        <>
-          {q.prefix && <span>{q.prefix}</span>}
-          <strong style={{ fontWeight: 700 }}>{q.number}</strong>
-          <CambridgeInput value={value} onChange={onChange} />
-          {q.suffix && <span>{q.suffix}</span>}
-        </>
-      ) : (
-        <>
-          <span>{q.text}</span>
-          <strong style={{ fontWeight: 700 }}>{q.number}</strong>
-          <CambridgeInput value={value} onChange={onChange} />
-        </>
-      )}
+  const inlineRow = (content: React.ReactNode) => (
+    <div ref={questionRef} className="group"
+      style={{ display:"flex", alignItems:"baseline", flexWrap:"wrap", gap:"0 5px", lineHeight:"2.4" }}>
+      {flagBtn}{content}
     </div>
   );
+
+  if (isSentence) {
+    return inlineRow(<>
+      {q.prefix && <span>{q.prefix}</span>}
+      <strong>{q.number}</strong>
+      <CambridgeInput value={value} onChange={onChange} />
+      {q.suffix && <span>{q.suffix}</span>}
+    </>);
+  }
+
+  if (isTwoCol) {
+    const label   = q.text.slice(0, colonIdx + 1);
+    const rest    = q.text.slice(colonIdx + 1).trim();
+    const parts   = rest.split(/_{2,}/);
+    return (
+      <div ref={questionRef} className="group"
+        style={{ display:"grid", gridTemplateColumns:"160px 1fr", gap:"0 16px", alignItems:"baseline", lineHeight:"2.4" }}>
+        <span style={{ display:"flex", alignItems:"baseline", gap:"4px" }}>{flagBtn}{label}</span>
+        <span style={{ display:"flex", alignItems:"baseline", flexWrap:"wrap", gap:"0 5px" }}>
+          {parts.length > 1 ? (
+            <>{parts[0] && <span>{parts[0]}</span>}<strong>{q.number}</strong><CambridgeInput value={value} onChange={onChange} />{parts[1] && <span>{parts[1]}</span>}</>
+          ) : (
+            <>{rest && <span>{rest}</span>}<strong>{q.number}</strong><CambridgeInput value={value} onChange={onChange} /></>
+          )}
+        </span>
+      </div>
+    );
+  }
+
+  if (hasBlank) {
+    const parts = q.text.split(/_{2,}/);
+    return inlineRow(<>
+      {parts[0] && <span>{parts[0]}</span>}
+      <strong>{q.number}</strong>
+      <CambridgeInput value={value} onChange={onChange} />
+      {parts[1] && <span>{parts[1]}</span>}
+    </>);
+  }
+
+  // Default: full text then number + input at end
+  return inlineRow(<>
+    <span>{q.text}</span>
+    <strong>{q.number}</strong>
+    <CambridgeInput value={value} onChange={onChange} />
+  </>);
 }
 
-// Underline-only input (replaces Cambridge dotted line)
+// Fix 2 — fixed-width underline input (Cambridge dotted-line replacement)
 function CambridgeInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [focused, setFocused] = React.useState(false);
   return (
@@ -1421,8 +1457,9 @@ function CambridgeInput({ value, onChange }: { value: string; onChange: (v: stri
         border:       "none",
         borderBottom: focused ? "2px solid #2563eb" : "1.5px solid #374151",
         background:   "transparent",
-        minWidth:     "140px",
-        padding:      "0 4px 2px",
+        width:        "140px",
+        flexShrink:   0,
+        padding:      "0 4px 1px",
         fontSize:     "14px",
         fontFamily:   "'Times New Roman', Georgia, serif",
         outline:      "none",
@@ -1435,7 +1472,7 @@ function CambridgeInput({ value, onChange }: { value: string; onChange: (v: stri
   );
 }
 
-// MCQ question (Cambridge light style)
+// Cambridge MCQ
 function CambridgeMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, questionRef }: {
   q:           LQuestion;
   value:       string;
@@ -1445,9 +1482,7 @@ function CambridgeMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, question
   onFlag?:     () => void;
   questionRef?: (el: HTMLDivElement | null) => void;
 }) {
-  const selected = isMulti
-    ? value.split(",").map(s => s.trim()).filter(Boolean)
-    : [value];
+  const selected = isMulti ? value.split(",").map(s => s.trim()).filter(Boolean) : [value];
 
   function toggle(letter: string) {
     if (!isMulti) { onChange(value === letter ? "" : letter); return; }
@@ -1458,49 +1493,40 @@ function CambridgeMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, question
 
   return (
     <div ref={questionRef} style={{ marginBottom: "12px" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "6px" }}>
+      <div style={{ display:"flex", alignItems:"flex-start", gap:"6px" }}>
         {onFlag && (
           <button onClick={onFlag}
-            style={{ fontSize: "10px", color: isFlagged ? "#d97706" : "#9ca3af", background: "none", border: "none", cursor: "pointer", paddingTop: "2px" }}>
+            style={{ fontSize:"10px", color: isFlagged ? "#d97706" : "#9ca3af", background:"none", border:"none", cursor:"pointer", paddingTop:"2px", flexShrink:0 }}>
             🚩
           </button>
         )}
-        <p style={{ margin: 0 }}>
-          <strong style={{ fontWeight: 700 }}>{q.number}.</strong> {q.text}
+        <p style={{ margin:0, lineHeight:"1.6" }}>
+          <strong>{q.number}.</strong> {q.text}
         </p>
       </div>
-      <div style={{ paddingLeft: "20px", marginTop: "4px" }}>
+      <div style={{ paddingLeft:"20px", marginTop:"4px" }}>
         {(q.options ?? []).map((opt, oi) => {
           const letter     = ["A","B","C","D","E","F","G"][oi];
           const isSelected = selected.includes(letter);
           return (
             <button key={oi} onClick={() => toggle(letter)}
               style={{
-                display:    "flex",
-                alignItems: "center",
-                gap:        "8px",
-                width:      "100%",
-                textAlign:  "left",
-                padding:    "4px 8px",
-                margin:     "2px 0",
+                display:"flex", alignItems:"center", gap:"8px",
+                width:"100%", textAlign:"left", padding:"5px 10px", margin:"3px 0",
                 borderRadius:"4px",
-                border:     `1px solid ${isSelected ? "#2563eb" : "#e5e7eb"}`,
+                border:`1px solid ${isSelected ? "#2563eb" : "#e5e7eb"}`,
                 background: isSelected ? "#dbeafe" : "white",
                 color:      isSelected ? "#1d4ed8" : "#374151",
-                fontFamily: "'Times New Roman', Georgia, serif",
-                fontSize:   "14px",
-                cursor:     "pointer",
+                fontFamily:"'Times New Roman', Georgia, serif", fontSize:"14px", cursor:"pointer",
               }}>
               <span style={{
-                width:"20px", height:"20px", borderRadius:"50%",
-                border:    `1px solid ${isSelected ? "#2563eb" : "#d1d5db"}`,
+                width:"20px", height:"20px", borderRadius:"50%", flexShrink:0,
+                border:`1px solid ${isSelected ? "#2563eb" : "#d1d5db"}`,
                 background: isSelected ? "#2563eb" : "white",
                 color:      isSelected ? "white" : "#6b7280",
-                display:   "flex", alignItems:"center", justifyContent:"center",
-                fontSize:  "11px", fontWeight:700, flexShrink:0,
-              }}>
-                {letter}
-              </span>
+                display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:"11px", fontWeight:700,
+              }}>{letter}</span>
               {opt}
             </button>
           );
@@ -1509,8 +1535,3 @@ function CambridgeMCQ({ q, value, onChange, isMulti, isFlagged, onFlag, question
     </div>
   );
 }
-
-// Keep old names as aliases so nothing else breaks
-const OneIELTSInput  = CambridgeQuestionLine;
-const OneIELTSField  = CambridgeInput;
-const OneIELTSMCQ    = CambridgeMCQ;
