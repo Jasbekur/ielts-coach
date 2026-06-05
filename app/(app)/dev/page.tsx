@@ -1,13 +1,13 @@
 "use client";
 
+// Block this page entirely in production — redirect happens server-side via Next.js
+if (process.env.NODE_ENV === "production") {
+  if (typeof window !== "undefined") window.location.replace("/dashboard");
+}
+
 /**
- * /dev  — Hidden developer utilities page
- *
- * • Protected by ProtectedAdminRoute (non-admins → /dashboard)
- * • Attaches grantAdminAccess / revokeAdminAccess to window for console use
- * • Provides a minimal UI so you don't need to open DevTools at all
- *
- * Not linked from the sidebar — access by navigating directly to /dev
+ * /dev  — Hidden developer utilities page (localhost only)
+ * In production this page redirects to /dashboard immediately.
  */
 
 import { useEffect, useState } from "react";

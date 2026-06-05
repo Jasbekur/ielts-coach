@@ -12,6 +12,7 @@ import { formatBand, roundBand } from "@/lib/utils/band-score";
 import { CountUp } from "@/components/shared/CountUp";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { BandRing } from "@/components/shared/BandRing";
+import { ExamCountdown } from "@/components/dashboard/ExamCountdown";
 
 // ─── Daily IELTS Tips ─────────────────────────────────────────────────────
 const IELTS_TIPS = [
@@ -50,18 +51,18 @@ function BandSparkline({ attempts }: { attempts: Attempt[] }) {
     <div className="flex items-center gap-3">
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0">
         <polyline points={points.join(" ")} fill="none"
-          stroke={improving ? "#10b981" : "#f59e0b"} strokeWidth="2"
+          stroke={improving ? "#2563eb" : "#f59e0b"} strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round" />
         {last7.map((a, i) => {
           const x = (i / (last7.length - 1)) * w;
           const y = h - ((a.overall_band - min) / (max - min)) * h;
           return <circle key={i} cx={x} cy={y} r="3"
-            fill={i === last7.length - 1 ? "#059669" : "#e5e7eb"}
-            stroke={i === last7.length - 1 ? "#059669" : "#9ca3af"} strokeWidth="1.5" />;
+            fill={i === last7.length - 1 ? "#2563eb" : "#e5e7eb"}
+            stroke={i === last7.length - 1 ? "#2563eb" : "#9ca3af"} strokeWidth="1.5" />;
         })}
       </svg>
       <div className="text-xs text-muted-foreground">
-        <span className={improving ? "text-emerald-500" : "text-amber-500"}>
+        <span className={improving ? "text-blue-600" : "text-amber-500"}>
           {improving ? "↑" : "↓"} {Math.abs(last7[last7.length - 1].overall_band - last7[0].overall_band).toFixed(1)} bands
         </span>
         <span className="ml-1">this week</span>
@@ -189,6 +190,9 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Exam date countdown ── */}
+      <ExamCountdown />
 
       {/* ── Onboarding card — shown only on first visit (zero attempts ever) ── */}
       {!allData?.length && (

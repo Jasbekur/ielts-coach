@@ -13,9 +13,10 @@ import { CorrectionsView } from "@/components/writing/CorrectionsView";
 import { BandRewrite } from "@/components/writing/BandRewrite";
 import { WritingResult } from "@/types/ielts";
 import { Loader2, FileText, RotateCcw, RefreshCw, Timer, ChevronDown, ChevronUp, Shuffle, ImagePlus, X, BarChart3 } from "lucide-react";
-import confetti from "canvas-confetti";
 import { wordCount } from "@/lib/utils/word-count";
 import { TASK1_PRACTICE } from "@/lib/data/task1-practice";
+import { useLocalDraft } from "@/hooks/useLocalDraft";
+import { ShareScoreCard } from "@/components/shared/ShareScoreCard";
 
 // ─── GT Task 1 Letter Questions ───────────────────────────────────────────
 const GT_TASK1_QUESTIONS = [
@@ -296,6 +297,31 @@ export default function WritingPage() {
   const minWords = taskType === "task1" ? 150 : 250;
   const wc = wordCount(essay);
 
+  // ── LocalStorage draft persistence ──────────────────────────────────────────
+  type Draft = { question: string; essay: string; moduleType: string; taskType: string };
+  const draft = useLocalDraft<Draft>("ielts-writing-draft");
+
+  // Restore draft on mount (only if no result yet)
+  useEffect(() => {
+    const saved = draft.load();
+    if (saved && saved.essay && !result) {
+      if (saved.moduleType) setModuleType(saved.moduleType as "academic" | "general");
+      if (saved.taskType)   setTaskType(saved.taskType as "task1" | "task2");
+      if (saved.question)   setQuestion(saved.question);
+      if (saved.essay)      setEssay(saved.essay);
+      toast.info("Draft restored from your last session");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-save on every change
+  useEffect(() => {
+    if (essay || question) {
+      draft.save({ question, essay, moduleType, taskType });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [essay, question, moduleType, taskType]);
+
   function startTimer() {
     if (timerActive || timerStartedRef.current) return;
     timerStartedRef.current = true;
@@ -440,9 +466,7 @@ export default function WritingPage() {
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Scoring failed. Please try again."); return; }
       setResult(data.result);
-      if (data.result.scores.overall >= 7) {
-        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ["#8b5cf6", "#10b981", "#f59e0b"] });
-      }
+      draft.clear(); // answered successfully — wipe draft
       setTimeout(() => document.getElementById("results")?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch {
       toast.error("Network error. Please check your connection.");
@@ -798,6 +822,13 @@ export default function WritingPage() {
           )}
 
           <ScoreCard result={result} taskType={taskType} />
+          {result.scores.overall && (
+            <ShareScoreCard
+              band={result.scores.overall}
+              mode="Writing"
+              detail={taskType === "task2" ? "Task 2 Essay" : moduleType === "general" ? "Task 1 Letter" : "Task 1 Report"}
+            />
+          )}
           <CorrectionsView result={result} />
           <BandRewrite result={result} />
         </div>

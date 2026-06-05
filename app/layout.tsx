@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans, Lora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -64,8 +66,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${plusJakartaSans.variable} ${lora.variable}`}>
       <body className="font-sans antialiased bg-background text-foreground">
-        {children}
-        {/* Bottom-center on mobile so toasts don't clash with browser chrome */}
+        <OfflineBanner />
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
         <Toaster richColors closeButton position="bottom-center"
           toastOptions={{ classNames: { toast: "md:!translate-x-0" } }} />
       </body>

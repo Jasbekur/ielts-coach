@@ -8,6 +8,8 @@ import {
   AlignLeft, Zap, ClipboardList, ChevronRight,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useLocalDraft } from "@/hooks/useLocalDraft";
+import { ShareScoreCard } from "@/components/shared/ShareScoreCard";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -151,6 +153,22 @@ export default function ListeningPage() {
   const [ftRunning,    setFtRunning]    = useState(false);
   const ftTimerRef                      = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // ── Answer persistence ─────────────────────────────────────────────────────
+  const answerDraft = useLocalDraft<Record<number, string>>("ielts-listening-ft-answers");
+  useEffect(() => {
+    if (pageMode === "fulltest" && ftPhase === "active") {
+      const saved = answerDraft.load();
+      if (saved && Object.keys(saved).length > 0) setFtAnswers(saved);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageMode, ftPhase]);
+  useEffect(() => {
+    if (pageMode === "fulltest" && ftPhase === "active" && Object.keys(ftAnswers).length > 0) {
+      answerDraft.save(ftAnswers);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ftAnswers]);
+
   // ── Question navigator & flagging ──────────────────────────────────────────
   const [ftFlagged,        setFtFlagged]        = useState<Set<number>>(new Set());
   const [showSubmitModal,  setShowSubmitModal]  = useState(false);
@@ -258,6 +276,7 @@ export default function ListeningPage() {
     if (ftTimerRef.current) clearInterval(ftTimerRef.current);
     if (audioRef.current)   { audioRef.current.pause(); setPlaying(false); }
     setFtRunning(false);
+    answerDraft.clear(); // wipe persisted answers after submit
     setFtPhase("results");
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -677,6 +696,8 @@ export default function ListeningPage() {
             ))}
           </div>
         </div>
+
+        <ShareScoreCard band={overallBand} mode="Listening" detail="Full Mock Test" />
 
         {/* ── Per-section answer review ── */}
         {secResults.map((r, si) => (

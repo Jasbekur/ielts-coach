@@ -17,7 +17,7 @@ import {
   CheckCircle2, PencilLine, Trophy, Zap, ClipboardList, Sparkles, Copy, Check,
 } from "lucide-react";
 import { formatBand, roundBand } from "@/lib/utils/band-score";
-import confetti from "canvas-confetti";
+import { ShareScoreCard } from "@/components/shared/ShareScoreCard";
 
 // ─── Cue Card Bank (50 real IELTS Part 2 cards) ───────────────────────────────
 interface CueCardData {
@@ -474,6 +474,7 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         </Card>
       )}
       <SpeakingModelAnswer result={result} />
+      <ShareScoreCard band={result.scores.overall} mode="Speaking" />
       <Card>
         <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Next Actions</CardTitle></CardHeader>
         <CardContent className="space-y-2">
@@ -680,6 +681,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
         </Card>
       ))}
 
+      <ShareScoreCard band={overallBand} mode="Speaking" detail="Full Mock Test" />
       <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#2563eb" }}>
         <ClipboardList className="w-5 h-5" /> Take Another Mock Test
       </Button>
@@ -857,7 +859,6 @@ export default function SpeakingPage() {
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Scoring failed"); return; }
       setResult(data.result);
-      if (data.result.scores.overall >= 7) confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ["#8b5cf6", "#10b981", "#f59e0b"] });
       setTimeout(() => document.getElementById("speaking-results")?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch { toast.error("Network error. Please try again."); }
     finally { setLoading(false); }
@@ -989,7 +990,6 @@ export default function SpeakingPage() {
       part2Result.scores.overall,
       avg(part3Results.map(r => r.scores.overall)),
     ]);
-    if (overall >= 7) confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ["#8b5cf6", "#10b981", "#f59e0b", "#3b82f6"] });
     setTimeout(() => document.getElementById("mock-results-top")?.scrollIntoView({ behavior: "smooth" }), 100);
   }
 
