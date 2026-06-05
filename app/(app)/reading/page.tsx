@@ -87,7 +87,7 @@ function QuestionItem({
 
   const resultIcon = showResult ? (
     correct ? (
-      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+      <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
     ) : (
       <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
     )
@@ -95,7 +95,7 @@ function QuestionItem({
 
   const itemBg = showResult
     ? correct
-      ? "bg-emerald-50 border-emerald-200"
+      ? "bg-red-50 border-red-200"
       : "bg-red-50 border-red-200"
     : "bg-white border-border";
 
@@ -110,7 +110,7 @@ function QuestionItem({
         <div className="flex gap-2">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800 leading-snug">
-            <span className="text-emerald-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
             {question.type === "tfng" ? (
               <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mr-1">T/F/NG</span>
             ) : (
@@ -130,10 +130,10 @@ function QuestionItem({
                 value === opt
                   ? showResult
                     ? correct
-                      ? "bg-emerald-500 text-white border-emerald-500"
+                      ? "bg-red-500 text-white border-red-500"
                       : "bg-red-500 text-white border-red-500"
-                    : "bg-emerald-700 text-white border-violet-600"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50"
+                    : "bg-red-700 text-white border-red-600"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-red-300 hover:bg-red-50"
               )}
             >
               {opt}
@@ -141,7 +141,7 @@ function QuestionItem({
           ))}
         </div>
         {showResult && !correct && (
-          <p className="text-xs text-emerald-700 font-medium">
+          <p className="text-xs text-red-700 font-medium">
             ✓ Correct: <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -156,7 +156,7 @@ function QuestionItem({
         <div className="flex gap-2">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800 leading-snug">
-            <span className="text-emerald-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
             {question.text}
           </p>
         </div>
@@ -171,12 +171,12 @@ function QuestionItem({
                 value === opt.letter
                   ? showResult
                     ? correct
-                      ? "bg-emerald-500 text-white border-emerald-500"
+                      ? "bg-red-500 text-white border-red-500"
                       : "bg-red-400 text-white border-red-400"
-                    : "bg-emerald-700 text-white border-violet-600"
+                    : "bg-red-700 text-white border-red-600"
                   : showResult && opt.letter === question.answer
-                    ? "bg-emerald-100 border-emerald-300 text-emerald-800"
-                    : "bg-white border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 text-gray-700"
+                    ? "bg-red-100 border-red-300 text-red-800"
+                    : "bg-white border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700"
               )}
             >
               <span className="font-bold shrink-0">{opt.letter}.</span>
@@ -211,9 +211,9 @@ function QuestionItem({
         <div className="flex gap-2 items-start">
           {resultIcon}
           <p className="text-sm font-medium text-gray-700">
-            <span className="text-emerald-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
             {prefix}{" "}
-            <span className="inline-block border-b-2 border-dashed border-violet-400 min-w-[80px] mx-1" />
+            <span className="inline-block border-b-2 border-dashed border-red-400 min-w-[80px] mx-1" />
             {suffix && <span> {suffix}</span>}
           </p>
         </div>
@@ -225,17 +225,17 @@ function QuestionItem({
             onChange={e => onChange(e.target.value)}
             placeholder={maxW}
             className={cn(
-              "flex-1 text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all",
+              "flex-1 text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-400 transition-all",
               showResult
                 ? correct
-                  ? "border-emerald-400 bg-emerald-50 text-emerald-800"
+                  ? "border-red-400 bg-red-50 text-red-800"
                   : "border-red-400 bg-red-50 text-red-800"
                 : "border-gray-300 bg-white"
             )}
           />
         </div>
         {showResult && !correct && (
-          <p className="text-xs text-emerald-700 font-medium">
+          <p className="text-xs text-red-700 font-medium">
             ✓ Correct: <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -251,7 +251,7 @@ function QuestionItem({
         <div className="flex gap-2 items-center">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800">
-            <span className="text-emerald-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
             Paragraph <span className="font-bold">{question.paragraph}</span>
           </p>
         </div>
@@ -260,10 +260,10 @@ function QuestionItem({
           value={value}
           onChange={e => onChange(e.target.value)}
           className={cn(
-            "w-full text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white transition-all",
+            "w-full text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-400 bg-white transition-all",
             showResult
               ? correct
-                ? "border-emerald-400 bg-emerald-50 text-emerald-800"
+                ? "border-red-400 bg-red-50 text-red-800"
                 : "border-red-400 bg-red-50"
               : "border-gray-300"
           )}
@@ -279,7 +279,7 @@ function QuestionItem({
           })}
         </select>
         {showResult && !correct && (
-          <p className="text-xs text-emerald-700 font-medium">
+          <p className="text-xs text-red-700 font-medium">
             ✓ Correct: <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -294,7 +294,7 @@ function QuestionItem({
         <div className="flex gap-2">
           {resultIcon}
           <p className="text-sm font-medium text-gray-800 leading-snug">
-            <span className="text-emerald-600 font-bold mr-1.5">{question.number}.</span>
+            <span className="text-red-600 font-bold mr-1.5">{question.number}.</span>
             {question.text}
           </p>
         </div>
@@ -309,12 +309,12 @@ function QuestionItem({
                 value === para
                   ? showResult
                     ? correct
-                      ? "bg-emerald-500 text-white border-emerald-500"
+                      ? "bg-red-500 text-white border-red-500"
                       : "bg-red-500 text-white border-red-500"
-                    : "bg-emerald-700 text-white border-violet-600"
+                    : "bg-red-700 text-white border-red-600"
                   : showResult && para === question.answer
-                    ? "bg-emerald-100 border-emerald-400 text-emerald-700"
-                    : "bg-white border-gray-200 hover:border-emerald-300 text-gray-600"
+                    ? "bg-red-100 border-red-400 text-red-700"
+                    : "bg-white border-gray-200 hover:border-red-300 text-gray-600"
               )}
             >
               {para}
@@ -322,7 +322,7 @@ function QuestionItem({
           ))}
         </div>
         {showResult && !correct && (
-          <p className="text-xs text-emerald-700 font-medium">
+          <p className="text-xs text-red-700 font-medium">
             ✓ Correct: paragraph <span className="font-bold">{correctAnswer}</span>
           </p>
         )}
@@ -350,7 +350,7 @@ function PassagePanel({ passage }: { passage: ReadingPassage }) {
       </div>
       {passage.paragraphs.map(para => (
         <div key={para.label} className="flex gap-3">
-          <span className="text-xs font-bold text-emerald-600 shrink-0 mt-0.5 w-4">
+          <span className="text-xs font-bold text-red-600 shrink-0 mt-0.5 w-4">
             {para.label}
           </span>
           <p className="text-sm text-gray-700 leading-relaxed">{para.text}</p>
@@ -377,15 +377,15 @@ function QuestionsPanel({
       {passage.questionGroups.map((group, gi) => (
         <div key={gi} className="space-y-3">
           {/* Instructions */}
-          <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
-            <p className="text-xs text-violet-800 font-medium leading-relaxed whitespace-pre-line">
+          <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+            <p className="text-xs text-red-800 font-medium leading-relaxed whitespace-pre-line">
               {group.instructions}
             </p>
             {group.headingOptions && (
               <div className="mt-3 space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-600 mb-1">List of Headings</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-red-600 mb-1">List of Headings</p>
                 {group.headingOptions.map((h, i) => (
-                  <p key={i} className="text-xs text-emerald-700">{h}</p>
+                  <p key={i} className="text-xs text-red-700">{h}</p>
                 ))}
               </div>
             )}
@@ -409,9 +409,9 @@ function QuestionsPanel({
                           "inline-flex items-center mx-0.5 px-2 py-0.5 rounded font-bold text-xs",
                           showResult
                             ? correct
-                              ? "bg-emerald-100 text-emerald-800"
+                              ? "bg-red-100 text-red-800"
                               : "bg-red-100 text-red-700"
-                            : "bg-emerald-100 text-emerald-700"
+                            : "bg-red-100 text-red-700"
                         )}
                       >
                         {num}
@@ -596,8 +596,8 @@ export default function ReadingPage() {
         </div>
 
         {/* Header card */}
-        <div style={{ background: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", borderLeft: "4px solid #2563eb", padding: "20px 24px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-          <p style={{ fontSize: "11px", fontWeight: 600, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>IELTS Academic</p>
+        <div style={{ background: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", borderLeft: "4px solid #dc2626", padding: "20px 24px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+          <p style={{ fontSize: "11px", fontWeight: 600, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>IELTS Academic</p>
           <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>Reading</h1>
           <p style={{ fontSize: "13px", color: "#475569" }}>3 passages · 40 questions · 60 minutes · Timed exam</p>
         </div>
@@ -605,7 +605,7 @@ export default function ReadingPage() {
         <div className="space-y-6">
         {/* Test set picker */}
         <div>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
+          <p style={{ fontSize: "11px", fontWeight: 700, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
             Select Test Set
           </p>
           <div className="flex gap-2">
@@ -616,9 +616,9 @@ export default function ReadingPage() {
                 style={{
                   padding: "6px 16px", borderRadius: "20px", fontSize: "13px",
                   fontWeight: testSetIdx === idx ? 600 : 400, cursor: "pointer",
-                  background: testSetIdx === idx ? "#2563eb" : "#ffffff",
+                  background: testSetIdx === idx ? "#dc2626" : "#ffffff",
                   color: testSetIdx === idx ? "#ffffff" : "#64748b",
-                  border: testSetIdx === idx ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                  border: testSetIdx === idx ? "1px solid #dc2626" : "1px solid #e2e8f0",
                   transition: "all 0.15s",
                 }}
               >
@@ -658,7 +658,7 @@ export default function ReadingPage() {
                 </div>
               ))}
             </div>
-            <button style={{ background: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", padding: "10px 20px", fontSize: "13.5px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            <button style={{ background: "#dc2626", color: "#ffffff", border: "none", borderRadius: "6px", padding: "10px 20px", fontSize: "13.5px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
               Start Full Test <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -680,7 +680,7 @@ export default function ReadingPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm"
-                      style={{ background: "rgba(37,99,235,0.1)", color: "#2563eb" }}>
+                      style={{ background: "rgba(37,99,235,0.1)", color: "#dc2626" }}>
                       {p.id}
                     </div>
                     <div>
@@ -742,7 +742,7 @@ export default function ReadingPage() {
           {isPractice ? (
             /* Practice: show raw score without band */
             <>
-              <div className="text-6xl font-black font-mono tracking-tight text-emerald-600">
+              <div className="text-6xl font-black font-mono tracking-tight text-red-600">
                 {results.correct}<span className="text-3xl text-muted-foreground font-bold">/{results.total}</span>
               </div>
               <p className="text-lg font-semibold mt-1 text-gray-700">
@@ -932,7 +932,7 @@ export default function ReadingPage() {
                       <button key={num} onClick={() => { scrollToReadingQ(num); setShowQNavigator(false); }}
                         className="h-7 w-full rounded text-xs font-bold transition-all hover:scale-105"
                         style={{
-                          background: flagged ? "#d97706" : answered ? "#2563eb" : "rgba(255,255,255,0.12)",
+                          background: flagged ? "#d97706" : answered ? "#dc2626" : "rgba(255,255,255,0.12)",
                           color: (flagged || answered) ? "white" : "rgba(255,255,255,0.5)",
                         }}>
                         {num}
@@ -953,7 +953,7 @@ export default function ReadingPage() {
           className={cn(
             "flex-1 py-2 text-xs font-semibold transition-all",
             mobileView === "passage"
-              ? "text-emerald-600 border-b-2 border-emerald-600"
+              ? "text-red-600 border-b-2 border-emerald-600"
               : "text-muted-foreground"
           )}
         >
@@ -964,13 +964,13 @@ export default function ReadingPage() {
           className={cn(
             "flex-1 py-2 text-xs font-semibold transition-all relative",
             mobileView === "questions"
-              ? "text-emerald-600 border-b-2 border-emerald-600"
+              ? "text-red-600 border-b-2 border-emerald-600"
               : "text-muted-foreground"
           )}
         >
           <FileText className="w-3.5 h-3.5 inline mr-1" />Questions
           {answered > 0 && (
-            <span className="ml-1 text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-bold">
+            <span className="ml-1 text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">
               {answered}/{totalInPassage}
             </span>
           )}
@@ -1044,7 +1044,7 @@ export default function ReadingPage() {
                   "rounded-full transition-all",
                   i === activePassage ? "w-6 h-2" : "w-2 h-2",
                   full
-                    ? "bg-emerald-500"
+                    ? "bg-red-500"
                     : i === activePassage
                       ? "bg-emerald-600"
                       : "bg-gray-300"

@@ -13,9 +13,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const PRIMARY    = "#059669";
-const PRIMARY_LT = "#10b981";
-const PRIMARY_DIM = "rgba(5,150,105,0.18)";
+const PRIMARY    = "#dc2626";
+const PRIMARY_LT = "#ef4444";
+const PRIMARY_DIM = "rgba(220,38,38,0.15)";
 
 const FEATURES = [
   { icon: BookOpen,  label: "IELTS Writing Coach", desc: "Task 1 & Task 2 with instant AI feedback" },
@@ -74,7 +74,7 @@ export default function LoginPage() {
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
           style={{ background: `radial-gradient(circle, ${PRIMARY_DIM}, transparent 70%)` }} />
         <div className="absolute -bottom-32 -right-32 w-[420px] h-[420px] rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%)" }} />
+          style={{ background: "radial-gradient(circle, rgba(220,38,38,0.06), transparent 70%)" }} />
 
         {/* Logo */}
         <div className="relative z-10">
@@ -83,7 +83,7 @@ export default function LoginPage() {
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
               style={{
                 background: PRIMARY,
-                boxShadow: `0 4px 16px rgba(5,150,105,0.45)`,
+                boxShadow: `0 4px 16px rgba(220,38,38,0.45)`,
               }}
             >
               <GraduationCap className="w-5 h-5 text-white" />
@@ -98,7 +98,7 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold leading-snug mb-3 text-white">
             Your path to<br />
             <span style={{
-              background: `linear-gradient(135deg, #6ee7b7, ${PRIMARY_LT})`,
+              background: `linear-gradient(135deg, #fca5a5, ${PRIMARY_LT})`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -175,7 +175,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-3 mb-8 lg:hidden">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: PRIMARY, boxShadow: `0 4px 12px rgba(5,150,105,0.4)` }}
+              style={{ background: PRIMARY, boxShadow: `0 4px 12px rgba(220,38,38,0.4)` }}
             >
               <GraduationCap className="w-4 h-4 text-white" />
             </div>
@@ -260,8 +260,8 @@ export default function LoginPage() {
               className="w-full h-11 gap-2 text-sm font-semibold mt-2 text-white"
               disabled={loading}
               style={{
-                background: "#006c49",
-                boxShadow: `0 4px 0 #004d35, 0 6px 16px rgba(0,108,73,0.35)`,
+                background: "#dc2626",
+                boxShadow: `0 4px 0 #b91c1c, 0 6px 16px rgba(220,38,38,0.35)`,
               }}
             >
               {loading ? (
@@ -289,7 +289,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-center gap-4 pt-2 flex-wrap">
               {["Free to start", "Scores in 15 sec", "4 IELTS criteria"].map((badge) => (
                 <div key={badge} className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                  <CheckCircle2 className="w-3 h-3 text-red-500" />
                   {badge}
                 </div>
               ))}

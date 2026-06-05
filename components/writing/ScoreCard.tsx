@@ -85,7 +85,7 @@ export function ScoreCard({ result, taskType }: ScoreCardProps) {
       <div className="grid sm:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-600">
+            <CardTitle className="text-sm font-medium text-green-600">
               ✓ Strengths
             </CardTitle>
           </CardHeader>
@@ -93,7 +93,7 @@ export function ScoreCard({ result, taskType }: ScoreCardProps) {
             <ul className="space-y-1.5">
               {result.strengths.map((s, i) => (
                 <li key={i} className="text-sm text-muted-foreground flex gap-2">
-                  <span className="text-emerald-500 shrink-0">•</span>
+                  <span className="text-green-600 shrink-0">•</span>
                   {s}
                 </li>
               ))}

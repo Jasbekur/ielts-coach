@@ -32,17 +32,17 @@ const BAND_TABS: { key: BandKey; label: string; color: string; bg: string; ring:
   {
     key: "band7",
     label: "Band 7",
-    color: "text-emerald-600",
-    bg: "bg-emerald-500",
-    ring: "ring-emerald-300",
+    color: "text-green-600",
+    bg: "bg-green-500",
+    ring: "ring-red-300",
     desc: "Good range, mostly accurate — well organised and convincing",
   },
   {
     key: "band8",
     label: "Band 8+",
-    color: "text-emerald-600",
-    bg: "bg-emerald-600",
-    ring: "ring-emerald-300",
+    color: "text-green-600",
+    bg: "bg-red-600",
+    ring: "ring-red-300",
     desc: "Sophisticated, idiomatic — examiner-level quality",
   },
 ];
@@ -76,10 +76,10 @@ export function BandRewrite({ result }: BandRewriteProps) {
   const selectedTab = BAND_TABS.find(t => t.key === selectedBand)!;
 
   return (
-    <Card className="border-emerald-200 dark:border-emerald-800">
+    <Card className="border-red-200 dark:border-red-800">
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-sm font-medium text-emerald-600 flex items-center gap-1.5">
+          <CardTitle className="text-sm font-medium text-green-600 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" />
             Model Answer
           </CardTitle>
@@ -87,7 +87,7 @@ export function BandRewrite({ result }: BandRewriteProps) {
             {expanded && (
               <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 w-7 p-0">
                 {copied
-                  ? <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  ? <Check className="w-3.5 h-3.5 text-green-600" />
                   : <Copy className="w-3.5 h-3.5 text-muted-foreground" />
                 }
               </Button>
@@ -124,12 +124,12 @@ export function BandRewrite({ result }: BandRewriteProps) {
                       className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                         isSelected
                           ? `${tab.bg} text-white border-transparent shadow-sm`
-                          : "bg-background border-border text-muted-foreground hover:border-emerald-300 hover:text-foreground"
+                          : "bg-background border-border text-muted-foreground hover:border-red-300 hover:text-foreground"
                       }`}
                     >
                       {tab.label}
                       {isDefault && (
-                        <span className={`text-[10px] font-normal ${isSelected ? "text-white/80" : "text-emerald-600"}`}>
+                        <span className={`text-[10px] font-normal ${isSelected ? "text-white/80" : "text-green-600"}`}>
                           ← your level
                         </span>
                       )}
@@ -142,8 +142,8 @@ export function BandRewrite({ result }: BandRewriteProps) {
               <div className={`text-xs rounded-lg px-3 py-2 border ${
                 selectedBand === "band5" ? "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300" :
                 selectedBand === "band6" ? "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300" :
-                selectedBand === "band7" ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300" :
-                "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300"
+                selectedBand === "band7" ? "bg-green-50 dark:bg-emerald-950/20 border-red-200 dark:border-red-800 text-emerald-700 dark:text-emerald-300" :
+                "bg-green-50 dark:bg-emerald-950/20 border-red-200 dark:border-red-800 text-emerald-700 dark:text-emerald-300"
               }`}>
                 <span className="font-semibold">{selectedTab.label}:</span> {selectedTab.desc}
               </div>
@@ -164,11 +164,11 @@ export function BandRewrite({ result }: BandRewriteProps) {
           {/* Upgrade nudge */}
           {hasMultiBand && selectedBand !== "band8" && (
             <div className="text-xs text-muted-foreground border-t pt-3 flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-emerald-400" />
+              <Sparkles className="w-3 h-3 text-red-400" />
               Compare with{" "}
               <button
                 onClick={() => setSelectedBand("band8")}
-                className="text-emerald-600 hover:underline font-medium"
+                className="text-green-600 hover:underline font-medium"
               >
                 Band 8+ answer
               </button>{" "}

@@ -49,7 +49,7 @@ export function SpeakingTimer({
             ? "[&>div]:bg-red-500"
             : isWarning
             ? "[&>div]:bg-amber-500"
-            : "[&>div]:bg-violet-500"
+            : "[&>div]:bg-red-600"
         )}
       />
       <p className="text-xs text-muted-foreground">

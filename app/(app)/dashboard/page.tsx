@@ -51,14 +51,14 @@ function BandSparkline({ attempts }: { attempts: Attempt[] }) {
     <div className="flex items-center gap-3">
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0">
         <polyline points={points.join(" ")} fill="none"
-          stroke={improving ? "#2563eb" : "#f59e0b"} strokeWidth="2"
+          stroke={improving ? "#dc2626" : "#f59e0b"} strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round" />
         {last7.map((a, i) => {
           const x = (i / (last7.length - 1)) * w;
           const y = h - ((a.overall_band - min) / (max - min)) * h;
           return <circle key={i} cx={x} cy={y} r="3"
-            fill={i === last7.length - 1 ? "#2563eb" : "#e5e7eb"}
-            stroke={i === last7.length - 1 ? "#2563eb" : "#9ca3af"} strokeWidth="1.5" />;
+            fill={i === last7.length - 1 ? "#dc2626" : "#e5e7eb"}
+            stroke={i === last7.length - 1 ? "#dc2626" : "#9ca3af"} strokeWidth="1.5" />;
         })}
       </svg>
       <div className="text-xs text-muted-foreground">
@@ -134,8 +134,8 @@ export default async function DashboardPage() {
       <div className="fade-up rounded-2xl px-5 py-5 relative overflow-hidden"
         style={{
           animationDelay: "0ms",  // keep at 0 — hero is instant
-          background: "linear-gradient(135deg, #e8f5f0 0%, #f0f4ff 100%)",
-          border: "1px solid rgba(16,185,129,0.15)",
+          background: "linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%)",
+          border: "1px solid rgba(220,38,38,0.12)",
         }}>
 
         {/* Noise texture — feTurbulence fractal noise at 3% opacity */}
@@ -172,8 +172,8 @@ export default async function DashboardPage() {
             <Link href="/writing"
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
               style={{
-                background: "#006c49",
-                boxShadow: "0 4px 0 #004d35, 0 6px 16px #006c4940",
+                background: "#dc2626",
+                boxShadow: "0 4px 0 #b91c1c, 0 6px 16px #dc262640",
               }}>
               <BookOpen className="w-3.5 h-3.5" /> Write now
             </Link>
@@ -185,7 +185,7 @@ export default async function DashboardPage() {
                 border: "1px solid #d1d5db",
                 boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
               }}>
-              <Mic className="w-3.5 h-3.5" style={{ color: "#059669" }} /> Speak now
+              <Mic className="w-3.5 h-3.5" style={{ color: "#dc2626" }} /> Speak now
             </Link>
           </div>
         </div>
@@ -197,10 +197,10 @@ export default async function DashboardPage() {
       {/* ── Onboarding card — shown only on first visit (zero attempts ever) ── */}
       {!allData?.length && (
         <div className="fade-up rounded-2xl border-2 border-dashed px-5 py-5 space-y-4"
-          style={{ borderColor: "rgba(5,150,105,0.3)", animationDelay: "20ms" }}>
+          style={{ borderColor: "#fca5a5", animationDelay: "20ms" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: "linear-gradient(135deg, oklch(0.546 0.245 274 / 15%), oklch(0.62 0.22 300 / 10%))" }}>
+              style={{ background: "rgba(220,38,38,0.12)" }}>
               <span className="text-lg">🚀</span>
             </div>
             <div>
@@ -222,7 +222,7 @@ export default async function DashboardPage() {
                 </div>
                 <p className="text-sm font-semibold">{title}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
-                <span className="text-xs font-semibold flex items-center gap-1 mt-auto" style={{ color: "#059669" }}>
+                <span className="text-xs font-semibold flex items-center gap-1 mt-auto" style={{ color: "#dc2626" }}>
                   {cta} <ArrowRight className="w-3 h-3" />
                 </span>
               </Link>
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Today</p>
               <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "rgba(5,150,105,0.12)" }}>
-                <TrendingUp className="w-3 h-3" style={{ color: "#059669" }} />
+                <TrendingUp className="w-3 h-3" style={{ color: "#dc2626" }} />
               </div>
             </div>
             <p className="text-3xl font-display leading-none tracking-nums">
@@ -266,7 +266,7 @@ export default async function DashboardPage() {
             </p>
             <p className="text-xs text-muted-foreground mt-1.5">
               {remaining > 0
-                ? <span className="text-emerald-600 dark:text-emerald-400 font-medium">{remaining} remaining</span>
+                ? <span className="text-red-600 dark:text-red-400 font-medium">{remaining} remaining</span>
                 : <span className="text-amber-600 font-medium">Limit reached</span>}
             </p>
           </CardContent>
@@ -321,8 +321,8 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: "linear-gradient(135deg, rgba(5,150,105,0.15), rgba(5,150,105,0.08))" }}>
-                  <GraduationCap className="w-4 h-4" style={{ color: "#059669" }} />
+                  style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.12), rgba(220,38,38,0.06))" }}>
+                  <GraduationCap className="w-4 h-4" style={{ color: "#dc2626" }} />
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -392,7 +392,7 @@ export default async function DashboardPage() {
                     Journey to Band {target.toFixed(1)}
                   </p>
                   {reached && (
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                    <p className="text-xs text-red-600 dark:text-red-400 font-medium mt-0.5">
                       🎉 Target reached this week!
                     </p>
                   )}
@@ -450,22 +450,22 @@ export default async function DashboardPage() {
           {
             href: "/writing", label: "Writing",
             sub: "Task 1 & Task 2",
-            icon: BookOpen, iconColor: "text-violet-500",
-            bg: "linear-gradient(135deg, oklch(0.546 0.245 274 / 8%), oklch(0.62 0.22 300 / 5%))",
-            iconBg: "linear-gradient(135deg, oklch(0.546 0.245 274 / 20%), oklch(0.546 0.245 274 / 10%))",
-            statColor: "text-violet-600 dark:text-violet-400",
-            arrowColor: "text-violet-400",
+            icon: BookOpen, iconColor: "text-red-600",
+            bg: "linear-gradient(135deg, rgba(220,38,38,0.06), rgba(220,38,38,0.03))",
+            iconBg: "linear-gradient(135deg, rgba(220,38,38,0.18), rgba(220,38,38,0.08))",
+            statColor: "text-red-600 dark:text-red-400",
+            arrowColor: "text-red-400",
             count: writingAttempts.length,
             bestBandVal: writingAttempts.length ? Math.max(...writingAttempts.map(a => a.overall_band)) : null,
           },
           {
             href: "/speaking", label: "Speaking",
             sub: "Parts 1, 2 & 3",
-            icon: Mic, iconColor: "text-emerald-500",
-            bg: "linear-gradient(135deg, oklch(0.62 0.18 160 / 8%), oklch(0.65 0.16 175 / 5%))",
-            iconBg: "linear-gradient(135deg, oklch(0.62 0.18 160 / 20%), oklch(0.62 0.18 160 / 10%))",
-            statColor: "text-emerald-600 dark:text-emerald-400",
-            arrowColor: "text-emerald-400",
+            icon: Mic, iconColor: "text-red-600",
+            bg: "linear-gradient(135deg, rgba(220,38,38,0.06), rgba(220,38,38,0.03))",
+            iconBg: "linear-gradient(135deg, rgba(220,38,38,0.18), rgba(220,38,38,0.08))",
+            statColor: "text-red-600 dark:text-red-400",
+            arrowColor: "text-red-400",
             count: speakingAttempts.length,
             bestBandVal: speakingAttempts.length ? Math.max(...speakingAttempts.map(a => a.overall_band)) : null,
           },
@@ -537,7 +537,7 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold tracking-tight text-foreground">Recent attempts</h2>
             <Link href="/history"
-              className="text-xs font-medium text-violet-600 dark:text-violet-400 hover:underline underline-offset-2 flex items-center gap-1">
+              className="text-xs font-medium text-red-600 dark:text-red-400 hover:underline underline-offset-2 flex items-center gap-1">
               View all <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -548,11 +548,11 @@ export default async function DashboardPage() {
               <Link href={`/history/${attempt.id}`} className="block">
                 <div className="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-card shadow-card cursor-pointer card-hover-default">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                    attempt.mode === "writing" ? "bg-violet-100 dark:bg-violet-900/50" : "bg-emerald-100 dark:bg-emerald-900/50"
+                    attempt.mode === "writing" ? "bg-red-100 dark:bg-red-900/50" : "bg-red-100 dark:bg-red-900/50"
                   }`}>
                     {attempt.mode === "writing"
-                      ? <BookOpen className="w-4 h-4 text-violet-500" />
-                      : <Mic className="w-4 h-4 text-emerald-500" />}
+                      ? <BookOpen className="w-4 h-4 text-red-600" />
+                      : <Mic className="w-4 h-4 text-red-600" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold capitalize leading-none tracking-tight">
@@ -564,7 +564,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className={`px-2.5 py-1 rounded-xl font-mono font-bold text-sm tracking-nums shrink-0 ${
                     attempt.overall_band >= 7
-                      ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300"
+                      ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300"
                       : attempt.overall_band >= 5.5
                       ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300"
                       : "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300"
@@ -590,12 +590,12 @@ export default async function DashboardPage() {
           <div className="flex gap-2 justify-center">
             <Link href="/writing"
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.02]"
-              style={{ background: "linear-gradient(135deg, oklch(0.546 0.245 274), oklch(0.48 0.22 290))", boxShadow: "0 4px 12px oklch(0.546 0.245 274 / 30%)" }}>
+              style={{ background: "#dc2626", boxShadow: "0 4px 12px rgba(220,38,38,0.3)" }}>
               <BookOpen className="w-3.5 h-3.5" /> Try Writing
             </Link>
             <Link href="/speaking"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-border hover:border-violet-300 transition-all hover:scale-[1.02]">
-              <Mic className="w-3.5 h-3.5 text-emerald-500" /> Try Speaking
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-border hover:border-red-300 transition-all hover:scale-[1.02]">
+              <Mic className="w-3.5 h-3.5 text-red-600" /> Try Speaking
             </Link>
           </div>
         </div>

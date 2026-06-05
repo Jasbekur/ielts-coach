@@ -65,7 +65,7 @@ function ProgressChart({ attempts }: { attempts: Attempt[] }) {
           <div className="flex items-center gap-3 text-xs">
             <span className="text-muted-foreground">{data.length} attempts shown</span>
             <span className={`flex items-center gap-1 font-semibold ${
-              trend > 0 ? "text-emerald-500" : trend < 0 ? "text-amber-500" : "text-violet-500"
+              trend > 0 ? "text-red-600" : trend < 0 ? "text-amber-500" : "text-red-600"
             }`}>
               {trend > 0 ? <TrendingUp className="w-3.5 h-3.5" /> :
                trend < 0 ? <TrendingDown className="w-3.5 h-3.5" /> :
@@ -118,7 +118,7 @@ function ProgressChart({ attempts }: { attempts: Attempt[] }) {
         <div className="flex gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
           <span>First: <span className="font-mono font-semibold">{formatBand(first)}</span></span>
           <span>Latest: <span className="font-mono font-semibold" style={{ color }}>{formatBand(last)}</span></span>
-          <span>Best: <span className="font-mono font-semibold text-violet-500">{formatBand(Math.max(...bands))}</span></span>
+          <span>Best: <span className="font-mono font-semibold text-red-600">{formatBand(Math.max(...bands))}</span></span>
         </div>
       </CardContent>
     </Card>
@@ -178,17 +178,17 @@ export function HistoryClient({ attempts }: { attempts: Attempt[] }) {
           <div className="space-y-2">
             {filtered.map((attempt) => (
               <Link key={attempt.id} href={`/history/${attempt.id}`}>
-                <Card className="hover:border-violet-300 transition-colors cursor-pointer">
+                <Card className="hover:border-red-300 transition-colors cursor-pointer">
                   <CardContent className="py-3.5">
                     <div className="flex items-center gap-3">
                       <div className={`w-9 h-9 rounded-lg shrink-0 flex items-center justify-center ${
                         attempt.mode === "writing"
-                          ? "bg-violet-100 dark:bg-violet-950"
-                          : "bg-emerald-100 dark:bg-emerald-950"
+                          ? "bg-red-100 dark:bg-red-950"
+                          : "bg-red-100 dark:bg-red-950"
                       }`}>
                         {attempt.mode === "writing"
-                          ? <BookOpen className="w-4 h-4 text-violet-500" />
-                          : <Mic className="w-4 h-4 text-emerald-500" />}
+                          ? <BookOpen className="w-4 h-4 text-red-600" />
+                          : <Mic className="w-4 h-4 text-red-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">

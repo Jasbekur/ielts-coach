@@ -47,13 +47,13 @@ interface LGroup {
 }
 
 const LGROUP_META: Record<LGroupType, { label: string; instruction: string; color: string }> = {
-  form:       { label: "Form Completion",     instruction: "Complete the form below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.", color: "#38bdf8" },
-  notes:      { label: "Note Completion",     instruction: "Complete the notes below. Write NO MORE THAN TWO WORDS for each answer.",                color: "#34d399" },
-  table:      { label: "Table Completion",    instruction: "Complete the table below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.", color: "#fbbf24" },
-  mcq_single: { label: "Multiple Choice",     instruction: "Choose the correct letter, A, B or C.",                                                   color: "#c084fc" },
-  mcq_multi:  { label: "MCQ — Choose TWO",   instruction: "Choose TWO correct letters, A–E.",                                                         color: "#a78bfa" },
-  short:      { label: "Short Answer",        instruction: "Answer the questions below. Write NO MORE THAN THREE WORDS AND/OR A NUMBER for each answer.", color: "#fb923c" },
-  sentence:   { label: "Sentence Completion", instruction: "Complete the sentences below. Write NO MORE THAN TWO WORDS for each answer.",              color: "#f472b6" },
+  form:       { label: "Form Completion",     instruction: "Complete the form below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.", color: "#dc2626" },
+  notes:      { label: "Note Completion",     instruction: "Complete the notes below. Write NO MORE THAN TWO WORDS for each answer.",                color: "#dc2626" },
+  table:      { label: "Table Completion",    instruction: "Complete the table below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.", color: "#dc2626" },
+  mcq_single: { label: "Multiple Choice",     instruction: "Choose the correct letter, A, B or C.",                                                   color: "#dc2626" },
+  mcq_multi:  { label: "MCQ — Choose TWO",   instruction: "Choose TWO correct letters, A–E.",                                                         color: "#dc2626" },
+  short:      { label: "Short Answer",        instruction: "Answer the questions below. Write NO MORE THAN THREE WORDS AND/OR A NUMBER for each answer.", color: "#dc2626" },
+  sentence:   { label: "Sentence Completion", instruction: "Complete the sentences below. Write NO MORE THAN TWO WORDS for each answer.",              color: "#dc2626" },
 };
 
 interface QuestionContent {
@@ -89,39 +89,39 @@ interface AdminLog {
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
-const S1  = "#1c1a2e";
-const S2  = "#22203a";
-const S3  = "#2a2845";
-const BD  = "#35325a";
-const BDL = "#433f6e";
-const T1  = "#f0effe";
-const T2  = "#b8b5d8";
-const T3  = "#7a7898";
-const AC  = "#7c3aed";
-const ACL = "#a78bfa";
-const ACG = "linear-gradient(135deg,#7c3aed,#6d28d9)";
-const ACG2 = "linear-gradient(135deg,#8b5cf6,#7c3aed)";
+const S1  = "#f8fafc";
+const S2  = "#ffffff";
+const S3  = "#f1f5f9";
+const BD  = "#e2e8f0";
+const BDL = "#cbd5e1";
+const T1  = "#0f172a";
+const T2  = "#334155";
+const T3  = "#64748b";
+const AC  = "#dc2626";
+const ACL = "#ef4444";
+const ACG = "linear-gradient(135deg,#dc2626,#b91c1c)";
+const ACG2 = "linear-gradient(135deg,#ef4444,#dc2626)";
 
 // ── Config maps ───────────────────────────────────────────────────────────────
 
 const SECTIONS: { value: Section; label: string; icon: React.ElementType; color: string; bg: string }[] = [
-  { value: "writing",   label: "Writing",   icon: FileText,   color: "#38bdf8", bg: "#0c2a3d" },
-  { value: "reading",   label: "Reading",   icon: BookMarked, color: "#34d399", bg: "#0a2d22" },
-  { value: "speaking",  label: "Speaking",  icon: Mic,        color: "#c084fc", bg: "#1d0d38" },
-  { value: "listening", label: "Listening", icon: Headphones, color: "#fb923c", bg: "#2d1408" },
+  { value: "writing",   label: "Writing",   icon: FileText,   color: "#dc2626", bg: "#fef2f2" },
+  { value: "reading",   label: "Reading",   icon: BookMarked, color: "#dc2626", bg: "#fef2f2" },
+  { value: "speaking",  label: "Speaking",  icon: Mic,        color: "#dc2626", bg: "#fef2f2" },
+  { value: "listening", label: "Listening", icon: Headphones, color: "#dc2626", bg: "#fef2f2" },
 ];
 
 const TYPE_META: Record<QuestionType, { label: string; color: string; bg: string; section: Section }> = {
-  writing_task1:   { label: "Task 1 Academic",  color: "#38bdf8", bg: "#0c2a3d", section: "writing"   },
-  writing_task2:   { label: "Task 2 Essay",     color: "#34d399", bg: "#0a2d22", section: "writing"   },
-  reading_passage: { label: "Reading Passage",  color: "#34d399", bg: "#0a2d22", section: "reading"   },
-  speaking_part1:  { label: "Speaking Part 1",  color: "#c084fc", bg: "#1d0d38", section: "speaking"  },
-  speaking_part2:  { label: "Speaking Part 2",  color: "#a78bfa", bg: "#180d38", section: "speaking"  },
-  speaking_part3:  { label: "Speaking Part 3",  color: "#818cf8", bg: "#0e0d38", section: "speaking"  },
-  listening_s1:    { label: "Listening S1",     color: "#38bdf8", bg: "#071826", section: "listening" },
-  listening_s2:    { label: "Listening S2",     color: "#34d399", bg: "#061a10", section: "listening" },
-  listening_s3:    { label: "Listening S3",     color: "#fbbf24", bg: "#1a1206", section: "listening" },
-  listening_s4:    { label: "Listening S4",     color: "#c084fc", bg: "#130a20", section: "listening" },
+  writing_task1:   { label: "Task 1 Academic",  color: "#dc2626", bg: "#fef2f2", section: "writing"   },
+  writing_task2:   { label: "Task 2 Essay",     color: "#dc2626", bg: "#fef2f2", section: "writing"   },
+  reading_passage: { label: "Reading Passage",  color: "#dc2626", bg: "#fef2f2", section: "reading"   },
+  speaking_part1:  { label: "Speaking Part 1",  color: "#dc2626", bg: "#fef2f2", section: "speaking"  },
+  speaking_part2:  { label: "Speaking Part 2",  color: "#dc2626", bg: "#fef2f2", section: "speaking"  },
+  speaking_part3:  { label: "Speaking Part 3",  color: "#dc2626", bg: "#fef2f2", section: "speaking"  },
+  listening_s1:    { label: "Listening S1",     color: "#dc2626", bg: "#fef2f2", section: "listening" },
+  listening_s2:    { label: "Listening S2",     color: "#dc2626", bg: "#fef2f2", section: "listening" },
+  listening_s3:    { label: "Listening S3",     color: "#dc2626", bg: "#fef2f2", section: "listening" },
+  listening_s4:    { label: "Listening S4",     color: "#dc2626", bg: "#fef2f2", section: "listening" },
 };
 
 const WRITING_TYPES:   QuestionType[] = ["writing_task1", "writing_task2"];
@@ -131,27 +131,27 @@ const LISTENING_TYPES: QuestionType[] = ["listening_s1", "listening_s2", "listen
 const ALL_TYPES = [...WRITING_TYPES, ...READING_TYPES, ...SPEAKING_TYPES, ...LISTENING_TYPES];
 
 const LISTENING_SECTION_META = [
-  { type: "listening_s1" as QuestionType, label: "Section 1", color: "#38bdf8", bg: "#071826", desc: "Everyday conversation", start: 1  },
-  { type: "listening_s2" as QuestionType, label: "Section 2", color: "#34d399", bg: "#061a10", desc: "Social monologue",      start: 11 },
-  { type: "listening_s3" as QuestionType, label: "Section 3", color: "#fbbf24", bg: "#1a1206", desc: "Academic discussion",   start: 21 },
-  { type: "listening_s4" as QuestionType, label: "Section 4", color: "#c084fc", bg: "#130a20", desc: "Academic lecture",      start: 31 },
+  { type: "listening_s1" as QuestionType, label: "Section 1", color: "#dc2626", bg: "#fef2f2", desc: "Everyday conversation", start: 1  },
+  { type: "listening_s2" as QuestionType, label: "Section 2", color: "#dc2626", bg: "#fef2f2", desc: "Social monologue",      start: 11 },
+  { type: "listening_s3" as QuestionType, label: "Section 3", color: "#dc2626", bg: "#fef2f2", desc: "Academic discussion",   start: 21 },
+  { type: "listening_s4" as QuestionType, label: "Section 4", color: "#dc2626", bg: "#fef2f2", desc: "Academic lecture",      start: 31 },
 ];
 
 const DIFFICULTY_OPTIONS = [
-  { value: "band_5_6" as Difficulty, label: "Band 5–6", color: "#fbbf24" },
-  { value: "band_6_7" as Difficulty, label: "Band 6–7", color: "#34d399" },
-  { value: "band_7_8" as Difficulty, label: "Band 7–8", color: "#38bdf8" },
-  { value: "band_8_9" as Difficulty, label: "Band 8–9", color: "#c084fc" },
+  { value: "band_5_6" as Difficulty, label: "Band 5–6", color: "#dc2626" },
+  { value: "band_6_7" as Difficulty, label: "Band 6–7", color: "#dc2626" },
+  { value: "band_7_8" as Difficulty, label: "Band 7–8", color: "#dc2626" },
+  { value: "band_8_9" as Difficulty, label: "Band 8–9", color: "#dc2626" },
 ];
 
 const PASSAGE_LEVEL_OPTIONS: { value: PassageLevel; label: string; desc: string; color: string }[] = [
-  { value: "level_1", label: "Passage 1", desc: "Easier · Factual",          color: "#34d399" },
-  { value: "level_2", label: "Passage 2", desc: "Medium · Descriptive",      color: "#38bdf8" },
-  { value: "level_3", label: "Passage 3", desc: "Harder · Argumentative",    color: "#c084fc" },
+  { value: "level_1", label: "Passage 1", desc: "Easier · Factual",          color: "#dc2626" },
+  { value: "level_2", label: "Passage 2", desc: "Medium · Descriptive",      color: "#dc2626" },
+  { value: "level_3", label: "Passage 3", desc: "Harder · Argumentative",    color: "#dc2626" },
 ];
 const DIFFICULTY_LABEL: Record<Difficulty,string> = { band_5_6:"Band 5–6", band_6_7:"Band 6–7", band_7_8:"Band 7–8", band_8_9:"Band 8–9" };
-const DIFFICULTY_COLOR: Record<Difficulty,string> = { band_5_6:"#fbbf24", band_6_7:"#34d399", band_7_8:"#38bdf8", band_8_9:"#c084fc" };
-const DIFFICULTY_BG:    Record<Difficulty,string> = { band_5_6:"#2d1f06", band_6_7:"#062d1e", band_7_8:"#062630", band_8_9:"#1d0d38" };
+const DIFFICULTY_COLOR: Record<Difficulty,string> = { band_5_6:"#dc2626", band_6_7:"#dc2626", band_7_8:"#dc2626", band_8_9:"#dc2626" };
+const DIFFICULTY_BG:    Record<Difficulty,string> = { band_5_6:"#fef2f2", band_6_7:"#fef2f2", band_7_8:"#fef2f2", band_8_9:"#fef2f2" };
 
 function typeIcon(type: QuestionType): React.ElementType {
   if (WRITING_TYPES.includes(type))  return type === "writing_task1" ? FileText : BookOpen;
@@ -303,10 +303,10 @@ function AdminContent() {
       {/* ── Usage stats grid ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label:"Total Users",   value: totalUsers  !== null ? totalUsers.toLocaleString()  : "…", icon:<Users className="w-4 h-4"/>,    color:"#38bdf8", bg:"#0c2a3d" },
-          { label:"Tests Today",   value: testsToday  !== null ? testsToday.toLocaleString()  : "…", icon:<Zap className="w-4 h-4"/>,      color:"#34d399", bg:"#0a2d22" },
-          { label:"Content Items", value: questions.length.toString(),                               icon:<BarChart3 className="w-4 h-4"/>, color:"#c084fc", bg:"#1d0d38" },
-          { label:"Avg Band",      value: avgBand     !== null ? avgBand.toFixed(1)            : "…", icon:<CheckCircle2 className="w-4 h-4"/>, color:"#fb923c", bg:"#2d1408" },
+          { label:"Total Users",   value: totalUsers  !== null ? totalUsers.toLocaleString()  : "…", icon:<Users className="w-4 h-4"/>,    color:"#dc2626", bg:"#fef2f2" },
+          { label:"Tests Today",   value: testsToday  !== null ? testsToday.toLocaleString()  : "…", icon:<Zap className="w-4 h-4"/>,      color:"#dc2626", bg:"#fef2f2" },
+          { label:"Content Items", value: questions.length.toString(),                               icon:<BarChart3 className="w-4 h-4"/>, color:"#dc2626", bg:"#fef2f2" },
+          { label:"Avg Band",      value: avgBand     !== null ? avgBand.toFixed(1)            : "…", icon:<CheckCircle2 className="w-4 h-4"/>, color:"#dc2626", bg:"#fef2f2" },
         ].map(({ label, value, icon, color, bg }) => (
           <div key={label} className="rounded-2xl p-4 flex flex-col gap-2"
             style={{ background: bg, border:`1px solid ${color}25` }}>
@@ -344,11 +344,11 @@ function AdminContent() {
 
           {/* Stats */}
           <div className="flex items-stretch gap-3 shrink-0">
-            <StatPill icon={<BarChart3 className="w-4 h-4"/>}    label="Total"   value={questions.length} color="#c084fc" bg="#1d0d38" />
-            <StatPill icon={<FileText className="w-4 h-4"/>}     label="Writing" value={bySection("writing")}  color="#38bdf8" bg="#0c2a3d" />
-            <StatPill icon={<BookMarked className="w-4 h-4"/>}   label="Reading" value={bySection("reading")}  color="#34d399" bg="#0a2d22" />
-            <StatPill icon={<Mic className="w-4 h-4"/>}          label="Speaking" value={bySection("speaking")} color="#c084fc" bg="#1d0d38" />
-            <StatPill icon={<Headphones className="w-4 h-4"/>}   label="Listening" value={bySection("listening")} color="#fb923c" bg="#2d1408" />
+            <StatPill icon={<BarChart3 className="w-4 h-4"/>}    label="Total"   value={questions.length} color="#dc2626" bg="#fef2f2" />
+            <StatPill icon={<FileText className="w-4 h-4"/>}     label="Writing" value={bySection("writing")}  color="#dc2626" bg="#fef2f2" />
+            <StatPill icon={<BookMarked className="w-4 h-4"/>}   label="Reading" value={bySection("reading")}  color="#dc2626" bg="#fef2f2" />
+            <StatPill icon={<Mic className="w-4 h-4"/>}          label="Speaking" value={bySection("speaking")} color="#dc2626" bg="#fef2f2" />
+            <StatPill icon={<Headphones className="w-4 h-4"/>}   label="Listening" value={bySection("listening")} color="#dc2626" bg="#fef2f2" />
           </div>
         </div>
       </div>
@@ -365,7 +365,7 @@ function AdminContent() {
           <SectionHeading number="2" title="Manage Questions" subtitle="Edit or remove questions" />
           {!isAdmin && (
             <span className="text-[10px] font-bold px-3 py-1.5 rounded-full"
-              style={{ background:"#2d1f06", color:"#fbbf24", border:"1px solid rgba(251,191,36,0.35)" }}>
+              style={{ background:"#fef9c3", color:"#d97706", border:"1px solid rgba(217,119,6,0.35)" }}>
               Editor — view &amp; add only
             </span>
           )}
@@ -413,7 +413,7 @@ function AdminContent() {
                 const plMeta = pl ? PASSAGE_LEVEL_OPTIONS.find(p => p.value === pl) : null;
                 const diffLabel = diff ? DIFFICULTY_LABEL[diff] : plMeta ? plMeta.label : "—";
                 const diffColor = diff ? DIFFICULTY_COLOR[diff] : plMeta ? plMeta.color : T3;
-                const diffBg    = diff ? DIFFICULTY_BG[diff]    : pl === "level_1" ? "#062d1e" : pl === "level_2" ? "#062630" : pl === "level_3" ? "#1d0d38" : S2;
+                const diffBg    = diff ? DIFFICULTY_BG[diff]    : S2;
                 const isPublished = q.content?.status === "published";
                 const preview = q.title.length > 60 ? q.title.slice(0,60).trimEnd() + "…" : q.title;
 
@@ -445,8 +445,8 @@ function AdminContent() {
                     </span>
 
                     <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-full whitespace-nowrap"
-                      style={{ background:isPublished?"#062d1e":S2, color:isPublished?"#34d399":T3, border:`1px solid ${isPublished?"rgba(52,211,153,0.35)":BD}` }}>
-                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background:isPublished?"#34d399":T3 }} />
+                      style={{ background:isPublished?"#f0fdf4":S2, color:isPublished?"#16a34a":T3, border:`1px solid ${isPublished?"rgba(22,163,74,0.35)":BD}` }}>
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background:isPublished?"#16a34a":T3 }} />
                       {isPublished ? "Published" : "Draft"}
                     </span>
 
@@ -455,11 +455,11 @@ function AdminContent() {
                     </span>
 
                     <div className="flex items-center gap-1 justify-center">
-                      <ActionBtn label="Edit" color="#38bdf8" hoverBg="#0c2a3d" onClick={() => openEdit(q)}>
+                      <ActionBtn label="Edit" color="#dc2626" hoverBg="#fef2f2" onClick={() => openEdit(q)}>
                         <Pencil className="w-3.5 h-3.5" />
                       </ActionBtn>
                       {isAdmin && (
-                        <ActionBtn label="Delete" color="#f87171" hoverBg="#2d0f0f" onClick={() => setDeleteTarget(q)}>
+                        <ActionBtn label="Delete" color="#f87171" hoverBg="#fef2f2" onClick={() => setDeleteTarget(q)}>
                           <Trash2 className="w-3.5 h-3.5" />
                         </ActionBtn>
                       )}
@@ -487,8 +487,8 @@ function AdminContent() {
             <ul>
               {logs.map((log, i) => {
                 const isAdded = log.action === "added";
-                const accent  = isAdded ? "#34d399" : "#f87171";
-                const logBg   = isAdded ? "#062d1e" : "#2d0f0f";
+                const accent  = isAdded ? "#16a34a" : "#f87171";
+                const logBg   = isAdded ? "#f0fdf4" : "#fef2f2";
                 const preview = log.question_title.length > 60
                   ? log.question_title.slice(0,60).trimEnd() + "…" : log.question_title;
                 return (
@@ -527,8 +527,8 @@ function AdminContent() {
           <form onSubmit={handleEditSave} className="space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl" style={{ background:"#0c2a3d", border:"1px solid rgba(56,189,248,0.3)" }}>
-                  <Pencil className="w-4 h-4" style={{ color:"#38bdf8" }} />
+                <div className="p-2 rounded-xl" style={{ background:"#fef2f2", border:"1px solid rgba(220,38,38,0.3)" }}>
+                  <Pencil className="w-4 h-4" style={{ color:"#dc2626" }} />
                 </div>
                 <div>
                   <h2 className="text-base font-black" style={{ color:T1 }}>Edit Question</h2>
@@ -576,7 +576,7 @@ function AdminContent() {
         <Modal onClose={() => setDeleteTarget(null)}>
           <div className="space-y-5">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-2xl shrink-0" style={{ background:"#2d0f0f", border:"1px solid rgba(248,113,113,0.3)" }}>
+              <div className="p-3 rounded-2xl shrink-0" style={{ background:"#fef2f2", border:"1px solid rgba(248,113,113,0.3)" }}>
                 <AlertTriangle className="w-5 h-5" style={{ color:"#f87171" }} />
               </div>
               <div>
@@ -889,7 +889,7 @@ function AddQuestionForm({ onSuccess, onLog }: {
                 <button type="button" onClick={removeImage}
                   className="absolute top-2.5 right-2.5 p-1.5 rounded-lg transition-all"
                   style={{ background:"rgba(0,0,0,0.8)", color:"#f87171", border:"1px solid rgba(248,113,113,0.3)" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "#2d0f0f")}
+                  onMouseEnter={e => (e.currentTarget.style.background = "#fef2f2")}
                   onMouseLeave={e => (e.currentTarget.style.background = "rgba(0,0,0,0.8)")}>
                   <X className="w-4 h-4" />
                 </button>
@@ -927,7 +927,7 @@ function AddQuestionForm({ onSuccess, onLog }: {
             <div className="grid grid-cols-3 gap-2">
               {PASSAGE_LEVEL_OPTIONS.map(({ value, label, desc, color }) => {
                 const active = passageLevel === value;
-                const bg = value === "level_1" ? "#062d1e" : value === "level_2" ? "#062630" : "#1d0d38";
+                const bg = "#fef2f2";
                 return (
                   <button key={value} type="button" onClick={() => setPassageLevel(value)}
                     className="flex flex-col items-center gap-1 px-3 py-3 rounded-xl text-xs font-bold transition-all duration-150"
@@ -1040,9 +1040,9 @@ function AddQuestionForm({ onSuccess, onLog }: {
           {/* Audio upload */}
           <FieldLabel label={<>Audio File <span className="font-normal normal-case tracking-normal" style={{ color:T3 }}>— MP3 / WAV / M4A · max 20 MB</span></>}>
             {audioFile ? (
-              <div className="rounded-xl overflow-hidden" style={{ background: "#071826", border: "1px solid rgba(56,189,248,0.3)" }}>
+              <div className="rounded-xl overflow-hidden" style={{ background: "#fef2f2", border: "1px solid rgba(220,38,38,0.2)" }}>
                 <div className="flex items-center gap-3 px-4 py-3">
-                  <Music2 className="w-4 h-4 shrink-0" style={{ color: "#38bdf8" }} />
+                  <Music2 className="w-4 h-4 shrink-0" style={{ color: "#dc2626" }} />
                   <span className="text-sm flex-1 truncate" style={{ color: "#94a3b8" }}>{audioName}</span>
                   <button type="button" onClick={() => { setAudioFile(null); setAudioName(""); if(audioRef2.current) audioRef2.current.value=""; if(audioPreviewUrl){URL.revokeObjectURL(audioPreviewUrl);setAudioPreviewUrl(null);} }}
                     className="p-1 rounded-lg transition-colors" style={{ color: "#f87171" }}>
@@ -1051,7 +1051,7 @@ function AddQuestionForm({ onSuccess, onLog }: {
                 </div>
                 {audioPreviewUrl && (
                   <div className="px-4 pb-3">
-                    <audio controls src={audioPreviewUrl} className="w-full h-8" style={{ accentColor: "#38bdf8" }} />
+                    <audio controls src={audioPreviewUrl} className="w-full h-8" style={{ accentColor: "#dc2626" }} />
                   </div>
                 )}
               </div>
@@ -1060,11 +1060,11 @@ function AddQuestionForm({ onSuccess, onLog }: {
                 className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl cursor-pointer transition-all duration-150"
                 style={{ border: `1.5px dashed ${BDL}`, background: S2 }}>
                 <div className="p-3 rounded-xl" style={{ background: "rgba(251,146,60,0.15)", border: "1px solid rgba(251,146,60,0.25)" }}>
-                  <Headphones className="w-5 h-5" style={{ color: "#fb923c" }} />
+                  <Headphones className="w-5 h-5" style={{ color: "#dc2626" }} />
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-semibold" style={{ color: T2 }}>
-                    Click to upload audio or <span style={{ color: "#fb923c" }}>browse</span>
+                    Click to upload audio or <span style={{ color: "#dc2626" }}>browse</span>
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: T3 }}>MP3, WAV, M4A</p>
                 </div>
@@ -1222,7 +1222,7 @@ function AddQuestionForm({ onSuccess, onLog }: {
               <button type="button" onClick={addLGroup}
                 className="w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-150"
                 style={{ background: S2, border: `1px dashed ${BDL}`, color: T2 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#fb923c"; (e.currentTarget as HTMLElement).style.color = "#fb923c"; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#fb923c"; (e.currentTarget as HTMLElement).style.color = "#dc2626"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = BDL; (e.currentTarget as HTMLElement).style.color = T2; }}>
                 <Plus className="w-3.5 h-3.5" /> Add question group
               </button>
@@ -1338,9 +1338,9 @@ function StatusToggle({ value, onChange }: { value:Status; onChange:(s:Status)=>
           <button key={s} type="button" onClick={() => onChange(s)}
             className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-bold transition-all duration-150 flex-1 justify-center"
             style={{
-              background: active ? (isP ? "#062d1e" : S2) : S2,
+              background: active ? (isP ? "#f0fdf4" : S2) : S2,
               border:     `1px solid ${active ? (isP ? "rgba(52,211,153,0.4)" : BDL) : BD}`,
-              color:      active ? (isP ? "#34d399" : T2) : T3,
+              color:      active ? (isP ? "#16a34a" : T2) : T3,
             }}>
             {isP ? <Globe className="w-3.5 h-3.5"/> : <FileX2 className="w-3.5 h-3.5"/>}
             {s.charAt(0).toUpperCase() + s.slice(1)}

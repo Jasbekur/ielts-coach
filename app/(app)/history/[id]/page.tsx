@@ -13,10 +13,10 @@ import { ArrowLeft, BookOpen, Mic, CheckCircle2, AlertCircle, ArrowRight } from 
 import { WritingResult, SpeakingResult, getBandTailwind } from "@/types/ielts";
 
 const ESSAY_TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  opinion:                    { label: "Opinion Essay",               color: "bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300" },
+  opinion:                    { label: "Opinion Essay",               color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" },
   discuss_both_views:         { label: "Discuss Both Views",          color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" },
   problem_solution:           { label: "Problem & Solution",          color: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300" },
-  advantages_disadvantages:   { label: "Advantages & Disadvantages",  color: "bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300" },
+  advantages_disadvantages:   { label: "Advantages & Disadvantages",  color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" },
   direct_question:            { label: "Direct Question",             color: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300" },
 };
 
@@ -65,14 +65,14 @@ export default async function AttemptDetailPage({
             <div
               className={`w-7 h-7 rounded-md flex items-center justify-center ${
                 isWriting
-                  ? "bg-violet-100 dark:bg-violet-950"
-                  : "bg-emerald-100 dark:bg-emerald-950"
+                  ? "bg-red-100 dark:bg-red-950"
+                  : "bg-red-100 dark:bg-red-950"
               }`}
             >
               {isWriting ? (
-                <BookOpen className="w-3.5 h-3.5 text-violet-500" />
+                <BookOpen className="w-3.5 h-3.5 text-red-600" />
               ) : (
-                <Mic className="w-3.5 h-3.5 text-emerald-500" />
+                <Mic className="w-3.5 h-3.5 text-green-600" />
               )}
             </div>
             <h1 className="text-xl font-bold capitalize">{attempt.mode}</h1>
@@ -171,9 +171,9 @@ export default async function AttemptDetailPage({
             {(writingResult.strengths?.length > 0 || writingResult.weaknesses?.length > 0) && (
               <div className="grid sm:grid-cols-2 gap-4">
                 {writingResult.strengths?.length > 0 && (
-                  <Card className="border-emerald-200 dark:border-emerald-800">
+                  <Card className="border-green-200 dark:border-green-800">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-xs font-medium uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      <CardTitle className="text-xs font-medium uppercase tracking-wider text-green-600 dark:text-green-400">
                         ✓ Strengths
                       </CardTitle>
                     </CardHeader>
@@ -181,7 +181,7 @@ export default async function AttemptDetailPage({
                       <ul className="space-y-1.5">
                         {writingResult.strengths.map((s, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
                             <span>{s}</span>
                           </li>
                         ))}
@@ -216,9 +216,9 @@ export default async function AttemptDetailPage({
 
             {/* Next Actions */}
             {writingResult.next_actions?.length > 0 && (
-              <Card className="border-violet-200 dark:border-violet-800">
+              <Card className="border-red-200 dark:border-red-800">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-violet-600 dark:text-violet-400">
+                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-red-600 dark:text-red-400">
                     📋 Action Plan
                   </CardTitle>
                 </CardHeader>
@@ -226,7 +226,7 @@ export default async function AttemptDetailPage({
                   <ol className="space-y-2">
                     {writingResult.next_actions.map((action, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <span className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 text-red-600 dark:text-red-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
                           {i + 1}
                         </span>
                         <span>{action}</span>
@@ -289,9 +289,9 @@ export default async function AttemptDetailPage({
             {(speakingResult.strengths?.length > 0 || speakingResult.weaknesses?.length > 0) && (
               <div className="grid sm:grid-cols-2 gap-4">
                 {speakingResult.strengths?.length > 0 && (
-                  <Card className="border-emerald-200 dark:border-emerald-800">
+                  <Card className="border-green-200 dark:border-green-800">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-xs font-medium uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      <CardTitle className="text-xs font-medium uppercase tracking-wider text-green-600 dark:text-green-400">
                         ✓ Strengths
                       </CardTitle>
                     </CardHeader>
@@ -299,7 +299,7 @@ export default async function AttemptDetailPage({
                       <ul className="space-y-1.5">
                         {speakingResult.strengths.map((s, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
                             <span>{s}</span>
                           </li>
                         ))}
@@ -379,7 +379,7 @@ export default async function AttemptDetailPage({
                         <div className="flex items-center gap-2 flex-wrap mb-0.5">
                           <span className="line-through text-red-500 font-mono">&quot;{g.said}&quot;</span>
                           <ArrowRight className="w-3 h-3 text-muted-foreground shrink-0" />
-                          <span className="text-emerald-600 dark:text-emerald-400 font-mono font-medium">&quot;{g.should_be}&quot;</span>
+                          <span className="text-green-600 dark:text-green-400 font-mono font-medium">&quot;{g.should_be}&quot;</span>
                         </div>
                         <p className="text-xs text-muted-foreground">{g.reason}</p>
                       </div>
@@ -415,9 +415,9 @@ export default async function AttemptDetailPage({
             )}
 
             {/* Model answer */}
-            <Card className="border-violet-200 dark:border-violet-800">
+            <Card className="border-red-200 dark:border-red-800">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-violet-600 dark:text-violet-400">✦ Band 8+ Model Answer</CardTitle>
+                <CardTitle className="text-sm font-medium text-red-600 dark:text-red-400">✦ Band 8+ Model Answer</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-relaxed">{speakingResult.model_answer}</p>
@@ -426,9 +426,9 @@ export default async function AttemptDetailPage({
 
             {/* Next actions */}
             {speakingResult.next_actions?.length > 0 && (
-              <Card className="border-violet-200 dark:border-violet-800">
+              <Card className="border-red-200 dark:border-red-800">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-violet-600 dark:text-violet-400">
+                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-red-600 dark:text-red-400">
                     📋 Action Plan
                   </CardTitle>
                 </CardHeader>
@@ -436,7 +436,7 @@ export default async function AttemptDetailPage({
                   <ol className="space-y-2">
                     {speakingResult.next_actions.map((action, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <span className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900 text-red-600 dark:text-red-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
                           {i + 1}
                         </span>
                         <span>{action}</span>

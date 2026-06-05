@@ -10,8 +10,8 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 const CATEGORY_COLORS: Record<string, string> = {
   grammar: "bg-red-100 text-red-700 border-red-200",
   vocabulary: "bg-amber-100 text-amber-700 border-amber-200",
-  cohesion: "bg-blue-100 text-blue-700 border-blue-200",
-  task: "bg-purple-100 text-purple-700 border-purple-200",
+  cohesion: "bg-red-100 text-red-700 border-red-200",
+  task: "bg-red-100 text-red-700 border-red-200",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -28,7 +28,7 @@ function CorrectionItem({ correction }: { correction: Correction }) {
     <button
       type="button"
       onClick={() => setOpen(!open)}
-      className="w-full text-left border rounded-lg p-3 bg-card hover:border-emerald-300 transition-colors"
+      className="w-full text-left border rounded-lg p-3 bg-card hover:border-red-300 transition-colors"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <Badge
@@ -56,7 +56,7 @@ function CorrectionItem({ correction }: { correction: Correction }) {
           <>
             <div className="leading-snug">
               <span className="text-xs text-muted-foreground mr-1">✅</span>
-              <span className="text-emerald-600 font-medium">{correction.fixed}</span>
+              <span className="text-green-600 font-medium">{correction.fixed}</span>
             </div>
             <p className="text-xs text-muted-foreground border-t border-border pt-1.5 mt-1.5">
               {correction.reason}
@@ -100,7 +100,7 @@ export function CorrectionsView({ result }: CorrectionsViewProps) {
           <button
             type="button"
             onClick={() => setShowAll(!showAll)}
-            className="w-full text-xs text-emerald-600 hover:text-emerald-600 py-2 border border-dashed border-emerald-200 rounded-lg transition-colors"
+            className="w-full text-xs text-green-600 hover:text-green-600 py-2 border border-dashed border-green-200 rounded-lg transition-colors"
           >
             {showAll
               ? "Show less"

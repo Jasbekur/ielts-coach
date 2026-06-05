@@ -501,13 +501,13 @@ export default function WritingPage() {
     {/* ── Header card ── */}
     <div style={{
       background: "#ffffff", borderRadius: "8px",
-      border: "1px solid #e2e8f0", borderLeft: "4px solid #2563eb",
+      border: "1px solid #e2e8f0", borderLeft: "4px solid #dc2626",
       padding: "20px 24px", marginBottom: "20px",
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
       display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px",
     }}>
       <div>
-        <p style={{ fontSize: "11px", fontWeight: 600, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+        <p style={{ fontSize: "11px", fontWeight: 600, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
           IELTS Academic
         </p>
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>
@@ -519,7 +519,7 @@ export default function WritingPage() {
       </div>
       <button
         onClick={() => setShowBandGuide(!showBandGuide)}
-        style={{ fontSize: "12px", color: "#2563eb", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, flexShrink: 0, marginTop: "2px" }}
+        style={{ fontSize: "12px", color: "#dc2626", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, flexShrink: 0, marginTop: "2px" }}
       >
         Band guide {showBandGuide ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
       </button>
@@ -732,7 +732,7 @@ export default function WritingPage() {
                 disabled={loading}
                 className="flex-1 sm:flex-none sm:min-w-[200px] gap-2 text-white text-base font-bold py-5"
                 style={{
-                  background: "#2563eb",
+                  background: "#dc2626",
                   boxShadow: "0 4px 0 #1d4ed8, 0 6px 20px rgba(37,99,235,0.35)",
                   transition: "transform 0.1s, box-shadow 0.1s",
                 }}

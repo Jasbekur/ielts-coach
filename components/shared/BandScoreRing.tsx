@@ -25,8 +25,8 @@ export function BandScoreRing({
   const getStrokeColor = () => {
     if (band < 5) return "#ef4444"; // red-500
     if (band < 7) return "#f59e0b"; // amber-500
-    if (band < 8.5) return "#10b981"; // emerald-500
-    return "#8b5cf6"; // violet-500
+    if (band < 8.5) return "#16a34a"; // emerald-500
+    return "#16a34a"; // violet-500
   };
 
   return (

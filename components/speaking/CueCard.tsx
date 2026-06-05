@@ -12,14 +12,14 @@ interface CueCardProps {
 
 export function CueCard({ cueCard, prepTimeLeft, isPrep }: CueCardProps) {
   return (
-    <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-white dark:from-violet-950 dark:to-background">
+    <Card className="border-red-200 bg-gradient-to-br from-red-50 to-white dark:from-red-950 dark:to-background">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-violet-700 dark:text-violet-300">
+          <CardTitle className="text-base font-semibold text-red-700 dark:text-red-300">
             {cueCard.topic}
           </CardTitle>
           {isPrep && prepTimeLeft !== undefined && (
-            <div className="flex items-center gap-1.5 text-sm font-mono font-bold text-violet-600">
+            <div className="flex items-center gap-1.5 text-sm font-mono font-bold text-red-600">
               <PencilLine className="w-3.5 h-3.5" />
               Prep: {prepTimeLeft}s
             </div>

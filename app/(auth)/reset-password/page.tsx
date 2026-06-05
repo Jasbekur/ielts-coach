@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
   // Show spinner while we verify the session to avoid flash
   if (validSession === null) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "oklch(0.982 0.005 285)" }}>
-      <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+      <div className="w-8 h-8 rounded-full border-2 border-red-500 border-t-transparent animate-spin" />
     </div>
   );
 
@@ -65,16 +65,16 @@ export default function ResetPasswordPage() {
         style={{ background: "oklch(0.155 0.032 278)" }}
       >
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, oklch(0.546 0.245 274 / 18%), transparent 70%)" }} />
+          style={{ background: "radial-gradient(circle, rgba(220,38,38,0.15), transparent 70%)" }} />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, oklch(0.65 0.18 160 / 12%), transparent 70%)" }} />
+          style={{ background: "radial-gradient(circle, rgba(220,38,38,0.08), transparent 70%)" }} />
 
         <div className="relative z-10 text-center space-y-5 max-w-xs">
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
             style={{
-              background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))",
-              boxShadow: "0 4px 24px oklch(0.546 0.245 274 / 40%)",
+              background: "#dc2626",
+              boxShadow: "0 4px 24px rgba(220,38,38,0.4)",
             }}
           >
             <ShieldCheck className="w-8 h-8 text-white" />
@@ -94,7 +94,7 @@ export default function ResetPasswordPage() {
               "Avoid using personal information",
             ].map((tip) => (
               <div key={tip} className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: "oklch(0.72 0.18 160)" }} />
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: "#dc2626" }} />
                 <p className="text-xs" style={{ color: "oklch(0.65 0.012 278)" }}>{tip}</p>
               </div>
             ))}
@@ -110,7 +110,7 @@ export default function ResetPasswordPage() {
           <div className="flex items-center gap-3 mb-8 lg:hidden">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))" }}
+              style={{ background: "#dc2626" }}
             >
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
@@ -152,7 +152,7 @@ export default function ResetPasswordPage() {
                       <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300"
                         style={{
                           background: password.length >= i * 3
-                            ? i === 3 ? "oklch(0.65 0.18 160)" : i === 2 ? "oklch(0.75 0.18 55)" : "oklch(0.65 0.2 27)"
+                            ? i === 3 ? "#16a34a" : i === 2 ? "oklch(0.75 0.18 55)" : "oklch(0.65 0.2 27)"
                             : "oklch(0.912 0.012 285)"
                         }} />
                     ))}
@@ -179,7 +179,7 @@ export default function ResetPasswordPage() {
                 <p className="text-xs text-destructive">Passwords don&apos;t match</p>
               )}
               {confirmOk && (
-                <p className="text-xs" style={{ color: "oklch(0.65 0.18 160)" }}>✓ Passwords match</p>
+                <p className="text-xs" style={{ color: "#16a34a" }}>✓ Passwords match</p>
               )}
             </div>
 
@@ -188,8 +188,8 @@ export default function ResetPasswordPage() {
               className="w-full h-11 font-semibold mt-2"
               disabled={loading || !passwordOk || !confirmOk}
               style={{
-                background: "linear-gradient(135deg, oklch(0.546 0.245 274), oklch(0.52 0.22 300))",
-                boxShadow: "0 4px 16px oklch(0.546 0.245 274 / 35%)",
+                background: "#dc2626",
+                boxShadow: "0 4px 16px rgba(220,38,38,0.35)",
               }}
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update password"}

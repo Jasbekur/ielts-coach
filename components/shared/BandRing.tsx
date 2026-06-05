@@ -33,24 +33,24 @@ function easeOutCubic(t: number): number {
 function ringStroke(band: number): string {
   if (band < 5)   return "oklch(0.628 0.258 29.2)";   // red-500
   if (band < 7)   return "oklch(0.769 0.189 70.1)";   // amber-500
-  if (band < 8.5) return "oklch(0.696 0.170 162.5)";  // emerald-500
-  return                  "oklch(0.627 0.265 303.9)";  // violet-500
+  if (band < 8.5) return "oklch(0.627 0.194 149.6)";  // green-600
+  return                  "oklch(0.527 0.194 149.6)";  // green-700
 }
 
 /** Track glow colour — softer, lower chroma */
 function ringGlow(band: number): string {
   if (band < 5)   return "oklch(0.628 0.258 29.2  / 25%)";
   if (band < 7)   return "oklch(0.769 0.189 70.1  / 25%)";
-  if (band < 8.5) return "oklch(0.696 0.170 162.5 / 25%)";
-  return                  "oklch(0.627 0.265 303.9 / 25%)";
+  if (band < 8.5) return "oklch(0.627 0.194 149.6 / 25%)";
+  return                  "oklch(0.527 0.194 149.6 / 25%)";
 }
 
 /** Tailwind text class for the centre numeral */
 function numClass(band: number): string {
   if (band < 5)   return "text-red-500";
   if (band < 7)   return "text-amber-500";
-  if (band < 8.5) return "text-emerald-500";
-  return                  "text-violet-500";
+  if (band < 8.5) return "text-green-600";
+  return                  "text-green-700";
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────

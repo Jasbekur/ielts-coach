@@ -341,7 +341,7 @@ function SpeakingModelAnswer({ result }: { result: SpeakingResult }) {
                   >
                     {t.label}
                     {isDefault && (
-                      <span className={`text-[10px] font-normal ${isSelected ? "text-white/80" : "text-emerald-600"}`}>
+                      <span className={`text-[10px] font-normal ${isSelected ? "text-white/80" : "text-red-600"}`}>
                         ← your level
                       </span>
                     )}
@@ -421,8 +421,8 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
       </Card>
       <div className="grid sm:grid-cols-2 gap-4">
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-emerald-600">✓ Strengths</CardTitle></CardHeader>
-          <CardContent><ul className="space-y-1.5">{result.strengths.map((s, i) => <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-emerald-500 shrink-0">•</span>{s}</li>)}</ul></CardContent>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-red-600">✓ Strengths</CardTitle></CardHeader>
+          <CardContent><ul className="space-y-1.5">{result.strengths.map((s, i) => <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-red-600 shrink-0">•</span>{s}</li>)}</ul></CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-red-600">✗ Weaknesses</CardTitle></CardHeader>
@@ -438,7 +438,7 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
                 <span className="font-mono font-semibold text-amber-600">&ldquo;{p.word}&rdquo;</span>
                 <span className="text-muted-foreground mx-1.5">—</span>
                 <span className="text-muted-foreground">{p.issue}</span>
-                <p className="text-emerald-600 text-xs mt-1.5 font-medium">✓ Fix: {p.fix}</p>
+                <p className="text-red-600 text-xs mt-1.5 font-medium">✓ Fix: {p.fix}</p>
               </div>
             ))}
           </CardContent>
@@ -451,7 +451,7 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
             {result.grammar_issues.map((g, i) => (
               <div key={i} className="text-sm border rounded-md p-3 bg-card">
                 <div className="line-through text-red-500">&ldquo;{g.said}&rdquo;</div>
-                <div className="text-emerald-600 font-medium mt-1">&ldquo;{g.should_be}&rdquo;</div>
+                <div className="text-red-600 font-medium mt-1">&ldquo;{g.should_be}&rdquo;</div>
                 <p className="text-xs text-muted-foreground mt-1.5">{g.reason}</p>
               </div>
             ))}
@@ -466,7 +466,7 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
               <div key={i} className="text-sm border rounded-md p-3 bg-card">
                 <span className="text-muted-foreground line-through">{v.basic_word}</span>
                 <span className="mx-2 text-muted-foreground">→</span>
-                <span className="text-emerald-600 font-semibold">{v.better_word}</span>
+                <span className="text-red-600 font-semibold">{v.better_word}</span>
                 <p className="text-xs text-muted-foreground mt-1 italic">&ldquo;{v.example}&rdquo;</p>
               </div>
             ))}
@@ -536,7 +536,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
             <BandScoreRing band={overallBand} size={140} />
             <div className="flex-1 text-center sm:text-left">
               <p className="text-sm text-muted-foreground">Overall Mock Band Score</p>
-              <p className="text-5xl font-mono font-bold text-emerald-600">{formatBand(overallBand)}</p>
+              <p className="text-5xl font-mono font-bold text-red-600">{formatBand(overallBand)}</p>
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                 Averaged across all {allResults.length} answers in your full IELTS Speaking mock test
               </p>
@@ -581,8 +581,8 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
       {/* Strengths / Weaknesses */}
       <div className="grid sm:grid-cols-2 gap-4">
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-emerald-600">✓ Key Strengths</CardTitle></CardHeader>
-          <CardContent><ul className="space-y-1.5">{allStrengths.map((s, i) => <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-emerald-500 shrink-0">•</span>{s}</li>)}</ul></CardContent>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-red-600">✓ Key Strengths</CardTitle></CardHeader>
+          <CardContent><ul className="space-y-1.5">{allStrengths.map((s, i) => <li key={i} className="text-sm text-muted-foreground flex gap-2"><span className="text-red-600 shrink-0">•</span>{s}</li>)}</ul></CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-red-600">✗ Areas to Improve</CardTitle></CardHeader>
@@ -603,15 +603,15 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
                   <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center">P1 · Q{i + 1}</Badge>
                   <p className="text-xs text-muted-foreground truncate hidden sm:block">{r.transcript?.slice(0, 70)}…</p>
                 </div>
-                <span className="font-mono font-semibold text-sm text-emerald-600 shrink-0 ml-3">{formatBand(r.scores.overall)}</span>
+                <span className="font-mono font-semibold text-sm text-red-600 shrink-0 ml-3">{formatBand(r.scores.overall)}</span>
               </div>
             ))}
             <div className="flex items-center justify-between py-2 border-b border-border/40">
               <div className="flex items-center gap-2.5 min-w-0">
-                <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center border-blue-300 text-emerald-600">P2</Badge>
+                <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center border-blue-300 text-red-600">P2</Badge>
                 <p className="text-xs text-muted-foreground truncate hidden sm:block">{results.part2.transcript?.slice(0, 70)}…</p>
               </div>
-              <span className="font-mono font-semibold text-sm text-emerald-600 shrink-0 ml-3">{formatBand(results.part2.scores.overall)}</span>
+              <span className="font-mono font-semibold text-sm text-red-600 shrink-0 ml-3">{formatBand(results.part2.scores.overall)}</span>
             </div>
             {results.part3.map((r, i) => (
               <div key={`p3-${i}`} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
@@ -619,7 +619,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
                   <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center">P3 · Q{i + 1}</Badge>
                   <p className="text-xs text-muted-foreground truncate hidden sm:block">{r.transcript?.slice(0, 70)}…</p>
                 </div>
-                <span className="font-mono font-semibold text-sm text-emerald-600 shrink-0 ml-3">{formatBand(r.scores.overall)}</span>
+                <span className="font-mono font-semibold text-sm text-red-600 shrink-0 ml-3">{formatBand(r.scores.overall)}</span>
               </div>
             ))}
           </div>
@@ -657,7 +657,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
                         <div key={j} className="text-xs border rounded-md p-2 bg-card">
                           <span className="line-through text-red-500">{g.said}</span>
                           <span className="mx-2">→</span>
-                          <span className="text-emerald-600 font-medium">{g.should_be}</span>
+                          <span className="text-red-600 font-medium">{g.should_be}</span>
                         </div>
                       ))}
                     </div>
@@ -669,7 +669,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
                         <div key={j} className="text-xs border rounded-md p-2 bg-card flex gap-2">
                           <span className="text-muted-foreground line-through">{v.basic_word}</span>
                           <span>→</span>
-                          <span className="text-emerald-600 font-semibold">{v.better_word}</span>
+                          <span className="text-red-600 font-semibold">{v.better_word}</span>
                         </div>
                       ))}
                     </div>
@@ -682,7 +682,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
       ))}
 
       <ShareScoreCard band={overallBand} mode="Speaking" detail="Full Mock Test" />
-      <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#2563eb" }}>
+      <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#dc2626" }}>
         <ClipboardList className="w-5 h-5" /> Take Another Mock Test
       </Button>
     </div>
@@ -1013,11 +1013,11 @@ export default function SpeakingPage() {
     {/* ── Header card ── */}
     <div style={{
       background: "#ffffff", borderRadius: "8px",
-      border: "1px solid #e2e8f0", borderLeft: "4px solid #2563eb",
+      border: "1px solid #e2e8f0", borderLeft: "4px solid #dc2626",
       padding: "20px 24px", marginBottom: "20px",
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
     }}>
-      <p style={{ fontSize: "11px", fontWeight: 600, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+      <p style={{ fontSize: "11px", fontWeight: 600, color: "#dc2626", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
         IELTS Academic
       </p>
       <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>
@@ -1035,9 +1035,9 @@ export default function SpeakingPage() {
         <button
           onClick={() => setMode("practice")}
           style={{ padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-            border: mode === "practice" ? "2px solid #2563eb" : "1px solid #e2e8f0",
+            border: mode === "practice" ? "2px solid #dc2626" : "1px solid #e2e8f0",
             background: mode === "practice" ? "#eff6ff" : "#ffffff",
-            color: mode === "practice" ? "#2563eb" : "#64748b",
+            color: mode === "practice" ? "#dc2626" : "#64748b",
             fontSize: "13.5px", fontWeight: 600,
             display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
           }}
@@ -1048,9 +1048,9 @@ export default function SpeakingPage() {
         <button
           onClick={() => { setMode("mock"); if (mockPhase === "intro") setMockPhase("intro"); }}
           style={{ padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
-            border: mode === "mock" ? "2px solid #2563eb" : "1px solid #e2e8f0",
+            border: mode === "mock" ? "2px solid #dc2626" : "1px solid #e2e8f0",
             background: mode === "mock" ? "#eff6ff" : "#ffffff",
-            color: mode === "mock" ? "#2563eb" : "#64748b",
+            color: mode === "mock" ? "#dc2626" : "#64748b",
             fontSize: "13.5px", fontWeight: 600,
             display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
           }}
@@ -1476,7 +1476,7 @@ export default function SpeakingPage() {
             <Card className="border-blue-200 dark:border-blue-800">
               <CardContent className="pt-10 pb-10 text-center space-y-5">
                 <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mx-auto">
-                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                  <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">Analysing your complete mock test…</h3>

@@ -37,13 +37,13 @@ export default function ForgotPasswordPage() {
         style={{ background: "oklch(0.155 0.032 278)" }}
       >
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, oklch(0.546 0.245 274 / 18%), transparent 70%)" }} />
+          style={{ background: "radial-gradient(circle, rgba(220,38,38,0.15), transparent 70%)" }} />
         <div className="relative z-10 text-center space-y-5 max-w-xs">
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
             style={{
-              background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))",
-              boxShadow: "0 4px 24px oklch(0.546 0.245 274 / 40%)",
+              background: "#dc2626",
+              boxShadow: "0 4px 24px rgba(220,38,38,0.4)",
             }}
           >
             <KeyRound className="w-8 h-8 text-white" />
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
             className="rounded-xl p-4 text-left"
             style={{ background: "oklch(0.22 0.028 278)" }}
           >
-            <p className="text-xs font-semibold mb-1" style={{ color: "oklch(0.78 0.18 274)" }}>
+            <p className="text-xs font-semibold mb-1" style={{ color: "#dc2626" }}>
               💡 Quick tip
             </p>
             <p className="text-xs leading-relaxed" style={{ color: "oklch(0.65 0.012 278)" }}>
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
           <div className="flex items-center gap-3 mb-8 lg:hidden">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, oklch(0.62 0.245 274), oklch(0.52 0.22 300))" }}
+              style={{ background: "#dc2626" }}
             >
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
@@ -90,9 +90,9 @@ export default function ForgotPasswordPage() {
             <div className="text-center space-y-5">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
-                style={{ background: "oklch(0.65 0.18 160 / 12%)" }}
+                style={{ background: "rgba(220,38,38,0.1)" }}
               >
-                <CheckCircle2 className="w-8 h-8" style={{ color: "oklch(0.65 0.18 160)" }} />
+                <CheckCircle2 className="w-8 h-8" style={{ color: "#dc2626" }} />
               </div>
               <div>
                 <h1 className="text-2xl font-bold mb-2">Check your email</h1>
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
                 <Link
                   href="/login"
                   className="flex items-center justify-center gap-1.5 text-sm font-medium hover:underline transition-colors"
-                  style={{ color: "oklch(0.546 0.245 274)" }}
+                  style={{ color: "#dc2626" }}
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to sign in
                 </Link>
@@ -150,8 +150,8 @@ export default function ForgotPasswordPage() {
                   className="w-full h-11 gap-2 font-semibold"
                   disabled={loading}
                   style={{
-                    background: "linear-gradient(135deg, oklch(0.546 0.245 274), oklch(0.52 0.22 300))",
-                    boxShadow: "0 4px 16px oklch(0.546 0.245 274 / 35%)",
+                    background: "linear-gradient(135deg, #dc2626, oklch(0.52 0.22 300))",
+                    boxShadow: "0 4px 16px rgba(220,38,38,0.35)",
                   }}
                 >
                   {loading
@@ -164,7 +164,7 @@ export default function ForgotPasswordPage() {
                 <Link
                   href="/login"
                   className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline transition-colors"
-                  style={{ color: "oklch(0.546 0.245 274)" }}
+                  style={{ color: "#dc2626" }}
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to sign in
                 </Link>

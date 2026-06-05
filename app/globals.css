@@ -499,3 +499,14 @@
     100% { box-shadow: 0 0 0 0 oklch(0.65 0.22 0 / 0%); }
   }
 }
+
+/* Focus rings — red */
+*:focus-visible { outline: 2px solid #dc2626; outline-offset: 2px; }
+input:focus, textarea:focus, select:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.1) !important;
+  outline: none;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }

@@ -150,7 +150,7 @@ export function Recorder({
               ? "bg-red-500 hover:bg-red-600 focus:ring-red-300 animate-pulse"
               : state === "done"
               ? "bg-muted cursor-not-allowed"
-              : "bg-violet-500 hover:bg-violet-600 focus:ring-violet-300",
+              : "bg-red-600 hover:bg-red-700 focus:ring-red-300",
             disabled && "opacity-50 cursor-not-allowed"
           )}
           aria-label={state === "recording" ? "Stop recording" : "Start recording"}
