@@ -134,10 +134,10 @@ const TASK2_QUESTIONS = [
 ];
 
 const ESSAY_TYPE_LABELS: Record<string, { label: string; color: string; tip: string }> = {
-  opinion:                    { label: "Opinion Essay",              color: "bg-emerald-100 text-emerald-700", tip: "Give a CLEAR opinion. Support with 2 reasons + examples." },
+  opinion:                    { label: "Opinion Essay",              color: "bg-blue-100 text-blue-700", tip: "Give a CLEAR opinion. Support with 2 reasons + examples." },
   discuss_both_views:         { label: "Discuss Both Views",         color: "bg-blue-100 text-blue-700",    tip: "Discuss BOTH sides fairly. State your opinion in the introduction AND conclusion." },
   problem_solution:           { label: "Problem & Solution",         color: "bg-amber-100 text-amber-700",  tip: "Name specific problems, then give realistic solutions. Avoid vague answers." },
-  advantages_disadvantages:   { label: "Advantages & Disadvantages", color: "bg-emerald-100 text-emerald-700", tip: "Compare advantages and disadvantages. Give your opinion at the end." },
+  advantages_disadvantages:   { label: "Advantages & Disadvantages", color: "bg-blue-100 text-blue-700", tip: "Compare advantages and disadvantages. Give your opinion at the end." },
   direct_question:            { label: "Direct Question",            color: "bg-pink-100 text-pink-700",    tip: "Answer ALL parts of the question directly. Don't just give one side." },
 };
 
@@ -157,8 +157,8 @@ function WritingSkeletonLoader() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 py-2">
-        <div className="w-8 h-8 rounded-full bg-emerald-100 animate-pulse flex items-center justify-center">
-          <span className="text-emerald-600 text-sm">🎓</span>
+        <div className="w-8 h-8 rounded-full bg-blue-100 animate-pulse flex items-center justify-center">
+          <span className="text-blue-600 text-sm">🎓</span>
         </div>
         <p className="text-sm text-muted-foreground animate-pulse font-medium">
           IELTS Sensei is analysing your essay…
@@ -185,7 +185,7 @@ function TimerDisplay({ seconds, limit }: { seconds: number; limit: number }) {
     <div className={`flex items-center gap-2 text-sm font-mono font-bold px-3 py-1.5 rounded-lg border ${
       isOver    ? "text-red-500 border-red-200 bg-red-50" :
       isWarning ? "text-amber-500 border-amber-200 bg-amber-50" :
-                  "text-emerald-600 border-emerald-200 bg-emerald-50"
+                  "text-blue-600 border-blue-200 bg-blue-50"
     }`}>
       <Timer className="w-3.5 h-3.5" />
       {isOver ? "TIME UP" : `${mins}:${secs.toString().padStart(2, "0")}`}
@@ -249,8 +249,8 @@ function ChartUpload({
       onClick={() => inputRef.current?.click()}
       className={`relative flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed cursor-pointer transition-all ${
         dragging
-          ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950"
-          : "border-border hover:border-emerald-300 hover:bg-muted/30"
+          ? "border-blue-400 bg-blue-50 dark:bg-blue-950"
+          : "border-border hover:border-blue-300 hover:bg-muted/30"
       }`}
     >
       <input
@@ -260,8 +260,8 @@ function ChartUpload({
         className="hidden"
         onChange={handleFileInput}
       />
-      <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
-        <BarChart3 className="w-5 h-5 text-emerald-600" />
+      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+        <BarChart3 className="w-5 h-5 text-blue-600" />
       </div>
       <div className="text-center">
         <p className="text-sm font-medium">Upload your chart or diagram</p>
@@ -464,22 +464,37 @@ export default function WritingPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-display tracking-tight">Writing Practice</h1>
-          <p className="text-base text-muted-foreground mt-1">
-            Paste or type your answer and get instant examiner-grade feedback
-          </p>
-        </div>
-        <button
-          onClick={() => setShowBandGuide(!showBandGuide)}
-          className="text-xs flex items-center gap-1 shrink-0 mt-1 font-semibold"
-          style={{ color: "#059669" }}
-        >
-          Band guide {showBandGuide ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-        </button>
+    <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+    <div style={{ maxWidth: "860px" }}>
+
+    {/* ── Header card ── */}
+    <div style={{
+      background: "#ffffff", borderRadius: "8px",
+      border: "1px solid #e2e8f0", borderLeft: "4px solid #2563eb",
+      padding: "20px 24px", marginBottom: "20px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+      display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px",
+    }}>
+      <div>
+        <p style={{ fontSize: "11px", fontWeight: 600, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+          IELTS Academic
+        </p>
+        <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>
+          Writing Practice
+        </h1>
+        <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.5" }}>
+          Paste or type your answer and get instant examiner-grade feedback
+        </p>
       </div>
+      <button
+        onClick={() => setShowBandGuide(!showBandGuide)}
+        style={{ fontSize: "12px", color: "#2563eb", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, flexShrink: 0, marginTop: "2px" }}
+      >
+        Band guide {showBandGuide ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+      </button>
+    </div>
+
+    <div className="space-y-5">
 
       {/* Band guide */}
       {showBandGuide && (
@@ -498,7 +513,7 @@ export default function WritingPage() {
       )}
 
       {/* Module selector: Academic / General Training */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl w-fit" style={{ background: "#f3f4f6" }}>
+      <div className="flex items-center gap-2" style={{ background: "#f1f5f9", borderRadius: "6px", padding: "3px", width: "fit-content" }}>
         {(["academic", "general"] as const).map((m) => (
           <button
             key={m}
@@ -516,11 +531,14 @@ export default function WritingPage() {
               setChartFile(null);
               setChartPreview(null);
             }}
-            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
-              moduleType === m
-                ? "bg-white text-emerald-700 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            style={{
+              padding: "6px 16px", borderRadius: "5px",
+              background: moduleType === m ? "#ffffff" : "transparent",
+              color: moduleType === m ? "#0f172a" : "#64748b",
+              fontSize: "13px", fontWeight: 500, border: "none", cursor: "pointer",
+              boxShadow: moduleType === m ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              transition: "all 0.15s",
+            }}
           >
             {m === "academic" ? "Academic" : "General Training"}
           </button>
@@ -543,9 +561,9 @@ export default function WritingPage() {
           setChartPreview(null);
         }}
       >
-        <TabsList className="grid grid-cols-2 w-fit p-1.5 rounded-2xl h-auto gap-1.5" style={{ background: "#f3f4f6" }}>
-          <TabsTrigger value="task2" className="rounded-xl px-6 py-2.5 text-sm font-semibold data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm" style={{ ["--tw-ring-color" as string]: "transparent" }}>Task 2 — Essay</TabsTrigger>
-          <TabsTrigger value="task1" className="rounded-xl px-6 py-2.5 text-sm font-semibold data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm">
+        <TabsList className="flex border-b border-gray-200 bg-transparent h-auto p-0 rounded-none gap-0">
+          <TabsTrigger value="task2" className="px-5 py-2.5 text-sm rounded-none border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 font-medium bg-transparent">Task 2 — Essay</TabsTrigger>
+          <TabsTrigger value="task1" className="px-5 py-2.5 text-sm rounded-none border-b-2 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 font-medium bg-transparent">
             {moduleType === "general" && taskType === "task1" ? "Task 1 — Letter" : "Task 1 — Academic Report"}
           </TabsTrigger>
         </TabsList>
@@ -564,7 +582,7 @@ export default function WritingPage() {
                 <span>⏱ {taskType === "task1" ? "20 min" : "40 min"}</span>
                 <span>📝 Min {taskType === "task1" ? "150" : "250"} words</span>
                 {taskType === "task1" && (
-                  <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">Scored on Task Achievement, CC, LR, GRA</span>
+                  <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">Scored on Task Achievement, CC, LR, GRA</span>
                 )}
                 {taskType === "task2" && (
                   <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">Scored on Task Response, CC, LR, GRA</span>
@@ -577,7 +595,7 @@ export default function WritingPage() {
                   variant={timerActive ? "outline" : "default"}
                   size="sm"
                   onClick={toggleTimer}
-                  className={`gap-1.5 h-7 text-xs ${!timerActive ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+                  className={`gap-1.5 h-7 text-xs ${!timerActive ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}`}
                 >
                   <Timer className="w-3 h-3" />
                   {timerActive ? "Pause" : timerSeconds > 0 ? "Resume" : "Start Timer"}
@@ -614,7 +632,7 @@ export default function WritingPage() {
                   <button
                     type="button"
                     onClick={pickRandomQuestion}
-                    className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 transition-colors"
                   >
                     <Shuffle className="w-3 h-3" />
                     {taskType === "task1" && moduleType === "academic" ? "Practice question + chart" : "Practice question"}
@@ -643,7 +661,7 @@ export default function WritingPage() {
             {taskType === "task1" && moduleType === "academic" && (
               <div className="space-y-1.5">
                 <label className="text-sm font-medium flex items-center gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5 text-emerald-600" />
+                  <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
                   Chart or diagram
                   <span className="text-xs text-muted-foreground font-normal">(optional but recommended)</span>
                 </label>
@@ -683,8 +701,8 @@ export default function WritingPage() {
                 disabled={loading}
                 className="flex-1 sm:flex-none sm:min-w-[200px] gap-2 text-white text-base font-bold py-5"
                 style={{
-                  background: "#10b981",
-                  boxShadow: "0 4px 0 #059669, 0 6px 20px rgba(5,150,105,0.35)",
+                  background: "#2563eb",
+                  boxShadow: "0 4px 0 #1d4ed8, 0 6px 20px rgba(37,99,235,0.35)",
                   transition: "transform 0.1s, box-shadow 0.1s",
                 }}
               >
@@ -777,6 +795,8 @@ export default function WritingPage() {
           <BandRewrite result={result} />
         </div>
       )}
+    </div>
+    </div>
     </div>
   );
 }

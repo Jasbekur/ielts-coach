@@ -158,9 +158,9 @@ function TopicPicker({ topics, onSelect, onRandom, part }: {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {topics.map((t, i) => (
           <button key={i} onClick={() => onSelect(i)}
-            className="flex items-center gap-2.5 p-3 rounded-xl border bg-card hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all text-left group">
+            className="flex items-center gap-2.5 p-3 rounded-xl border bg-card hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all text-left group">
             <span className="text-xl shrink-0">{t.emoji}</span>
-            <span className="text-xs font-medium text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-300 leading-tight">{t.topic}</span>
+            <span className="text-xs font-medium text-foreground group-hover:text-blue-700 dark:group-hover:text-blue-300 leading-tight">{t.topic}</span>
           </button>
         ))}
       </div>
@@ -193,7 +193,7 @@ function CueCardPicker({ onSelect, onRandom }: {
         {["All", ...categories].map(cat => (
           <button key={cat} onClick={() => setActiveCategory(cat)}
             className={`text-xs px-3 py-1 rounded-full border transition-all ${
-              activeCategory === cat ? "bg-emerald-600 text-white border-emerald-600" : "border-border text-muted-foreground hover:border-emerald-300 hover:text-foreground"
+              activeCategory === cat ? "bg-blue-600 text-white border-blue-600" : "border-border text-muted-foreground hover:border-blue-300 hover:text-foreground"
             }`}>
             {cat}
           </button>
@@ -202,7 +202,7 @@ function CueCardPicker({ onSelect, onRandom }: {
       <div className="grid gap-2 max-h-96 overflow-y-auto pr-1">
         {filtered.map((card, i) => (
           <button key={i} onClick={() => onSelect(card)}
-            className="text-left p-3 rounded-xl border bg-card hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all">
+            className="text-left p-3 rounded-xl border bg-card hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all">
             <p className="text-xs font-medium text-foreground leading-snug">{card.topic}</p>
             <p className="text-xs text-muted-foreground mt-0.5 italic">and {card.followUp.replace("and ", "")}</p>
           </button>
@@ -222,11 +222,11 @@ function CueCardDisplay({ card, prepTimeLeft, isPrep, notes, onNotesChange }: {
 }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-background p-5">
+      <div className="rounded-xl border-2 border-blue-300 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-background p-5">
         <div className="flex items-start justify-between gap-3 mb-4">
-          <Badge variant="outline" className="text-xs text-emerald-600 border-emerald-300 shrink-0">{card.category}</Badge>
+          <Badge variant="outline" className="text-xs text-blue-600 border-blue-300 shrink-0">{card.category}</Badge>
           {isPrep && prepTimeLeft !== undefined && (
-            <div className="flex items-center gap-1.5 text-sm font-mono font-bold text-emerald-600 shrink-0">
+            <div className="flex items-center gap-1.5 text-sm font-mono font-bold text-blue-600 shrink-0">
               <PencilLine className="w-3.5 h-3.5" />
               {prepTimeLeft}s left
             </div>
@@ -237,7 +237,7 @@ function CueCardDisplay({ card, prepTimeLeft, isPrep, notes, onNotesChange }: {
         <ul className="space-y-1.5 mb-4">
           {card.bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-              <span className="text-emerald-400 font-bold shrink-0 mt-0.5">•</span>
+              <span className="text-blue-400 font-bold shrink-0 mt-0.5">•</span>
               {b}
             </li>
           ))}
@@ -247,7 +247,7 @@ function CueCardDisplay({ card, prepTimeLeft, isPrep, notes, onNotesChange }: {
       {isPrep && (
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <PencilLine className="w-3.5 h-3.5 text-emerald-600" />
+            <PencilLine className="w-3.5 h-3.5 text-blue-600" />
             <p className="text-sm font-medium">Preparation notes</p>
             <span className="text-xs text-muted-foreground">(use this 1 minute to plan your answer)</span>
           </div>
@@ -280,8 +280,8 @@ type BandKey = "band5" | "band6" | "band7" | "band8";
 const BAND_TABS = [
   { key: "band5" as BandKey, label: "Band 5", activeBg: "bg-red-500",     activeRing: "ring-red-300",     descColor: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300",     desc: "Simple sentences, basic vocabulary — a solid first step" },
   { key: "band6" as BandKey, label: "Band 6", activeBg: "bg-amber-500",   activeRing: "ring-amber-300",   descColor: "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300",   desc: "Adequate structure, reasonable vocabulary — clear and competent" },
-  { key: "band7" as BandKey, label: "Band 7", activeBg: "bg-emerald-500", activeRing: "ring-emerald-300", descColor: "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300", desc: "Good range, mostly accurate — well organised and convincing" },
-  { key: "band8" as BandKey, label: "Band 8+", activeBg: "bg-emerald-600", activeRing: "ring-emerald-300", descColor: "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300", desc: "Sophisticated, idiomatic, natural — examiner-level quality" },
+  { key: "band7" as BandKey, label: "Band 7", activeBg: "bg-blue-500", activeRing: "ring-blue-300", descColor: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300", desc: "Good range, mostly accurate — well organised and convincing" },
+  { key: "band8" as BandKey, label: "Band 8+", activeBg: "bg-blue-600", activeRing: "ring-blue-300", descColor: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300", desc: "Sophisticated, idiomatic, natural — examiner-level quality" },
 ] as const;
 
 function getDefaultBand(score: number): BandKey {
@@ -310,14 +310,14 @@ function SpeakingModelAnswer({ result }: { result: SpeakingResult }) {
   const tab = BAND_TABS.find(t => t.key === selected)!;
 
   return (
-    <Card className="border-emerald-200 dark:border-emerald-800">
+    <Card className="border-blue-200 dark:border-blue-800">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-medium text-emerald-600 flex items-center gap-1.5">
+          <CardTitle className="text-sm font-medium text-blue-600 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" /> Model Answer
           </CardTitle>
           <button onClick={copy} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-blue-500" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
         </div>
       </CardHeader>
@@ -336,7 +336,7 @@ function SpeakingModelAnswer({ result }: { result: SpeakingResult }) {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                       isSelected
                         ? `${t.activeBg} text-white border-transparent shadow-sm`
-                        : "bg-background border-border text-muted-foreground hover:border-emerald-300 hover:text-foreground"
+                        : "bg-background border-border text-muted-foreground hover:border-blue-300 hover:text-foreground"
                     }`}
                   >
                     {t.label}
@@ -363,9 +363,9 @@ function SpeakingModelAnswer({ result }: { result: SpeakingResult }) {
         {/* Nudge to see Band 8 */}
         {hasMultiBand && selected !== "band8" && (
           <p className="text-xs text-muted-foreground border-t pt-2.5 flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3 text-emerald-400 shrink-0" />
+            <Sparkles className="w-3 h-3 text-blue-400 shrink-0" />
             Compare with{" "}
-            <button onClick={() => setSelected("band8")} className="text-emerald-600 hover:underline font-medium">
+            <button onClick={() => setSelected("band8")} className="text-blue-600 hover:underline font-medium">
               Band 8+ answer
             </button>{" "}
             to see how far you can stretch.
@@ -479,7 +479,7 @@ function SpeakingResultView({ result }: { result: SpeakingResult }) {
         <CardContent className="space-y-2">
           {result.next_actions.map((action, i) => (
             <div key={i} className="flex gap-2.5 text-sm">
-              <span className="font-mono font-bold text-emerald-600 shrink-0">{i + 1}.</span>
+              <span className="font-mono font-bold text-blue-600 shrink-0">{i + 1}.</span>
               <span className="text-foreground">{action}</span>
             </div>
           ))}
@@ -523,10 +523,10 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
   return (
     <div className="space-y-4">
       {/* Header */}
-      <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50/50 to-background dark:from-emerald-950/30">
+      <Card className="border-blue-200 dark:border-blue-800 bg-gradient-to-br from-emerald-50/50 to-background dark:from-emerald-950/30">
         <CardContent className="pt-6">
           <div className="text-center mb-5">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-3">
               <Trophy className="w-3.5 h-3.5" />
               Full Mock Test Complete
             </div>
@@ -607,7 +607,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
             ))}
             <div className="flex items-center justify-between py-2 border-b border-border/40">
               <div className="flex items-center gap-2.5 min-w-0">
-                <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center border-emerald-300 text-emerald-600">P2</Badge>
+                <Badge variant="outline" className="text-xs shrink-0 w-14 justify-center border-blue-300 text-emerald-600">P2</Badge>
                 <p className="text-xs text-muted-foreground truncate hidden sm:block">{results.part2.transcript?.slice(0, 70)}…</p>
               </div>
               <span className="font-mono font-semibold text-sm text-emerald-600 shrink-0 ml-3">{formatBand(results.part2.scores.overall)}</span>
@@ -663,7 +663,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
                   )}
                   {r.vocabulary_suggestions && r.vocabulary_suggestions.length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Vocabulary Upgrades</p>
+                      <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Vocabulary Upgrades</p>
                       {r.vocabulary_suggestions.slice(0, 2).map((v, j) => (
                         <div key={j} className="text-xs border rounded-md p-2 bg-card flex gap-2">
                           <span className="text-muted-foreground line-through">{v.basic_word}</span>
@@ -680,7 +680,7 @@ function MockResultsView({ results, onRetry }: { results: MockResultsData; onRet
         </Card>
       ))}
 
-      <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#059669" }}>
+      <Button onClick={onRetry} className="w-full gap-2 text-white text-base py-6" style={{ background: "#2563eb" }}>
         <ClipboardList className="w-5 h-5" /> Take Another Mock Test
       </Button>
     </div>
@@ -703,21 +703,21 @@ function MockProgressBar({ phase, p1Done, p2Done, p3Done }: {
         <div key={i} className="flex items-center flex-1">
           <div className={`flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl transition-all ${
             step.active
-              ? "bg-emerald-100 dark:bg-emerald-900/40"
+              ? "bg-blue-100 dark:bg-blue-900/40"
               : step.done
-              ? "bg-emerald-50 dark:bg-emerald-950/30"
+              ? "bg-blue-50 dark:bg-blue-950/30"
               : "bg-muted/40"
           }`}>
             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
               step.done
-                ? "bg-emerald-500 text-white"
+                ? "bg-blue-500 text-white"
                 : step.active
-                ? "bg-emerald-600 text-white"
+                ? "bg-blue-600 text-white"
                 : "bg-muted text-muted-foreground"
             }`}>
               {step.done ? "✓" : i + 1}
             </div>
-            <p className={`text-xs font-semibold ${step.active ? "text-emerald-700 dark:text-emerald-300" : step.done ? "text-emerald-600" : "text-muted-foreground"}`}>{step.label}</p>
+            <p className={`text-xs font-semibold ${step.active ? "text-blue-700 dark:text-blue-300" : step.done ? "text-blue-600" : "text-muted-foreground"}`}>{step.label}</p>
             <p className="text-xs text-muted-foreground hidden sm:block">{step.sublabel}</p>
           </div>
           {i < steps.length - 1 && <div className="h-px w-3 bg-border shrink-0" />}
@@ -1000,47 +1000,56 @@ export default function SpeakingPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
+    <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
+    <div style={{ maxWidth: "860px" }}>
+
+    {/* ── Header card ── */}
+    <div style={{
+      background: "#ffffff", borderRadius: "8px",
+      border: "1px solid #e2e8f0", borderLeft: "4px solid #2563eb",
+      padding: "20px 24px", marginBottom: "20px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+    }}>
+      <p style={{ fontSize: "11px", fontWeight: 600, color: "#2563eb", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+        IELTS Academic
+      </p>
+      <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "4px" }}>
+        Speaking Practice
+      </h1>
+      <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.5" }}>
+        3 parts · Practice individually or take a full mock · AI band score
+      </p>
+    </div>
+
     <div className="space-y-6">
-      <div>
-        <span className="inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full mb-3"
-          style={{ background: "rgba(5,150,105,0.08)", color: "#059669" }}>
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#059669" }} />
-          AI-POWERED FEEDBACK
-        </span>
-        <h1 className="text-3xl font-display tracking-tight text-foreground">Speaking Practice</h1>
-        <p className="text-base text-muted-foreground mt-1">
-          {mode === "practice"
-            ? "Master the art of conversation. Practice individual parts or take a full exam to get your AI-generated band score in under 15 seconds."
-            : "Complete all 3 parts (Parts 1, 2 & 3) — takes about 15 minutes, just like the real exam"}
-        </p>
-      </div>
 
       {/* ── Mode Selector ── */}
-      <div className="flex gap-1.5 p-1.5 rounded-2xl w-fit" style={{ background: "#f3f4f6" }}>
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
         <button
           onClick={() => setMode("practice")}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
-          style={mode === "practice" ? {
-            background: "white",
-            color: "#059669",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-            border: "1px solid rgba(5,150,105,0.2)",
-          } : { color: "#6b7280" }}
+          style={{ padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
+            border: mode === "practice" ? "2px solid #2563eb" : "1px solid #e2e8f0",
+            background: mode === "practice" ? "#eff6ff" : "#ffffff",
+            color: mode === "practice" ? "#2563eb" : "#64748b",
+            fontSize: "13.5px", fontWeight: 600,
+            display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
+          }}
         >
-          <Zap className="w-3.5 h-3.5" /> Practice
+          ▷ Practice
+          <span style={{ fontSize: "11px", fontWeight: 400, color: "#94a3b8" }}>Choose parts · replay anytime</span>
         </button>
         <button
           onClick={() => { setMode("mock"); if (mockPhase === "intro") setMockPhase("intro"); }}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
-          style={mode === "mock" ? {
-            background: "white",
-            color: "#059669",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-            border: "1px solid rgba(5,150,105,0.2)",
-          } : { color: "#6b7280" }}
+          style={{ padding: "10px 20px", borderRadius: "6px", cursor: "pointer",
+            border: mode === "mock" ? "2px solid #2563eb" : "1px solid #e2e8f0",
+            background: mode === "mock" ? "#eff6ff" : "#ffffff",
+            color: mode === "mock" ? "#2563eb" : "#64748b",
+            fontSize: "13.5px", fontWeight: 600,
+            display: "flex", alignItems: "center", gap: "8px", transition: "all 0.15s",
+          }}
         >
-          <ClipboardList className="w-3.5 h-3.5" /> Full Mock Test
-          <span className="text-[10px] font-normal hidden sm:inline" style={{ color: "#9ca3af" }}>~15 min</span>
+          📋 Full Mock Test
+          <span style={{ fontSize: "11px", fontWeight: 400, color: "#94a3b8" }}>~15 min</span>
         </button>
       </div>
 
@@ -1070,7 +1079,7 @@ export default function SpeakingPage() {
                         </div>
                         <div className="flex gap-1.5 mb-4">
                           {currentTopicSet!.questions.map((_, i) => (
-                            <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${completedQuestions.includes(i) ? "bg-emerald-500" : i === questionInSet ? "bg-emerald-400" : "bg-muted"}`} />
+                            <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${completedQuestions.includes(i) ? "bg-blue-500" : i === questionInSet ? "bg-blue-400" : "bg-muted"}`} />
                           ))}
                         </div>
                         <p className="font-medium text-base leading-relaxed">{currentTopicSet!.questions[questionInSet]}</p>
@@ -1087,7 +1096,7 @@ export default function SpeakingPage() {
                     <Card><CardContent className="pt-5 pb-6">
                       {/* Mic permission notice */}
                       <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 mb-4">
-                        <Mic className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <Mic className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                         <span>Your browser will ask for <strong>microphone access</strong> when you click Record. Allow it to continue.</span>
                       </div>
                       <Recorder limitSeconds={PART_LIMITS[part]} minSeconds={PART_MIN[part]} onRecordingComplete={setAudioBlob} disabled={loading}
@@ -1096,7 +1105,7 @@ export default function SpeakingPage() {
                   )}
 
                   {audioBlob && !result && (
-                    <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                       {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring…</> : <><Mic className="w-4 h-4" /> Get Band Score</>}
                     </Button>
                   )}
@@ -1104,11 +1113,11 @@ export default function SpeakingPage() {
                   {result && !loading && (
                     <div className="flex flex-col sm:flex-row gap-2">
                       {!isLastQuestion ? (
-                        <Button onClick={handleNextQuestion} className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                        <Button onClick={handleNextQuestion} className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                           Next Question <ChevronRight className="w-4 h-4" />
                         </Button>
                       ) : (
-                        <Button onClick={handleChangeTopic} className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                        <Button onClick={handleChangeTopic} className="flex-1 gap-2 bg-blue-500 hover:bg-blue-600 text-white">
                           <CheckCircle2 className="w-4 h-4" /> Topic Complete — Try Another
                         </Button>
                       )}
@@ -1152,7 +1161,7 @@ export default function SpeakingPage() {
                   </Card>
 
                   {!prepActive && !recordingEnabled && !result && (
-                    <Button onClick={startPrep} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Button onClick={startPrep} className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                       ✏️ Start 1-minute preparation time
                     </Button>
                   )}
@@ -1164,7 +1173,7 @@ export default function SpeakingPage() {
                   {recordingEnabled && !result && (
                     <Card><CardContent className="pt-5 pb-6">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 mb-4">
-                        <Mic className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <Mic className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                         <span>Preparation time is over — speak for <strong>1–2 minutes</strong>. The examiner may ask 1–2 follow-up questions after.</span>
                       </div>
                       <Recorder limitSeconds={PART_LIMITS[2]} minSeconds={PART_MIN[2]} onRecordingComplete={setAudioBlob} disabled={loading}
@@ -1173,7 +1182,7 @@ export default function SpeakingPage() {
                   )}
 
                   {audioBlob && !result && (
-                    <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Button onClick={handleScore} disabled={loading} className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                       {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Scoring…</> : <><Mic className="w-4 h-4" /> Get Band Score</>}
                     </Button>
                   )}
@@ -1181,7 +1190,7 @@ export default function SpeakingPage() {
                   {result && (
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Button onClick={() => { setSelectedCard(null); setPrepNotes(""); setResult(null); setAudioBlob(null); setRecordingEnabled(false); setPrepTimeLeft(60); }}
-                        className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                        className="flex-1 gap-2 bg-blue-500 hover:bg-blue-600 text-white">
                         <CheckCircle2 className="w-4 h-4" /> Try Another Card
                       </Button>
                       <Button variant="outline" onClick={handleReset} className="gap-2">
@@ -1198,7 +1207,7 @@ export default function SpeakingPage() {
           {loading && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 animate-pulse flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-blue-100 animate-pulse flex items-center justify-center shrink-0">
                   <span className="text-sm">🎓</span>
                 </div>
                 <p className="text-sm text-muted-foreground animate-pulse font-medium">IELTS Sensei is analysing your speaking…</p>
@@ -1228,11 +1237,11 @@ export default function SpeakingPage() {
         <>
           {/* ── Intro ── */}
           {mockPhase === "intro" && (
-            <Card className="border-2 border-dashed border-emerald-200 dark:border-emerald-800">
+            <Card className="border-2 border-dashed border-blue-200 dark:border-blue-800">
               <CardContent className="pt-8 pb-8 text-center space-y-6">
                 <div>
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center mx-auto mb-4">
-                    <ClipboardList className="w-8 h-8 text-emerald-600" />
+                  <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mx-auto mb-4">
+                    <ClipboardList className="w-8 h-8 text-blue-600" />
                   </div>
                   <h2 className="text-xl font-bold mb-2">Full IELTS Speaking Mock Test</h2>
                   <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
@@ -1264,7 +1273,7 @@ export default function SpeakingPage() {
                   ⚡ Topics &amp; cue card are randomly selected. This uses <strong>11 scoring credits</strong> from your daily limit.
                 </div>
 
-                <Button onClick={startMockTest} size="lg" className="gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-10 text-base">
+                <Button onClick={startMockTest} size="lg" className="gap-3 bg-blue-600 hover:bg-blue-700 text-white px-10 text-base">
                   <ClipboardList className="w-5 h-5" /> Start Full Mock Test
                 </Button>
               </CardContent>
@@ -1282,7 +1291,7 @@ export default function SpeakingPage() {
               <Card>
                 <CardContent className="pt-4 pb-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Badge className="bg-emerald-600 text-white text-xs">Part 1 · Interview</Badge>
+                    <Badge className="bg-blue-600 text-white text-xs">Part 1 · Interview</Badge>
                     <span className="text-xl">{mockP1Topic.emoji}</span>
                     <span className="font-semibold text-sm flex-1">{mockP1Topic.topic}</span>
                     <Badge variant="outline" className="text-xs shrink-0">Q{mockQIdx + 1} / 5</Badge>
@@ -1290,7 +1299,7 @@ export default function SpeakingPage() {
                   <div className="flex gap-1.5 mb-4">
                     {mockP1Topic.questions.map((_, i) => (
                       <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${
-                        i < mockQIdx ? "bg-emerald-500" : i === mockQIdx ? "bg-emerald-600" : "bg-muted"
+                        i < mockQIdx ? "bg-blue-500" : i === mockQIdx ? "bg-blue-600" : "bg-muted"
                       }`} />
                     ))}
                   </div>
@@ -1317,7 +1326,7 @@ export default function SpeakingPage() {
                 <div className="flex gap-2">
                   <Button
                     onClick={() => mockSaveAndNext(mockRecordings)}
-                    className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     {mockQIdx < 4 ? (
                       <><CheckCircle2 className="w-4 h-4" /> Save &amp; Next Question <ChevronRight className="w-4 h-4" /></>
@@ -1339,7 +1348,7 @@ export default function SpeakingPage() {
               <Card>
                 <CardContent className="pt-4 pb-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Badge className="bg-emerald-600 text-white text-xs">Part 2 · Cue Card</Badge>
+                    <Badge className="bg-blue-600 text-white text-xs">Part 2 · Cue Card</Badge>
                     <span className="text-xs text-muted-foreground ml-auto">1 min prep + 2 min talk</span>
                   </div>
                   <CueCardDisplay
@@ -1359,7 +1368,7 @@ export default function SpeakingPage() {
               </Card>
 
               {!mockPrepActive && !mockRecordingEnabled && !mockAudioBlob && (
-                <Button onClick={startMockPrep} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                <Button onClick={startMockPrep} className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                   ✏️ Start 1-minute preparation time
                 </Button>
               )}
@@ -1386,7 +1395,7 @@ export default function SpeakingPage() {
                 <div className="flex gap-2">
                   <Button
                     onClick={() => mockSaveAndNext(mockRecordings)}
-                    className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     <CheckCircle2 className="w-4 h-4" /> Save &amp; Continue to Part 3 <ChevronRight className="w-4 h-4" />
                   </Button>
@@ -1404,7 +1413,7 @@ export default function SpeakingPage() {
               <Card>
                 <CardContent className="pt-4 pb-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Badge className="bg-emerald-600 text-white text-xs">Part 3 · Discussion</Badge>
+                    <Badge className="bg-blue-600 text-white text-xs">Part 3 · Discussion</Badge>
                     <span className="text-xl">{mockP3Topic.emoji}</span>
                     <span className="font-semibold text-sm flex-1">{mockP3Topic.topic}</span>
                     <Badge variant="outline" className="text-xs shrink-0">Q{mockQIdx + 1} / 5</Badge>
@@ -1412,7 +1421,7 @@ export default function SpeakingPage() {
                   <div className="flex gap-1.5 mb-4">
                     {mockP3Topic.questions.map((_, i) => (
                       <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${
-                        i < mockQIdx ? "bg-emerald-500" : i === mockQIdx ? "bg-emerald-600" : "bg-muted"
+                        i < mockQIdx ? "bg-blue-500" : i === mockQIdx ? "bg-blue-600" : "bg-muted"
                       }`} />
                     ))}
                   </div>
@@ -1439,7 +1448,7 @@ export default function SpeakingPage() {
                 <div className="flex gap-2">
                   <Button
                     onClick={() => mockSaveAndNext(mockRecordings)}
-                    className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     {mockQIdx < 4 ? (
                       <><CheckCircle2 className="w-4 h-4" /> Save &amp; Next Question <ChevronRight className="w-4 h-4" /></>
@@ -1457,9 +1466,9 @@ export default function SpeakingPage() {
 
           {/* ── Scoring ── */}
           {mockPhase === "scoring" && (
-            <Card className="border-emerald-200 dark:border-emerald-800">
+            <Card className="border-blue-200 dark:border-blue-800">
               <CardContent className="pt-10 pb-10 text-center space-y-5">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center mx-auto">
+                <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mx-auto">
                   <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
                 </div>
                 <div>
@@ -1470,7 +1479,7 @@ export default function SpeakingPage() {
                 </div>
                 <div className="w-full max-w-xs mx-auto bg-muted rounded-full h-2">
                   <div
-                    className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                     style={{ width: `${mockTotalToScore > 0 ? (mockScoringProgress / mockTotalToScore) * 100 : 0}%` }}
                   />
                 </div>
@@ -1494,6 +1503,8 @@ export default function SpeakingPage() {
           )}
         </>
       )}
+    </div>
+    </div>
     </div>
   );
 }
