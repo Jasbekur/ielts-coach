@@ -121,6 +121,7 @@ export default function ListeningPage() {
 
   // ── Shared ─────────────────────────────────────────────────────────────────
   const [pageMode,  setPageMode]  = useState<PageMode>("practice");
+
   const [examMode,  setExamMode]  = useState<ExamMode>("practice");
   const [available, setAvailable] = useState<Record<string, LMaterial[]>>({});
   const [loadingDB, setLoadingDB] = useState(true);
@@ -154,6 +155,14 @@ export default function ListeningPage() {
   const [ftTimeLeft,   setFtTimeLeft]   = useState(40 * 60);
   const [ftRunning,    setFtRunning]    = useState(false);
   const ftTimerRef                      = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Sync sidebar visibility with test phase ───────────────────────────────
+  useEffect(() => {
+    const isActive =
+      (pageMode === "practice" && practicePhase === "listening") ||
+      (pageMode === "fulltest" && ftPhase === "active" && ftSections.length > 0);
+    setTestActive(isActive);
+  }, [pageMode, practicePhase, ftPhase, ftSections.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Answer persistence ─────────────────────────────────────────────────────
   const answerDraft = useLocalDraft<Record<number, string>>("ielts-listening-ft-answers");
@@ -229,7 +238,6 @@ export default function ListeningPage() {
     if (ptTimerRef.current) clearInterval(ptTimerRef.current);
     if (audioRef.current)   { audioRef.current.pause(); setPlaying(false); }
     setPracticePhase("results");
-    setTestActive(false);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user && section) {
@@ -281,7 +289,6 @@ export default function ListeningPage() {
     setFtRunning(false);
     answerDraft.clear(); // wipe persisted answers after submit
     setFtPhase("results");
-    setTestActive(false);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -329,7 +336,6 @@ export default function ListeningPage() {
     setShowTranscript(false);
     if (examMode === "exam") setPtTimeLeft(10 * 60);
     setPracticePhase("listening");
-    setTestActive(true);
   }
 
   // ── Full-test: start ────────────────────────────────────────────────────────
@@ -346,7 +352,6 @@ export default function ListeningPage() {
     setPlaying(false); setCurTime(0); setDur(0);
     setFtTimeLeft(40 * 60); setFtRunning(true);
     setFtPhase("active");
-    setTestActive(true);
   }
 
   // ── Auto-play audio when full test goes active ──────────────────────────────
@@ -797,7 +802,7 @@ export default function ListeningPage() {
       <div className="space-y-5 pb-8">
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <button onClick={() => { setPracticePhase("selector"); setTestActive(false); if (ptTimerRef.current) clearInterval(ptTimerRef.current); if (audioRef.current) audioRef.current.pause(); }}
+          <button onClick={() => { setPracticePhase("selector"); if (ptTimerRef.current) clearInterval(ptTimerRef.current); if (audioRef.current) audioRef.current.pause(); }}
             className="flex items-center gap-1.5 text-sm font-medium transition-colors"
             style={{ color:"#475569" }}
             onMouseEnter={e=>(e.currentTarget.style.color="#94a3b8")}
