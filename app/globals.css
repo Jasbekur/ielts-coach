@@ -76,34 +76,34 @@
 
 /* ── Light mode ─────────────────────────────────────────────────────────── */
 :root {
-  /* Slightly warm off-white background — feels like a well-lit study space */
-  --background: oklch(0.982 0.005 285);
-  --foreground: oklch(0.16 0.02 278);
+  /* Clean white background — editorial, like IELTStation */
+  --background: #ffffff;
+  --foreground: #1a1310;
 
-  /* Cards pop against the background with pure white */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.02 278);
+  /* Cards are white on white — use border for separation */
+  --card: #ffffff;
+  --card-foreground: #1a1310;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.02 278);
+  --popover: #ffffff;
+  --popover-foreground: #1a1310;
 
-  /* Violet as the primary — intelligence, ambition, focus */
-  --primary: oklch(0.546 0.245 274);
-  --primary-foreground: oklch(0.99 0 0);
+  /* Red brand — energetic, bold, matches landing page */
+  --primary: #ef4444;
+  --primary-foreground: #ffffff;
 
-  --secondary: oklch(0.958 0.012 285);
-  --secondary-foreground: oklch(0.22 0.03 278);
+  --secondary: #fafafa;
+  --secondary-foreground: #1a1310;
 
-  --muted: oklch(0.958 0.008 285);
-  --muted-foreground: oklch(0.52 0.025 278);
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
 
-  --accent: oklch(0.952 0.018 274);
-  --accent-foreground: oklch(0.38 0.14 274);
+  --accent: #fef2f2;
+  --accent-foreground: #ef4444;
 
   --destructive: oklch(0.577 0.245 27.325);
 
   /* Subtle violet-tinted borders */
-  --border: oklch(0.912 0.012 285);
+  --border: #efe4e2;
   --input: oklch(0.912 0.012 285);
   --ring: oklch(0.546 0.245 274);
 

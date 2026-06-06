@@ -4,61 +4,48 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import {
-  BookOpen,
-  Mic,
-  LayoutDashboard,
-  History,
-  LogOut,
-  BookMarked,
-  ChevronUp,
-  ShieldCheck,
-  Headphones,
+  BookOpen, Mic, LayoutDashboard, History, LogOut,
+  BookMarked, ChevronUp, ShieldCheck, Headphones, GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useTestMode } from "@/contexts/TestModeContext";
 
+/* ── Design tokens (matches landing page) ────────────────────────────────────
+   bg      : #ffffff
+   border  : #efe4e2
+   fg      : #1a1310
+   muted   : #737373
+   brand   : #ef4444  (red)
+   surface : #fafafa
+────────────────────────────────────────────────────────────────────────────── */
+
+const BRAND = "#ef4444";
+const BRAND_BG = "#fef2f2";
+
 const navItems = [
-  { href: "/dashboard",  label: "Dashboard",  icon: LayoutDashboard, description: "Overview & stats" },
-  { href: "/writing",    label: "Writing",    icon: BookOpen,        description: "Task 1 & Task 2" },
-  { href: "/listening",  label: "Listening",  icon: Headphones,      description: "4 sections, 40 Q" },
-  { href: "/speaking",   label: "Speaking",   icon: Mic,             description: "Parts 1, 2 & 3" },
-  { href: "/reading",    label: "Reading",    icon: BookMarked,      description: "3 passages, 40 Q" },
-  { href: "/history",    label: "History",    icon: History,         description: "All attempts" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, desc: "Overview & stats" },
+  { href: "/writing",   label: "Writing",   icon: BookOpen,        desc: "Task 1 & Task 2" },
+  { href: "/listening", label: "Listening", icon: Headphones,      desc: "4 sections, 40 Q" },
+  { href: "/speaking",  label: "Speaking",  icon: Mic,             desc: "Parts 1, 2 & 3" },
+  { href: "/reading",   label: "Reading",   icon: BookMarked,      desc: "3 passages, 40 Q" },
+  { href: "/history",   label: "History",   icon: History,         desc: "All attempts" },
 ];
 
-const PRIMARY = "#16a34a";
-
-// ── Sensei logo mark ─────────────────────────────────────────────────────────
-function SenseiLogo({ size = 40 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      <rect width="40" height="40" rx="12" fill={PRIMARY} />
-      {/* Graduation cap */}
-      <polygon points="20,9 32,15 20,21 8,15" fill="white" opacity="0.95" />
-      <rect x="17" y="21" width="6" height="7" rx="1" fill="white" opacity="0.7" />
-      <line x1="32" y1="15" x2="32" y2="22" stroke="white" strokeWidth="2.2" strokeLinecap="round" opacity="0.8" />
-      <circle cx="32" cy="23" r="1.5" fill="white" opacity="0.8" />
-    </svg>
-  );
-}
-
 export function Sidebar() {
-  const pathname = usePathname();
-  const router   = useRouter();
-  const supabase = useMemo(() => createClient(), []);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const pathname   = usePathname();
+  const router     = useRouter();
+  const supabase   = useMemo(() => createClient(), []);
+  const [userEmail, setUserEmail]     = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
-  const { isAdmin, isEditor } = useUserRole();
-  const { isTestActive } = useTestMode();
+  const { isAdmin, isEditor }         = useUserRole();
+  const { isTestActive }              = useTestMode();
 
   if (isTestActive) return null;
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email ?? null);
-    });
+    supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? null));
   }, [supabase]);
 
   async function handleLogout() {
@@ -72,95 +59,87 @@ export function Sidebar() {
   return (
     <aside
       className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 z-40"
-      style={{
-        background: "linear-gradient(180deg, #0d1117 0%, #111827 100%)",
-        borderRight: "1px solid rgba(255,255,255,0.08)",
-      }}
+      style={{ background: "#ffffff", borderRight: "1px solid #efe4e2" }}
     >
-      {/* ── Logo ── */}
-      <div className="px-6 py-5 flex items-center gap-3">
-        <SenseiLogo size={40} />
-        <div>
-          <p className="font-bold text-sm leading-none text-white tracking-wide">IELTS Sensei</p>
-          <p className="text-[10px] mt-0.5 uppercase tracking-widest font-bold"
-            style={{ color: `${PRIMARY}cc` }}>
-            AI Exam Coach
-          </p>
-        </div>
+      {/* ── Logo ─────────────────────────────────────────────────────────── */}
+      <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid #efe4e2" }}>
+        <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+          <div style={{ width: "34px", height: "34px", borderRadius: "9px", background: BRAND, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <GraduationCap style={{ width: "18px", height: "18px", color: "#fff" }} />
+          </div>
+          <div>
+            <p style={{ fontWeight: 700, fontSize: "14px", color: "#1a1310", lineHeight: 1, margin: 0 }}>IELTS Sensei</p>
+            <p style={{ fontSize: "9px", fontWeight: 600, color: BRAND, textTransform: "uppercase", letterSpacing: "1.4px", margin: 0, marginTop: "2px" }}>AI Exam Coach</p>
+          </div>
+        </Link>
       </div>
 
-      {/* ── Nav ── */}
-      <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 mb-3"
-          style={{ color: "rgba(255,255,255,0.3)" }}>
+      {/* ── Nav ──────────────────────────────────────────────────────────── */}
+      <nav style={{ flex: 1, padding: "12px 10px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+        <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: "#999", padding: "0 10px", marginBottom: "6px" }}>
           Practice
         </p>
 
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {navItems.map(({ href, label, icon: Icon, desc }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
               key={href}
               href={href}
               prefetch={true}
-              className={cn(
-                "flex items-center gap-3.5 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                active ? "text-white shadow-lg" : "hover:text-white"
-              )}
-              style={
-                active
-                  ? { background: PRIMARY, boxShadow: `0 4px 14px ${PRIMARY}40` }
-                  : { color: "rgba(255,255,255,0.6)" }
-              }
-              onMouseEnter={e => {
-                if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.07)";
+              style={{
+                display: "flex", alignItems: "center", gap: "10px",
+                padding: "9px 10px", borderRadius: "8px",
+                textDecoration: "none", transition: "background 0.12s",
+                background: active ? BRAND_BG : "transparent",
+                color: active ? BRAND : "#1a1310",
               }}
-              onMouseLeave={e => {
-                if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
-              }}
+              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "#fafafa"; }}
+              onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
             >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span className="font-semibold">{label}</span>
+              <div style={{
+                width: "30px", height: "30px", borderRadius: "7px", flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: active ? `${BRAND}18` : "#f5f5f5",
+              }}>
+                <Icon style={{ width: "15px", height: "15px", color: active ? BRAND : "#737373" }} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ fontSize: "13px", fontWeight: active ? 700 : 500, color: active ? BRAND : "#1a1310", margin: 0, letterSpacing: "-0.01em" }}>{label}</p>
+                <p style={{ fontSize: "10px", color: "#999", margin: 0 }}>{desc}</p>
+              </div>
+              {active && (
+                <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: BRAND, marginLeft: "auto", flexShrink: 0 }} />
+              )}
             </Link>
           );
         })}
 
-        {/* ── Admin / Editor section ── */}
+        {/* Admin section */}
         {(isAdmin || isEditor) && (
           <>
-            {/* Divider */}
-            <div className="my-3 mx-3 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
-
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 mb-2"
-              style={{ color: "rgba(255,255,255,0.3)" }}>
+            <div style={{ height: "1px", background: "#efe4e2", margin: "8px 10px" }} />
+            <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: "#999", padding: "0 10px", marginBottom: "4px" }}>
               {isAdmin ? "Admin" : "Editor"}
             </p>
-
             {(() => {
-              const href   = "/admin";
+              const href = "/admin";
               const active = pathname === href || pathname.startsWith(href + "/");
               return (
-                <Link
-                  href={href}
-                  prefetch={true}
-                  className={cn(
-                    "flex items-center gap-3.5 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                    active ? "text-white shadow-lg" : "hover:text-white"
-                  )}
-                  style={
-                    active
-                      ? { background: "#16a34a", boxShadow: "0 4px 14px rgba(22,163,74,0.35)" }
-                      : { color: "rgba(255,255,255,0.6)" }
-                  }
-                  onMouseEnter={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(22,163,74,0.12)";
-                  }}
-                  onMouseLeave={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
-                  }}
+                <Link href={href} prefetch={true} style={{
+                  display: "flex", alignItems: "center", gap: "10px",
+                  padding: "9px 10px", borderRadius: "8px",
+                  textDecoration: "none", transition: "background 0.12s",
+                  background: active ? BRAND_BG : "transparent",
+                  color: active ? BRAND : "#1a1310",
+                }}
+                  onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "#fafafa"; }}
+                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
-                  <span className="font-semibold">Content Manager</span>
+                  <div style={{ width: "30px", height: "30px", borderRadius: "7px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: active ? `${BRAND}18` : "#f5f5f5" }}>
+                    <ShieldCheck style={{ width: "15px", height: "15px", color: active ? BRAND : "#737373" }} />
+                  </div>
+                  <p style={{ fontSize: "13px", fontWeight: active ? 700 : 500, color: active ? BRAND : "#1a1310", margin: 0 }}>Content Manager</p>
                 </Link>
               );
             })()}
@@ -168,62 +147,42 @@ export function Sidebar() {
         )}
       </nav>
 
-      {/* ── Profile card ── */}
-      <div className="px-3 pb-4 pt-2 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        {/* Profile toggle button */}
+      {/* ── Profile ──────────────────────────────────────────────────────── */}
+      <div style={{ padding: "10px", borderTop: "1px solid #efe4e2" }}>
         <button
           onClick={() => setProfileOpen(o => !o)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group"
-          style={{ background: profileOpen ? "rgba(255,255,255,0.07)" : "transparent" }}
-          onMouseEnter={e => { if (!profileOpen) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)"; }}
+          style={{
+            width: "100%", display: "flex", alignItems: "center", gap: "10px",
+            padding: "9px 10px", borderRadius: "8px", border: "none", cursor: "pointer",
+            background: profileOpen ? "#fafafa" : "transparent", transition: "background 0.12s",
+          }}
+          onMouseEnter={e => { if (!profileOpen) (e.currentTarget as HTMLElement).style.background = "#fafafa"; }}
           onMouseLeave={e => { if (!profileOpen) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
         >
-          {/* Avatar */}
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-white text-sm font-bold"
-            style={{ background: `linear-gradient(135deg, ${PRIMARY}, #15803d)` }}
-          >
+          <div style={{ width: "30px", height: "30px", borderRadius: "7px", background: BRAND, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "13px", fontWeight: 700, color: "#fff" }}>
             {initials}
           </div>
-          <div className="flex-1 min-w-0 text-left">
-            <p className="text-xs font-semibold text-white truncate">
+          <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+            <p style={{ fontSize: "12px", fontWeight: 600, color: "#1a1310", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {userEmail ?? "Loading…"}
             </p>
-            <p className="text-[10px] font-semibold"
-              style={{ color: isAdmin ? "#16a34a" : isEditor ? "#fbbf24" : "rgba(255,255,255,0.35)" }}>
+            <p style={{ fontSize: "10px", color: isAdmin ? BRAND : isEditor ? "#f59e0b" : "#999", margin: 0, fontWeight: 500 }}>
               {isAdmin ? "Admin" : isEditor ? "Editor" : "Student"}
             </p>
           </div>
-          <ChevronUp
-            className="w-3.5 h-3.5 shrink-0 transition-transform duration-200"
-            style={{
-              color: "rgba(255,255,255,0.4)",
-              transform: profileOpen ? "rotate(0deg)" : "rotate(180deg)",
-            }}
-          />
+          <ChevronUp style={{ width: "13px", height: "13px", color: "#999", transform: profileOpen ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.2s", flexShrink: 0 }} />
         </button>
 
-        {/* Dropdown */}
         {profileOpen && (
-          <div
-            className="mt-1 rounded-xl overflow-hidden"
-            style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
-          >
+          <div style={{ marginTop: "4px", borderRadius: "8px", border: "1px solid #efe4e2", overflow: "hidden", background: "#fafafa" }}>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-150"
-              style={{ color: "rgba(255,255,255,0.55)" }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.color = "#f87171";
-                (e.currentTarget as HTMLElement).style.background = "rgba(248,113,113,0.08)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)";
-                (e.currentTarget as HTMLElement).style.background = "transparent";
-              }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", border: "none", cursor: "pointer", background: "transparent", transition: "background 0.12s", color: "#737373", fontSize: "13px" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#fef2f2"; (e.currentTarget as HTMLElement).style.color = BRAND; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "#737373"; }}
             >
-              <LogOut className="w-3.5 h-3.5 shrink-0" />
-              <span className="font-medium">Sign out</span>
+              <LogOut style={{ width: "13px", height: "13px", flexShrink: 0 }} />
+              <span style={{ fontWeight: 500 }}>Sign out</span>
             </button>
           </div>
         )}
@@ -233,50 +192,34 @@ export function Sidebar() {
 }
 
 export function MobileNav() {
-  const pathname  = usePathname();
+  const pathname = usePathname();
   const { isAdmin, isEditor } = useUserRole();
   const { isTestActive } = useTestMode();
 
   if (isTestActive) return null;
 
-  const adminItem = (isAdmin || isEditor)
-    ? [{ href: "/admin", label: "Admin", icon: ShieldCheck }]
-    : [];
+  const adminItem = (isAdmin || isEditor) ? [{ href: "/admin", label: "Admin", icon: ShieldCheck }] : [];
   const mobileItems = [...navItems, ...adminItem];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
-      style={{
-        background: "linear-gradient(180deg, #111827 0%, #0d1117 100%)",
-        borderColor: "rgba(255,255,255,0.08)",
-      }}>
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+      style={{ background: "#ffffff", borderTop: "1px solid #efe4e2" }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-around", height: "60px", padding: "0 8px" }}>
         {mobileItems.map(({ href, label, icon: Icon }) => {
-          const active     = pathname === href || pathname.startsWith(href + "/");
-          const isAdminTab = href === "/admin";
-          const activeColor = isAdminTab ? "#16a34a" : PRIMARY;
+          const active = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
               key={href}
               href={href}
               prefetch={true}
-              className="relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-150 min-w-[44px]"
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", padding: "8px 10px", borderRadius: "8px", textDecoration: "none", position: "relative" }}
             >
-              <Icon
-                className="w-5 h-5 transition-colors"
-                style={{ color: active ? activeColor : "rgba(255,255,255,0.45)" }}
-              />
-              <span
-                className="text-[10px] font-semibold leading-none transition-colors"
-                style={{ color: active ? activeColor : "rgba(255,255,255,0.45)" }}
-              >
-                {label}
-              </span>
+              <Icon style={{ width: "19px", height: "19px", color: active ? BRAND : "#999" }} />
+              <span style={{ fontSize: "9px", fontWeight: 600, color: active ? BRAND : "#999" }}>{label}</span>
               {active && (
-                <span
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                  style={{ background: activeColor }}
-                />
+                <span style={{ position: "absolute", bottom: "2px", left: "50%", transform: "translateX(-50%)", width: "14px", height: "2px", borderRadius: "999px", background: BRAND }} />
               )}
             </Link>
           );
