@@ -180,7 +180,7 @@ export default function DemoPage() {
               Your dashboard — live preview
             </h1>
             <p style={{ fontSize:"16px", color:"#737373" }}>
-              This is what <strong style={{ color:"#1a1310" }}>Jasurbek</strong> sees after 8 sessions. Band 6.5 → trending to 7.5.
+              This is what a <strong style={{ color:"#1a1310" }}>real student</strong> sees after 8 sessions. Band 6.5 → trending to 7.5.
             </p>
           </div>
 
@@ -209,7 +209,7 @@ export default function DemoPage() {
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:"12px" }}>
                   <div>
                     <h2 style={{ fontSize:"22px", fontWeight:700, color:"#1a1310", letterSpacing:"-0.02em", marginBottom:"4px" }}>
-                      Hey, Jasurbek 👋
+                      Hey, Asel 👋
                     </h2>
                     <p style={{ fontSize:"14px", color:"#737373" }}>
                       <Flame style={{ width:"14px", height:"14px", color:"#f97316", display:"inline", marginRight:"4px" }} />

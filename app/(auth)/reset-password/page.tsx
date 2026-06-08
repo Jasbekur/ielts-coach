@@ -29,12 +29,12 @@ export default function ResetPasswordPage() {
     });
   }, [supabase, router]);
 
-  const passwordOk = password.length >= 6;
+  const passwordOk = password.length >= 8;
   const confirmOk  = password === confirm && confirm.length > 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!passwordOk) { toast.error("Password must be at least 6 characters"); return; }
+    if (!passwordOk) { toast.error("Password must be at least 8 characters"); return; }
     if (!confirmOk)  { toast.error("Passwords do not match"); return; }
     setLoading(true);
     try {
@@ -158,7 +158,7 @@ export default function ResetPasswordPage() {
                     ))}
                   </div>
                   <p className="text-[10px] text-muted-foreground">
-                    {password.length < 3 ? "Weak" : password.length < 6 ? "Fair" : "Good"}
+                    {password.length < 4 ? "Weak" : password.length < 8 ? "Fair" : "Good"}
                   </p>
                 </div>
               )}

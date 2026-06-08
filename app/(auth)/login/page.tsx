@@ -9,13 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   GraduationCap, Loader2, ArrowRight, CheckCircle2,
-  BookOpen, Mic, BarChart3, Star
+  BookOpen, Mic, BarChart3, Star,
 } from "lucide-react";
 import { toast } from "sonner";
-
-const PRIMARY    = "#16a34a";
-const PRIMARY_LT = "#ef4444";
-const PRIMARY_DIM = "rgba(220,38,38,0.15)";
 
 const FEATURES = [
   { icon: BookOpen,  label: "IELTS Writing Coach", desc: "Task 1 & Task 2 with instant AI feedback" },
@@ -63,51 +59,39 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#f9fafb" }}>
+    <div className="min-h-screen flex" style={{ background: "#080d18" }}>
 
       {/* ── Left panel — branding ──────────────────────────────────────────── */}
       <div
         className="hidden lg:flex flex-col justify-between w-[480px] shrink-0 p-10 relative overflow-hidden"
-        style={{ background: "linear-gradient(180deg, #0d1117 0%, #111827 100%)" }}
+        style={{ background: "linear-gradient(160deg, #0e1e40 0%, #080d18 100%)", borderRight: "1px solid rgba(255,255,255,0.06)" }}
       >
-        {/* Background orbs */}
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: `radial-gradient(circle, ${PRIMARY_DIM}, transparent 70%)` }} />
+          style={{ background: "radial-gradient(circle, rgba(59,130,246,0.12), transparent 70%)" }} />
         <div className="absolute -bottom-32 -right-32 w-[420px] h-[420px] rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(220,38,38,0.06), transparent 70%)" }} />
+          style={{ background: "radial-gradient(circle, rgba(99,102,241,0.06), transparent 70%)" }} />
 
         {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-12">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{
-                background: PRIMARY,
-                boxShadow: `0 4px 16px rgba(220,38,38,0.45)`,
-              }}
-            >
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg,#3b82f6,#2563eb)", boxShadow: "0 4px 16px rgba(59,130,246,0.4)" }}>
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div>
               <p className="font-bold text-sm leading-none text-white">IELTS Sensei</p>
-              <p className="text-[10px] mt-0.5 uppercase tracking-widest font-bold"
-                style={{ color: `${PRIMARY}cc` }}>AI Exam Coach</p>
+              <p className="text-[10px] mt-0.5 uppercase tracking-widest font-bold" style={{ color: "rgba(96,165,250,0.7)" }}>AI Exam Coach</p>
             </div>
           </div>
 
           <h2 className="text-3xl font-bold leading-snug mb-3 text-white">
             Your path to<br />
-            <span style={{
-              background: `linear-gradient(135deg, #bbf7d0, ${PRIMARY_LT})`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>
+            <span style={{ background: "linear-gradient(135deg,#60a5fa,#818cf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
               Band 7+
             </span>
             {" "}starts here
           </h2>
-          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
             Examiner-grade feedback on Writing &amp; Speaking in under 15 seconds.
             Most students improve by 0.5–1.0 bands within 4 weeks.
           </p>
@@ -117,19 +101,13 @@ export default function LoginPage() {
         <div className="relative z-10 space-y-4">
           {FEATURES.map(({ icon: Icon, label, desc }) => (
             <div key={label} className="flex items-start gap-3">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                style={{ background: PRIMARY_DIM }}
-              >
-                <Icon className="w-4 h-4" style={{ color: PRIMARY_LT }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                style={{ background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.2)" }}>
+                <Icon className="w-4 h-4" style={{ color: "#60a5fa" }} />
               </div>
               <div>
-                <p className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.85)" }}>
-                  {label}
-                </p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  {desc}
-                </p>
+                <p className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.8)" }}>{label}</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{desc}</p>
               </div>
             </div>
           ))}
@@ -138,29 +116,21 @@ export default function LoginPage() {
         {/* Testimonials */}
         <div className="relative z-10 space-y-3">
           {TESTIMONIALS.map(({ name, country, score, text }) => (
-            <div
-              key={name}
-              className="rounded-xl p-4"
-              style={{ background: "rgba(255,255,255,0.06)" }}
-            >
+            <div key={name} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
               <div className="flex items-center gap-1.5 mb-1.5">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
                 ))}
-                <span className="ml-auto font-mono font-bold text-sm" style={{ color: PRIMARY_LT }}>
+                <span className="ml-auto font-mono font-bold text-sm" style={{ color: "#60a5fa" }}>
                   Band {score}
                 </span>
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
                 &ldquo;{text}&rdquo;
               </p>
               <div className="flex items-center gap-2 mt-1.5">
-                <p className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  — {name}
-                </p>
-                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  {country}
-                </p>
+                <p className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.3)" }}>— {name}</p>
+                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>{country}</p>
               </div>
             </div>
           ))}
@@ -173,28 +143,27 @@ export default function LoginPage() {
 
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-8 lg:hidden">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: PRIMARY, boxShadow: `0 4px 12px rgba(220,38,38,0.4)` }}
-            >
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg,#3b82f6,#2563eb)", boxShadow: "0 4px 12px rgba(59,130,246,0.35)" }}>
               <GraduationCap className="w-4 h-4 text-white" />
             </div>
-            <p className="font-bold text-base">IELTS Sensei</p>
+            <p className="font-bold text-base text-white">IELTS Sensei</p>
           </div>
 
-          {/* Heading */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h1 className="text-2xl font-bold tracking-tight text-white">Welcome back</h1>
+            <p className="text-sm mt-1" style={{ color: "#475569" }}>
               Sign in to continue your preparation
             </p>
           </div>
 
           {/* Google */}
-          <Button
-            variant="outline"
-            className="w-full gap-2.5 h-11 text-sm font-medium mb-6"
+          <button
             onClick={handleGoogle}
+            className="w-full h-11 flex items-center justify-center gap-2.5 rounded-lg text-sm font-medium mb-6 cursor-pointer"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", transition: "background 0.15s, border-color 0.15s" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.16)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.04)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.1)"; }}
           >
             <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -203,44 +172,39 @@ export default function LoginPage() {
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
             Continue with Google
-          </Button>
+          </button>
 
           {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
+              <span className="w-full" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }} />
             </div>
             <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
-              <span className="px-3 text-muted-foreground bg-[#f9fafb]">
-                or sign in with email
-              </span>
+              <span className="px-3" style={{ background: "#080d18", color: "#1e3a5f" }}>or sign in with email</span>
             </div>
           </div>
 
-          {/* Email/password form */}
+          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
+              <Label htmlFor="email" className="text-sm font-medium" style={{ color: "#64748b" }}>Email address</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
                 autoFocus
                 className="h-11"
+                style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)", color: "#f1f5f9" }}
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-medium hover:underline transition-colors"
-                  style={{ color: PRIMARY }}
-                >
+                <Label htmlFor="password" className="text-sm font-medium" style={{ color: "#64748b" }}>Password</Label>
+                <Link href="/forgot-password" className="text-xs font-medium hover:underline" style={{ color: "#3b82f6" }}>
                   Forgot password?
                 </Link>
               </div>
@@ -248,48 +212,36 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 className="h-11"
+                style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)", color: "#f1f5f9" }}
               />
             </div>
 
-            <Button
+            <button
               type="submit"
-              className="w-full h-11 gap-2 text-sm font-semibold mt-2 text-white"
               disabled={loading}
-              style={{
-                background: "#16a34a",
-                boxShadow: `0 4px 0 #15803d, 0 6px 16px rgba(220,38,38,0.35)`,
-              }}
+              className="w-full h-11 flex items-center justify-center gap-2 text-sm font-semibold mt-2 rounded-lg cursor-pointer text-white"
+              style={{ background: loading ? "#1e3a5f" : "#3b82f6", boxShadow: "0 6px 20px rgba(59,130,246,0.3)", border: "none", transition: "background 0.15s, box-shadow 0.15s", opacity: loading ? 0.7 : 1 }}
             >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <>Sign in <ArrowRight className="w-4 h-4" /></>
-              )}
-            </Button>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><span>Sign in</span><ArrowRight className="w-4 h-4" /></>}
+            </button>
           </form>
 
-          {/* Footer */}
           <div className="mt-6 space-y-4">
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm" style={{ color: "#334155" }}>
               No account?{" "}
-              <Link
-                href="/signup"
-                className="font-semibold hover:underline transition-colors"
-                style={{ color: PRIMARY }}
-              >
+              <Link href="/signup" className="font-semibold hover:underline" style={{ color: "#60a5fa" }}>
                 Create one free
               </Link>
             </p>
 
-            {/* Trust badges */}
             <div className="flex items-center justify-center gap-4 pt-2 flex-wrap">
-              {["Free to start", "Scores in 15 sec", "4 IELTS criteria"].map((badge) => (
-                <div key={badge} className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <CheckCircle2 className="w-3 h-3 text-red-500" />
+              {["Free to start", "Scores in 15 sec", "4 IELTS criteria"].map(badge => (
+                <div key={badge} className="flex items-center gap-1 text-[11px]" style={{ color: "#1e3a5f" }}>
+                  <CheckCircle2 className="w-3 h-3" style={{ color: "#1e3a5f" }} />
                   {badge}
                 </div>
               ))}
