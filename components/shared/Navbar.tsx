@@ -42,11 +42,13 @@ export function Sidebar() {
   const { isAdmin, isEditor }         = useUserRole();
   const { isTestActive }              = useTestMode();
 
-  if (isTestActive) return null;
-
+  // ⚠️ All hooks must run before any conditional return (Rules of Hooks)
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? null));
   }, [supabase]);
+
+  // Hide sidebar during active test — but only AFTER all hooks have been called
+  if (isTestActive) return null;
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -164,7 +166,7 @@ export function Sidebar() {
           </div>
           <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
             <p style={{ fontSize: "12px", fontWeight: 600, color: "#1a1310", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {userEmail ?? "Loading…"}
+              {userEmail ?? "My Account"}
             </p>
             <p style={{ fontSize: "10px", color: isAdmin ? BRAND : isEditor ? "#f59e0b" : "#999", margin: 0, fontWeight: 500 }}>
               {isAdmin ? "Admin" : isEditor ? "Editor" : "Student"}
