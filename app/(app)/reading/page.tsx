@@ -43,16 +43,20 @@ function formatTime(secs: number) {
 }
 
 function bandLabel(band: number) {
-  if (band >= 9) return "Expert";
+  if (band >= 9)   return "Expert";
   if (band >= 8.5) return "Very Good+";
-  if (band >= 8) return "Very Good";
+  if (band >= 8)   return "Very Good";
   if (band >= 7.5) return "Good+";
-  if (band >= 7) return "Good";
+  if (band >= 7)   return "Good";
   if (band >= 6.5) return "Competent+";
-  if (band >= 6) return "Competent";
+  if (band >= 6)   return "Competent";
   if (band >= 5.5) return "Modest+";
-  if (band >= 5) return "Modest";
-  return "Limited";
+  if (band >= 5)   return "Modest";
+  if (band >= 4)   return "Limited";
+  if (band >= 3)   return "Extremely Limited";
+  if (band >= 2)   return "Intermittent";
+  if (band >= 1)   return "Non-user";
+  return "Did not attempt";
 }
 
 // Question range per passage

@@ -702,7 +702,10 @@ export default function ListeningPage() {
                   : overallBand >= 7 ? "Good — above average"
                   : overallBand >= 6 ? "Competent — some errors"
                   : overallBand >= 5 ? "Modest — notable difficulties"
-                  : "Below threshold — keep practising"}
+                  : overallBand >= 4 ? "Limited — frequent breakdowns"
+                  : overallBand >= 3 ? "Extremely Limited — very basic comprehension"
+                  : overallBand >= 2 ? "Intermittent — only isolated words understood"
+                  : "Non-user — no effective listening"}
               </p>
             </div>
           </div>
@@ -961,7 +964,7 @@ export default function ListeningPage() {
               <p className="text-sm font-semibold mb-1" style={{ color:"#64748b" }}>{section.label} — {section.context}</p>
               <p className="text-3xl font-black text-white mb-0.5">Band {band}</p>
               <p className="text-sm" style={{ color: bc }}>
-                {band >= 8 ? "Excellent" : band >= 7 ? "Good — above average" : band >= 6 ? "Competent" : band >= 5 ? "Modest" : "Below threshold"}
+                {band >= 8 ? "Excellent" : band >= 7 ? "Good — above average" : band >= 6 ? "Competent" : band >= 5 ? "Modest" : band >= 4 ? "Limited" : band >= 3 ? "Extremely Limited" : band >= 2 ? "Intermittent" : "Non-user"}
               </p>
               <div className="flex items-center gap-3 mt-3">
                 <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background:`${bc}18`, color:bc, border:`1px solid ${bc}35` }}>

@@ -7,6 +7,14 @@
 // Forward import — reading-test-sets.ts uses `import type` from this file
 // so there is no circular runtime dependency.
 import { testSet2Passages, testSet3Passages } from "./reading-test-sets";
+import {
+  testSet4Passages, testSet5Passages, testSet6Passages,
+  testSet7Passages, testSet8Passages,
+} from "./reading-test-sets-4-8";
+import {
+  testSet9Passages, testSet10Passages, testSet11Passages,
+  testSet12Passages, testSet13Passages,
+} from "./reading-test-sets-9-13";
 
 export type QuestionType =
   | "tfng"                // True / False / Not Given
@@ -592,7 +600,7 @@ export const READING_PASSAGES: ReadingPassage[] = [passage1, passage2, passage3]
 export const TOTAL_QUESTIONS = 40;
 export const EXAM_DURATION_SECONDS = 60 * 60; // 60 minutes
 
-/** Map raw score (0–40) to IELTS band — Cambridge official conversion table */
+/** Map raw score (0–40) to IELTS band — Cambridge official Academic Reading conversion table */
 export function rawScoreToBand(correct: number): number {
   if (correct >= 39) return 9.0;
   if (correct >= 37) return 8.5;
@@ -605,7 +613,11 @@ export function rawScoreToBand(correct: number): number {
   if (correct >= 15) return 5.0;
   if (correct >= 12) return 4.5;
   if (correct >= 8)  return 4.0;
-  return 3.5;
+  if (correct >= 6)  return 3.5;
+  if (correct >= 4)  return 3.0;
+  if (correct >= 2)  return 2.5;
+  if (correct >= 1)  return 2.0;
+  return 0;
 }
 
 /** Normalise a student text answer for lenient comparison */
@@ -646,4 +658,14 @@ export const READING_TEST_SETS: ReadingPassage[][] = [
   READING_PASSAGES,
   testSet2Passages,
   testSet3Passages,
+  testSet4Passages,
+  testSet5Passages,
+  testSet6Passages,
+  testSet7Passages,
+  testSet8Passages,
+  testSet9Passages,
+  testSet10Passages,
+  testSet11Passages,
+  testSet12Passages,
+  testSet13Passages,
 ];
