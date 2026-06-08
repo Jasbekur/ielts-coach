@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { generateMetadata as gm } from "@/lib/metadata";
 import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
+import Breadcrumb from "@/components/shared/Breadcrumb";
+import { BreadcrumbSchema } from "@/components/shared/StructuredData";
 
 export const metadata: Metadata = {
   title: "IELTS Blog — Free Tips & Strategies",
@@ -34,6 +36,11 @@ export default function BlogPage({ searchParams }: { searchParams: { tag?: strin
   const allTags = Array.from(new Set(allPosts.flatMap((p) => p.tags))).sort();
 
   return (
+    <>
+      <BreadcrumbSchema items={[
+        { name: "Home", url: "https://ieltssensei.uz" },
+        { name: "Blog", url: "https://ieltssensei.uz/blog" },
+      ]} />
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="border-b border-gray-100 px-4 py-4">
@@ -46,6 +53,13 @@ export default function BlogPage({ searchParams }: { searchParams: { tag?: strin
       </nav>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Blog", href: "/blog" },
+          ]}
+          className="mb-6"
+        />
         <header className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">IELTS Blog</h1>
           <p className="text-gray-500 text-lg">Expert guides to help you reach your target band score.</p>
@@ -136,5 +150,6 @@ export default function BlogPage({ searchParams }: { searchParams: { tag?: strin
         </div>
       </div>
     </div>
+    </>
   );
 }

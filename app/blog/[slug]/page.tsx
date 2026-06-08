@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { getAllPosts, getPostBySlug, getRelatedPosts, renderMarkdown } from "@/lib/blog";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/shared/StructuredData";
+import Breadcrumb from "@/components/shared/Breadcrumb";
 import { Calendar, Clock, Tag, ArrowLeft, ArrowRight } from "lucide-react";
 
 const BASE_URL = "https://ieltssensei.uz";
@@ -231,6 +232,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </nav>
 
         <article className="max-w-3xl mx-auto px-4 py-12">
+          {/* Breadcrumb */}
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Blog", href: "/blog" },
+              { label: post.title, href: `/blog/${post.slug}` },
+            ]}
+            className="mb-6"
+          />
+
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-4">
             {post.tags.map((tag) => (
@@ -341,6 +352,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
           </section>
         )}
+      {/* Footer */}
+      <footer className="border-t border-gray-100 mt-8 py-8 px-4">
+        <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm text-gray-400">
+          <span>© {new Date().getFullYear()} <Link href="/" className="text-red-600 hover:underline">IELTS Sensei</Link></span>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/blog"        className="hover:text-gray-700 transition-colors">Blog</Link>
+            <Link href="/writing"     className="hover:text-gray-700 transition-colors">Writing</Link>
+            <Link href="/speaking"    className="hover:text-gray-700 transition-colors">Speaking</Link>
+            <Link href="/pricing"     className="hover:text-gray-700 transition-colors">Pricing</Link>
+            <a    href="/sitemap.xml" className="hover:text-gray-700 transition-colors">Sitemap</a>
+          </div>
+        </div>
+      </footer>
       </div>
     </>
   );

@@ -13,6 +13,7 @@ import { CorrectionsView } from "@/components/writing/CorrectionsView";
 import { BandRewrite } from "@/components/writing/BandRewrite";
 import { WritingResult } from "@/types/ielts";
 import { Loader2, FileText, RotateCcw, RefreshCw, Timer, ChevronDown, ChevronUp, Shuffle, ImagePlus, X, BarChart3 } from "lucide-react";
+import Breadcrumb from "@/components/shared/Breadcrumb";
 import { wordCount } from "@/lib/utils/word-count";
 import { TASK1_PRACTICE } from "@/lib/data/task1-practice";
 import { useLocalDraft } from "@/hooks/useLocalDraft";
@@ -492,11 +493,13 @@ export default function WritingPage() {
     <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "28px 32px 48px" }}>
     <div style={{ maxWidth: "860px", margin: "0 auto" }}>
 
-    {/* Back button */}
+    {/* Breadcrumb */}
     <div style={{ marginBottom: "16px" }}>
-      <a href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#64748b", fontSize: "13.5px", fontWeight: 500, textDecoration: "none" }}>
-        ← Dashboard
-      </a>
+      <Breadcrumb items={[
+        { label: "Home",             href: "/" },
+        { label: "Dashboard",        href: "/dashboard" },
+        { label: "Writing Practice", href: "/writing" },
+      ]} />
     </div>
 
     <LimitBanner />
