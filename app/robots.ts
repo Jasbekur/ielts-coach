@@ -5,87 +5,25 @@ const BASE_URL = "https://ieltssensei.uz";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // ── All crawlers ───────────────────────────────────────────────────────
+      // All search engine crawlers
       {
         userAgent: "*",
-        allow: [
-          "/",
-          "/blog",
-          "/blog/",
-          "/mock-test",
-          "/writing",
-          "/speaking",
-          "/reading",
-          "/listening",
-          "/pricing",
-          "/demo",
-          "/about",
-          "/contact",
-          "/signup",
-          "/login",
-        ],
-        disallow: [
-          "/admin",
-          "/admin/",
-          "/api/",
-          "/dashboard",
-          "/dashboard/",
-          "/history",
-          "/dev",
-          "/_next/",
-          "/forgot-password",
-          "/reset-password",
-        ],
+        allow: "/",
+        disallow: ["/api/", "/dashboard/", "/admin/", "/_next/"],
       },
-      // ── Googlebot — faster crawl, allow JS assets ─────────────────────────
+      // Googlebot
       {
         userAgent: "Googlebot",
         allow: "/",
-        disallow: [
-          "/admin/",
-          "/api/",
-          "/dashboard/",
-          "/history",
-          "/dev",
-        ],
-        crawlDelay: 1,
+        disallow: ["/api/", "/dashboard/", "/admin/", "/_next/"],
       },
-      // ── Bingbot ───────────────────────────────────────────────────────────
+      // Bingbot
       {
         userAgent: "Bingbot",
         allow: "/",
-        disallow: [
-          "/admin/",
-          "/api/",
-          "/dashboard/",
-          "/history",
-          "/dev",
-        ],
-        crawlDelay: 2,
-      },
-      // ── Block AI training crawlers (opt-out) ──────────────────────────────
-      {
-        userAgent: "GPTBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "anthropic-ai",
-        disallow: "/",
-      },
-      {
-        userAgent: "Claude-Web",
-        disallow: "/",
-      },
-      {
-        userAgent: "CCBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "Google-Extended",
-        disallow: "/",
+        disallow: ["/api/", "/dashboard/", "/admin/", "/_next/"],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
   };
 }
