@@ -112,10 +112,7 @@ export default function UzbekHomePage() {
             { href: "/reading",   emoji: "📖", title: "O'qish",    desc: "Academic va General. 10 000+ savol, vaqt cheklovli rejim." },
             { href: "/listening", emoji: "🎧", title: "Eshitish",  desc: "Cambridge formati. 4 bo'lim, 40 savol, bir marta audio." },
           ].map(({ href, emoji, title, desc }) => (
-            <Link key={href} href={href} style={{ display: "block", border: "1px solid #e2e8f0", borderRadius: "1rem", padding: "1.5rem", textDecoration: "none", color: "inherit", transition: "border-color 0.2s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#dc2626")}
-              onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
-            >
+            <Link key={href} href={href} style={{ display: "block", border: "1px solid #e2e8f0", borderRadius: "1rem", padding: "1.5rem", textDecoration: "none", color: "inherit" }}>
               <div style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>{emoji}</div>
               <div style={{ fontWeight: 700, fontSize: "1.125rem", marginBottom: "0.5rem" }}>{title}</div>
               <div style={{ fontSize: "0.875rem", color: "#64748b", lineHeight: 1.6 }}>{desc}</div>
