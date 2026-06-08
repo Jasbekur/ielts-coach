@@ -15,7 +15,7 @@ export function OrganizationSchema() {
           url: BASE_URL,
           logo: `${BASE_URL}/logo.png`,
           sameAs: [],
-          contactPoint: { "@type": "ContactPoint", contactType: "customer support", availableLanguage: ["English", "Uzbek"] },
+          contactPoint: { "@type": "ContactPoint", telephone: "+998881238262", contactType: "customer support", availableLanguage: ["English", "Uzbek"] },
           description: "AI-powered IELTS preparation platform. Get examiner-grade band scores for Writing and Speaking in under 15 seconds.",
         }),
       }}
