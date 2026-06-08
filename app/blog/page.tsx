@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { generateMetadata as gm } from "@/lib/metadata";
@@ -81,12 +82,14 @@ export default function BlogPage({ searchParams }: { searchParams: { tag?: strin
                 className="group block border border-gray-100 rounded-2xl overflow-hidden hover:border-red-200 hover:shadow-md transition-all"
               >
                 {post.image && (
-                  <div className="h-48 overflow-hidden bg-gray-100">
-                    <img
+                  <div className="h-48 relative overflow-hidden bg-gray-100">
+                    <Image
                       src={post.image}
                       alt={post.image_alt || post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
                       loading="lazy"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
                 )}

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
@@ -270,14 +271,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
           </div>
 
-          {/* Hero image */}
+          {/* Hero image — LCP element, load with priority */}
           {post.image && (
-            <div className="mb-8 rounded-xl overflow-hidden">
-              <img
+            <div className="mb-8 rounded-xl overflow-hidden relative h-64 sm:h-80">
+              <Image
                 src={post.image}
                 alt={post.image_alt || post.title}
-                className="w-full h-64 sm:h-80 object-cover"
-                loading="eager"
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 768px"
               />
             </div>
           )}
