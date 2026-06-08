@@ -84,7 +84,7 @@ export const metadata: Metadata = {
     canonical: BASE_URL,
     languages: {
       en:          BASE_URL,
-      "uz-UZ":     BASE_URL,
+      "uz-UZ":     `${BASE_URL}/uz`,
       "x-default": BASE_URL,
     },
   },
@@ -164,7 +164,7 @@ export default function RootLayout({
       <head>
         {/* Hreflang — explicit <link> tags for Bing/Yandex (mirrors metadata.alternates) */}
         <link rel="alternate" hrefLang="en"          href={BASE_URL} />
-        <link rel="alternate" hrefLang="uz-UZ"       href={BASE_URL} />
+        <link rel="alternate" hrefLang="uz-UZ"       href={`${BASE_URL}/uz`} />
         <link rel="alternate" hrefLang="x-default"   href={BASE_URL} />
       </head>
       <body className="font-sans antialiased bg-background text-foreground">
