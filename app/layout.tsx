@@ -149,7 +149,7 @@ export const metadata: Metadata = {
 
   // ── GSC verification (paste token when ready) ───────────────────────────────
   verification: {
-    google: "", // ← paste Google Search Console verification token here
+    google: "SPRU7Yhn3AQgpd7K-2AVz4Z9zwD1jYaewpsA5NBpeU0",
   },
 };
 
