@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
-import { getAllPosts } from "@/lib/blog";
+import fs from "fs";
+import path from "path";
 
 const BASE_URL = "https://ieltssensei.uz";
 
@@ -102,15 +103,26 @@ const STATIC_PAGES: MetadataRoute.Sitemap = [
 ];
 
 // ── Source 1: filesystem blog posts (public/blog/*.md) ───────────────────────
-// Always available — these are committed markdown files.
+// Read slugs directly with fs — avoids importing the heavy lib/blog chain
+// (gray-matter, remark, rehype-*, reading-time) which errors in sitemap context.
 function filesystemBlogRoutes(): MetadataRoute.Sitemap {
   try {
-    return getAllPosts().map((post) => ({
-      url: `${BASE_URL}/blog/${post.slug}`,
-      lastModified: new Date(post.updated_at || post.published_at),
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    }));
+    const dir = path.join(process.cwd(), "public", "blog");
+    if (!fs.existsSync(dir)) return [];
+    return fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".md"))
+      .map((f) => {
+        const slug = f.replace(/\.md$/, "");
+        const filePath = path.join(dir, f);
+        const stat = fs.statSync(filePath);
+        return {
+          url: `${BASE_URL}/blog/${slug}`,
+          lastModified: stat.mtime,
+          changeFrequency: "monthly" as const,
+          priority: 0.8,
+        };
+      });
   } catch {
     return [];
   }
